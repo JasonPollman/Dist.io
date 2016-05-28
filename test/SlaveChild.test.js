@@ -2,10 +2,32 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 'use strict';
 
+process.argv.push('--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias');
 const slave = require('./data/simple-slave-b');
 const expect = require('chai').expect;
 
-describe('SlaveChild Class', function () {
+describe('SlaveChildProcess Class', function () {
+  describe('SlaveChildProcess#id', function () {
+    it('Should return the slave\'s id', () => {
+      expect(slave.id).to.equal(10009);
+    });
+  });
+
+  describe('SlaveChildProcess#alias', function () {
+    it('Should return the slave\'s alias', () => {
+      expect(slave.alias).to.equal('test-alias');
+    });
+  });
+
+  describe('SlaveChildProcess#task', function () {
+    it('Should throw if the listener already exists', (done) => {
+      expect(slave.task('foo', () => {})).to.equal(slave);
+      expect(slave.task.bind(slave, 'foo', () => {})).to.throw(TypeError);
+      expect(slave.task.bind(slave, 'foo')).to.throw(TypeError);
+      done();
+    });
+  });
+
   it('Should respond to commands', function (done) {
     this.timeout(5500);
     this.slow(5000);

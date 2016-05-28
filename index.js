@@ -1,5 +1,15 @@
+/**
+ * @file
+ * Exports the dist.io module.
+ * @copyright © 2016 Jason James Pollman
+ */
+
 'use strict';
 /* eslint-disable global-require */
+
+/**
+ * @module DistIO
+ */
 
 /**
  * A simple exportable for the Dist.io module.
@@ -25,4 +35,8 @@ class DistIO {
   }
 }
 
+/**
+ * A singleton instance of the DistIO class.
+ * @type {DistIO}
+ */
 module.exports = new DistIO();
