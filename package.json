@@ -1,7 +1,7 @@
 {
   "name": "dist.io",
   "version": "0.0.0",
-  "description": "Distrubuted programming paradigms for forked node processes",
+  "description": "Distributed programming paradigms for forking node processes",
   "main": "index.js",
   "scripts": {
     "test": "istanbul cover _mocha"
