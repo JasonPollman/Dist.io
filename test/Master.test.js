@@ -93,8 +93,8 @@ describe('Master Class', function () {
 
   describe('Master#createSlave', function () {
     it('Should catch uncaught slave exceptions', function (done) {
-      this.timeout(5000);
-      this.slow(4000);
+      this.timeout(6000);
+      this.slow(5000);
 
       Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
         onUncaughtException: (e) => {
@@ -196,6 +196,7 @@ describe('Master Class', function () {
   });
 
   describe('Master#broadcast.to', function () {
+    this.slow(1000);
     it('Should reject when the command is not a string', function (done) {
       const slaves = Master.createSlaves(5, path.join(__dirname, 'data', 'simple-slave-c.js'), { group: 'test' });
 
@@ -216,7 +217,7 @@ describe('Master Class', function () {
 
     it('Broadcast messages to the given slave group', function (done) {
       this.timeout(3000);
-      this.slow(1000);
+      this.slow(2000);
       let totalDone = 0;
 
       const slaves = Master.createSlaves(5, path.join(__dirname, 'data', 'simple-slave-c.js'), { group: 'c-type' });

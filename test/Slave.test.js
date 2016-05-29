@@ -124,6 +124,7 @@ describe('Slave Class', function () {
   it('Should handle request timeouts', function (done) {
     this.timeout(3000);
     this.slow(2500);
+    let completed = 0;
 
     let location = path.join(__dirname, 'data', 'simple-slave-d.js');
     let slave = new Slave(location);
@@ -132,7 +133,7 @@ describe('Slave Class', function () {
         expect(res).to.be.an.instanceof(TimeoutResponse);
         expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 1000ms./);
         expect(res.error.name).to.equal('ResponseError: Error');
-        done();
+        if (++completed === 2) done();
       })
       .catch(e => {
         done(e);
@@ -145,7 +146,7 @@ describe('Slave Class', function () {
         expect(res).to.be.an.instanceof(Response);
         expect(res.error.message).to.match(/Slave #\d+ does not listen to task "1234"/);
         expect(res.error.name).to.equal('ResponseError: ReferenceError');
-        done();
+        if (++completed === 2) done();
       })
       .catch(e => {
         done(e);
@@ -210,6 +211,7 @@ describe('Slave Class', function () {
   });
 
   describe('Slave#ack', function () {
+    this.slow(2000);
     it('Should send an acknowledgement message', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
@@ -233,6 +235,7 @@ describe('Slave Class', function () {
   });
 
   describe('Slave#noop', function () {
+    this.slow(2000);
     it('Should send a noop message', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
