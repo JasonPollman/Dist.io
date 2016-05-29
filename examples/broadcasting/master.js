@@ -1,21 +1,38 @@
 /**
  * @file
- * A simple example of piping a response to another slave.
- * slave-foo returns a list of boys and girls.
- * slave-bar creates "love" pairs from the list provided from slave-foo.
+ * A simple example of message broadcasting.
+ * Broadcasting sends a command to multiple slaves and wait for all responses
+ * to be recieved before resolving.
+ *
+ * This master sends an ACK message (acknowledgement) message to all the slaves.
+ * The master.COMMANDS object contains various "common" commands that can be used.
+ *
+ * The acknowledgement just sends back an object with some info about the slave,
+ * like its id and uptime.
  */
+
+/* eslint-disable no-console */
 
 'use strict';
 const master = require('../../').Master;
 const path = require('path');
 const slaveLocation = path.join(__dirname, 'slave.js');
+const tell = master.tell;
 
-// Create slave foo
-master.createSlaves(10, slaveLocation);
+// Create 10 slaves...
+// Send an acknowledgement message to all the slaves...
+const broadcast = master.broadcast;
+master.create.slaves(10, slaveLocation)
+  .then(slaves => broadcast(master.COMMANDS.ACK).to(...slaves))
+  .then(res => res.each(r => console.log(r.value.message)))
+  // Shortcut to clase all slaves.
+  .then(() => master.close(...master.SLAVES.ALL))
+  .catch(e => console.log(e));
 
-master.broadcast(master.COMMANDS.ACK).to.all()
-  .then(res => {
-    res.each(r => console.log(r.value));
-  })
-  .then(master.close(...master.SLAVES.ALL))
-  .catch(e => { throw e; });
+// Alternative syntax...
+// Create 10 more slaves...
+master.create.slaves(10, slaveLocation)
+  .then(slaves => tell.slaves(...slaves).to(master.COMMANDS.ACK))
+  .then(res => res.each(r => console.log(r.value.message)))
+  .then(() => master.close(...master.SLAVES.ALL))
+  .catch(e => console.log(e));

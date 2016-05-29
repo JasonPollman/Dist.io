@@ -217,7 +217,13 @@ describe('Slave Class', function () {
       slave.ack()
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
-          expect(res.value).to.match(/^\d+$/);
+          expect(res.value).to.be.an('object');
+          expect(res.value.from).to.be.an('number');
+          expect(res.value.sent).to.be.an('number');
+          expect(res.value.responsed).to.be.an('number');
+          expect(res.value.started).to.be.an('number');
+          expect(res.value.uptime).to.be.an('number');
+          expect(res.value.message).to.be.an('string');
           done();
         })
         .catch(e => {
