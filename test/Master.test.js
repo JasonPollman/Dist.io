@@ -7,7 +7,6 @@ const Slave = require('../lib/Slave');
 const path = require('path');
 const expect = require('chai').expect;
 const Response = require('../lib/Response');
-const ResponseArray = require('../lib/ResponseArray');
 const ResponseError = require('../lib/ResponseError');
 
 describe('Master Class', function () {
@@ -407,13 +406,15 @@ describe('Master Class', function () {
         });
 
       Master.broadcast('echo').to('non-existent')
-        .then(responses => {
-          expect(responses).to.be.an.instanceof(ResponseArray);
-          expect(responses.length).to.equal(0);
-          if (++totalDone === TOTAL) done();
+        .then(() => {
+          done(new Error('Expected to throw'));
         })
         .catch(e => {
-          done(e);
+          expect(e).to.be.an.instanceof(TypeError);
+          expect(e.message).to.equal(
+            'Expected an instanceof Slave, slave id, group id, or slave alias, but got "non-existent".'
+          );
+          if (++totalDone === TOTAL) done();
         });
     });
   });

@@ -31,11 +31,11 @@ master.create.slave(slaveJS)
 
 master.create.slave(slaveJS)
   .then(slave => { slaveB = slave; })
-  .then(() => tell.slave(slaveB).to('say hello'))
-  .then(() => tell.slave(slaveB).to('say goodbye'))
+  .then(() => tell(slaveB).to('say hello'))
+  .then(() => tell(slaveB).to('say goodbye'))
   .then(() => slaveB.exit())
   // This will fail since now the slave has been closed.
-  .then(() => tell.slave(slaveB).to('say goodbye'))
+  .then(() => tell(slaveB).to('say goodbye'))
   .catch(e => console.log(e));
 
 // Create multiple slaves...

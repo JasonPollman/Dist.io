@@ -17,14 +17,15 @@ const dbSlave = master.createSlave(dbSlaveJS);
 // Create a new pipeline...
 const authenticateAndGetUserInfo = master.create.pipeline()
   // Authenticate the user token
-  .do('authenticate token').with.slave(authSlave)
+  .do('authenticate token').with(authSlave)
   // Intercept the response, and end the pipeline chain
   // if the token is invalid.
   .intercept((res, end) => {
     if (res.value === false) end('bad token');
-  })
+  });
   // Get the user's info for the token.
-  .do('get user info for token with id').with.slave(dbSlave)
+
+authenticateAndGetUserInfo.do('get user info for token with id').with(dbSlave)
   // Intercept the value and end the pipeline chain
   // if the user information dont exist.
   .intercept((res, end) => {
@@ -56,9 +57,9 @@ function onPipelineComplete(res) {
 // Execute the pipeline 2000 times.
 for (let i = 0; i < 1000; i++) {
   // Execute the pipeline against token-1...
-  authenticateAndGetUserInfo.execute.with('token-1')
+  authenticateAndGetUserInfo.execute('token-1')
     .then(onPipelineComplete)
-    .then(() => authenticateAndGetUserInfo.execute.with('token-2'))
+    .then(() => authenticateAndGetUserInfo.execute('token-2'))
     // Execute the pipeline against token-2...
     .then(onPipelineComplete)
     .catch(e => console.log(e));

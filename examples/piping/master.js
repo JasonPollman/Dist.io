@@ -30,22 +30,22 @@ master.create.slave(fooLocation)
     foo = slave;
   })
   // Tell slave foo to get the list of names.
-  .then(() => tell.slave(foo).to('get names'))
+  .then(() => tell(foo).to('get names'))
   // Pipe the response value to bar's "make pairs" task.
   // Pipe always returns an array, since we can pipe to multiple slaves.
   .then(res => res.pipe('make pairs').to(bar))
   // Log results...
-  .then(res => res[0].value.forEach(pair => {
+  .then(res => res.value.forEach(pair => {
     console.log(`${pair.girl} loves ${pair.boy}`);
   }))
   // Tell foo to add a new girl to the girl's list.
-  .then(() => tell.slave(foo).to('add name', { type: 'girl', name: 'Ashley' }))
+  .then(() => tell(foo).to('add name', { type: 'girl', name: 'Ashley' }))
   // Pipe the response to bar's "make pairs" task.
   .then(res => res.pipe('make pairs').to(bar))
   // Log results...
   .then(res => {
     console.log('\n');
-    res[0].value.forEach(pair => {
+    res.value.forEach(pair => {
       console.log(`${pair.girl} loves ${pair.boy}`);
     });
   })

@@ -3,7 +3,7 @@
 **Distributed programming paradigms for forking node processes.**    
 An abstraction around distributed, message passing programming and their complex patterns. Makes inter-process communication easy!
 
-> Because forks are better than chopsticks.
+> Because forks are easier than chopsticks.
 
 ## Install
 ---

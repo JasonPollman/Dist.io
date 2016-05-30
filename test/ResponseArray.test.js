@@ -13,7 +13,7 @@ describe('ResponseArray Class', function () {
       done(new Error('Should have thrown.'));
     } catch (e) {
       expect(e).to.be.an.instanceof(TypeError);
-      expect(e.message).to.equal('Response arrays only allow Response objects.');
+      expect(e.message).to.equal('Cannot insert non-Response object into ResponseArray!');
     }
 
     try {
@@ -21,7 +21,7 @@ describe('ResponseArray Class', function () {
       done(new Error('Should have thrown.'));
     } catch (e) {
       expect(e).to.be.an.instanceof(TypeError);
-      expect(e.message).to.equal('Response arrays only allow Response objects.');
+      expect(e.message).to.equal('Cannot insert non-Response object into ResponseArray!');
     }
 
     try {
@@ -29,7 +29,7 @@ describe('ResponseArray Class', function () {
       done(new Error('Should have thrown.'));
     } catch (e) {
       expect(e).to.be.an.instanceof(TypeError);
-      expect(e.message).to.equal('Response arrays only allow Response objects.');
+      expect(e.message).to.equal('Cannot insert non-Response object into ResponseArray!');
     }
 
     try {
@@ -37,7 +37,7 @@ describe('ResponseArray Class', function () {
       done(new Error('Should have thrown.'));
     } catch (e) {
       expect(e).to.be.an.instanceof(TypeError);
-      expect(e.message).to.equal('Response arrays only allow Response objects.');
+      expect(e.message).to.equal('Cannot insert non-Response object into ResponseArray!');
     }
 
     let x = new ResponseArray(); // eslint-disable-line
