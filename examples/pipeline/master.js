@@ -51,7 +51,7 @@ function onPipelineComplete(res) {
     console.log('Token authenticated: success!');
     console.log(`User=${user.username}, Password=${user.password}\n`);
   }
-  if (++done === 2000) master.close(...master.SLAVES.ALL);
+  if (++done === 2000) master.close(...master.slaves.ALL);
 }
 
 // Execute the pipeline 2000 times.
