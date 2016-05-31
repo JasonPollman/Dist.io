@@ -18,100 +18,14 @@ const slaves = master.createSlaves(5, slaveJS);
 const workpool = master.create.workpool(slaves);
 
 workpool
-  .do('echo', 'hello world!')
+  .while((i) => i < 20)
+  .do('echo', 'hello world #!')
   .then(res => {
-    console.log(res.value);
+    console.log(res.sortBy('sent').values);
+  })
+  .then(() => {
+    master.close(master.slaves.all);
   })
   .catch(e => {
     console.log(e);
   });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-workpool
-  .do('echo', 'hello world!')
-  .then(res => {
-    console.log(res.value);
-  })
-  .catch(e => {
-    console.log(e);
-  });
-
-  workpool
-    .do('echo', 'hello world!')
-    .then(res => {
-      console.log(res.value);
-    })
-    .catch(e => {
-      console.log(e);
-    });
-
-    workpool
-      .do('echo', 'hello world!')
-      .then(res => {
-        console.log(res.value);
-      })
-      .catch(e => {
-        console.log(e);
-      });
-
-      workpool
-        .do('echo', 'hello world!')
-        .then(res => {
-          console.log(res.value);
-        })
-        .catch(e => {
-          console.log(e);
-        });

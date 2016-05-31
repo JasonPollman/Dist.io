@@ -26,7 +26,7 @@ master.create.slaves(10, slaveLocation)
   .then(slaves => broadcast(master.commands.ACK).to(slaves))
   .then(res => res.each(r => console.log(r.value.message)))
   // Shortcut to clase all slaves.
-  .then(() => master.close(master.slaves.ALL))
+  .then(() => master.close(master.slaves.all))
   .catch(e => console.log(e));
 
 // Alternative syntax...
@@ -34,5 +34,5 @@ master.create.slaves(10, slaveLocation)
 master.create.slaves(10, slaveLocation)
   .then(slaves => tell(slaves).to(master.commands.ACK))
   .then(res => res.each(r => console.log(r.value.message)))
-  .then(() => master.close(master.SLAVES.ALL))
+  .then(() => master.close(master.slaves.all))
   .catch(e => console.log(e));

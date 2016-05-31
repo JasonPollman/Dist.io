@@ -13,5 +13,5 @@ slave
   .task('echo', (data, done) => {
     setTimeout(() => {
       done(`${data} from slave ${slave.id}`);
-    }, 1000);
+    }, 100);
   });
