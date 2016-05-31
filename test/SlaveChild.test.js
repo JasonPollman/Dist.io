@@ -2,7 +2,10 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 'use strict';
 
-process.argv.push('--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias');
+process.argv.push(
+  '--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias', '--dist-io-slave-title=slave-child-test'
+);
+
 const slave = require('./data/simple-slave-b');
 const expect = require('chai').expect;
 

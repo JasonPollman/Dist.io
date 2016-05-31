@@ -8,6 +8,7 @@ const path = require('path');
 const expect = require('chai').expect;
 const Response = require('../lib/Response');
 const ResponseError = require('../lib/ResponseError');
+const ResponseArray = require('../lib/ResponseArray');
 const SlaveArray = require('../lib/SlaveArray');
 
 describe('Master Class', function () {
@@ -110,6 +111,10 @@ describe('Master Class', function () {
   });
 
   describe('Master#kill', function () {
+    it('Should handle non-slave arguments', function () {
+      expect(Master.kill.bind(Master, {}, [], () => {}, 'string', 123)).to.not.throw(Error);
+    });
+
     it('Should kill the given slave arguments', function (done) {
       this.slow(1000);
 
@@ -145,6 +150,159 @@ describe('Master Class', function () {
       expect(slaves.length).to.equal(0);
       expect(slaves).to.be.an.instanceof(SlaveArray);
       done();
+    });
+  });
+
+  describe('Master#create.slave', function () {
+    it('Should create (and return) a single slave', function (done) {
+      this.slow(1000);
+
+      const s = Master.create.slave(path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(Slave);
+      expect(s.then).to.be.an.instanceof(Function);
+      expect(s.then(slave => {
+        expect(slave).to.equal(s);
+        s.close((err, status) => {
+          expect(status).to.equal(true);
+          done();
+        });
+      })).to.be.an.instanceof(Promise);
+    });
+  });
+
+  describe('Master#create.slaves', function () {
+    it('Should create (and return) multiple slaves', function (done) {
+      this.slow(1000);
+
+      const s = Master.create.slaves(10, path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(SlaveArray);
+      s.each(slave => {
+        expect(slave).to.be.an.instanceof(Slave);
+      });
+      expect(s.then).to.be.an.instanceof(Function);
+      expect(s.then(slaves => {
+        expect(slaves).to.equal(s);
+        slaves.close(statuses => {
+          expect(statuses).to.eql([true, true, true, true, true, true, true, true, true, true]);
+          done();
+        });
+      })).to.be.an.instanceof(Promise);
+    });
+  });
+
+  describe('Master#tell', function () {
+    it('Should work exactly like Master#broadcast', function (done) {
+      this.slow(1000);
+      const s = Master.create.slave(path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(Slave);
+
+      expect(Master.tell).to.be.a('function');
+      const to = Master.tell(s);
+      expect(to).to.be.an('object');
+
+      const p = to.to('echo', 'data');
+      p.then(res => {
+        expect(res).to.be.an.instanceof(Response);
+        expect(res.value).to.equal('data');
+        expect(res.error).to.equal(null);
+        s.close((err, status) => {
+          expect(status).to.equal(true);
+          done();
+        });
+      })
+      .catch(e => done(e));
+
+      expect(p).to.be.an.instanceof(Promise);
+    });
+
+    it('Should broadcast to multiple slaves (passing SlaveArray)', function (done) {
+      this.slow(500);
+      const s = Master.create.slaves(5, path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(SlaveArray);
+
+      expect(Master.tell).to.be.a('function');
+      const to = Master.tell(s);
+      expect(to).to.be.an('object');
+
+      const p = to.to('echo', 'data');
+      p.then(res => {
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.equal(5);
+        expect(res.values).to.eql(['data', 'data', 'data', 'data', 'data']);
+        expect(res.errors).to.eql([null, null, null, null, null]);
+        s.close(statuses => {
+          expect(statuses).to.eql([true, true, true, true, true]);
+          done();
+        });
+      })
+      .catch(e => done(e));
+      expect(p).to.be.an.instanceof(Promise);
+    });
+
+    it('Should broadcast to multiple slaves (spreading Slave Array)', function (done) {
+      this.slow(500);
+      const s = Master.create.slaves(5, path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(SlaveArray);
+
+      expect(Master.tell).to.be.a('function');
+      const to = Master.tell(...s);
+      expect(to).to.be.an('object');
+
+      const p = to.to('echo', 'data');
+      p.then(res => {
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.equal(5);
+        expect(res.values).to.eql(['data', 'data', 'data', 'data', 'data']);
+        expect(res.errors).to.eql([null, null, null, null, null]);
+        s.close(statuses => {
+          expect(statuses).to.eql([true, true, true, true, true]);
+          done();
+        });
+      })
+      .catch(e => done(e));
+      expect(p).to.be.an.instanceof(Promise);
+    });
+
+    it('Should resolve an empty ResponseArray when no slaves are passed', function (done) {
+      this.slow(500);
+
+      expect(Master.tell).to.be.a('function');
+      const to = Master.tell();
+      expect(to).to.be.an('object');
+
+      const p = to.to('echo', 'data');
+      p.then(res => {
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.equal(0);
+        expect(res.values).to.eql([]);
+        expect(res.errors).to.eql([]);
+        done();
+      })
+      .catch(e => done(e));
+      expect(p).to.be.an.instanceof(Promise);
+    });
+
+    it('Should broadcast to all slaves', function (done) {
+      this.slow(500);
+      const s = Master.createSlaves(2, path.join(__dirname, 'data', 'simple-slave-b.js'));
+
+      expect(Master.tell).to.be.a('function');
+      const to = Master.tell(Master.slaves.all);
+      expect(to).to.be.an('object');
+
+      const p = to.to(Master.commands.ACK);
+      p.then(res => {
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.be.gte(2);
+        res.each(r => {
+          expect(r.value.message).to.match(
+            /Slave acknowledgement from=\d+, received=\d+, responded=\d+, started=\d+, uptime=\d+/
+          );
+        });
+        s.close().then(() => { done(); });
+      })
+      .catch(e => done(e));
+      expect(p).to.be.an.instanceof(Promise);
     });
   });
 
@@ -200,7 +358,12 @@ describe('Master Class', function () {
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
           expect(res.value).to.equal('okay');
-          if (++completed === 3) done();
+          if (++completed === 3) {
+            Master.close('slavey', status => {
+              expect(status).to.equal(true);
+              done();
+            });
+          }
         })
         .catch(e => {
           done(e);
@@ -210,7 +373,12 @@ describe('Master Class', function () {
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
           expect(res.value).to.equal('okay 2');
-          if (++completed === 3) done();
+          if (++completed === 3) {
+            Master.close('slavey', status => {
+              expect(status).to.equal(true);
+              done();
+            });
+          }
         })
         .catch(e => {
           done(e);
@@ -220,7 +388,12 @@ describe('Master Class', function () {
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
           expect(res.value).to.equal('okay 3');
-          if (++completed === 3) done();
+          if (++completed === 3) {
+            Master.close('slavey', status => {
+              expect(status).to.equal(true);
+              done();
+            });
+          }
         })
         .catch(e => {
           done(e);
@@ -233,17 +406,20 @@ describe('Master Class', function () {
       this.timeout(6000);
       this.slow(5000);
 
-      Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
+      const a = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
         onUncaughtException: (e) => {
           expect(e).to.be.an.instanceof(Error);
           expect(e.message).to.equal('uncaught exception');
         },
       });
 
-      Master.createSlave(path.join(__dirname, 'data', 'simple-slave-h.js'), {
+      Master.kill(a);
+
+      const b = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-h.js'), {
         onUncaughtException: (er) => {
           expect(er).to.be.an.instanceof(Error);
           expect(er.message).to.equal('Unknown error');
+          Master.kill(b);
           done();
         },
       });
@@ -334,6 +510,24 @@ describe('Master Class', function () {
 
   describe('Master#broadcast.to', function () {
     this.slow(1000);
+
+    it('Should broadcast messages to all idle slaves using Master#broadcast.to.idle', function (done) {
+      const s = Master.createSlaves(2, path.join(__dirname, 'data', 'simple-slave-b.js'));
+
+      Master.broadcast(Master.commands.ACK).to.idle()
+        .then(res => {
+          expect(res).to.be.an.instanceof(ResponseArray);
+          expect(res.length).to.be.gte(2);
+          res.each(r => {
+            expect(r.value.message).to.match(
+              /Slave acknowledgement from=\d+, received=\d+, responded=\d+, started=\d+, uptime=\d+/
+            );
+          });
+          s.close().then(() => { done(); });
+        })
+        .catch(e => done(e));
+    });
+
     it('Should reject when the command is not a string', function (done) {
       const slaves = Master.createSlaves(5, path.join(__dirname, 'data', 'simple-slave-c.js'), { group: 'test' });
 
@@ -352,7 +546,7 @@ describe('Master Class', function () {
         });
     });
 
-    it('Broadcast messages to the given slave group', function (done) {
+    it('Should broadcast messages to the given slave group', function (done) {
       this.timeout(3000);
       this.slow(2000);
       let totalDone = 0;
