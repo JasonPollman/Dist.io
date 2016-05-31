@@ -8,12 +8,60 @@ const path = require('path');
 const expect = require('chai').expect;
 const Response = require('../lib/Response');
 const ResponseError = require('../lib/ResponseError');
+const SlaveArray = require('../lib/SlaveArray');
 
 describe('Master Class', function () {
+  describe('Master#close', function () {
+    it('Should gracefully close the given slave arguments', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      let slaves = Master.createSlaves(
+        10, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing close' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(10);
+
+      Master.close(slaves[0])
+        .then(status => {
+          expect(status).to.equal(true);
+          slaves = Master.slaves.inGroup('testing close');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(9);
+        })
+        .then(() => Master.close(slaves[0]))
+        .then(status => {
+          expect(status).to.equal(true);
+          slaves = Master.slaves.inGroup('testing close');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(8);
+        })
+        .then(() => Master.close(slaves[0], slaves[1]))
+        .then(statuses => {
+          expect(statuses).to.be.an.instanceof(Array);
+          expect(statuses[0]).to.equal(true);
+          expect(statuses[1]).to.equal(true);
+          slaves = Master.slaves.inGroup('testing close');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(6);
+        })
+        .then(() => Master.close(slaves))
+        .then(statuses => {
+          expect(statuses).to.be.an.instanceof(Array);
+          slaves = Master.slaves.inGroup('testing close');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(0);
+          done();
+        })
+        .catch(e => done(e));
+    });
+  });
+
   describe('Master#getSlaveWithId', function () {
     it('Should get the correct slave when passed a slave id', function () {
-      expect(Master.getSlaveWithId(0)).to.equal(null);
-      expect(Master.getSlaveWithId(1)).to.equal(null);
+      expect(Master.getSlaveWithId(Number.MAX_VALUE)).to.equal(null);
+      expect(Master.getSlaveWithId(11111)).to.equal(null);
       expect(Master.getSlaveWithId(-1)).to.equal(null);
       expect(Master.getSlaveWithId(800)).to.equal(null);
       expect(Master.getSlaveWithId('')).to.equal(null);
@@ -22,7 +70,7 @@ describe('Master Class', function () {
       expect(Master.getSlaveWithId({})).to.equal(null);
 
       const slave = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-b.js'));
-      const s = Master.getSlaveWithId(0);
+      const s = Master.getSlaveWithId(slave.id);
 
       expect(s).to.be.an.instanceof(Slave);
       expect(slave).to.equal(s);
