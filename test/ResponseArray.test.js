@@ -5,7 +5,7 @@
 const ResponseArray = require('../lib/ResponseArray');
 const Response = require('../lib/Response');
 const expect = require('chai').expect;
-const master = require('../lib/Master');
+const master = require('../').Master;
 const path = require('path');
 
 describe('ResponseArray Class', function () {

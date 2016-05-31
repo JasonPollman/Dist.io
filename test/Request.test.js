@@ -5,7 +5,7 @@
 const Request = require('../lib/Request');
 const Response = require('../lib/Response');
 const expect = require('chai').expect;
-const Master = require('../lib/Master');
+const Master = require('../').Master;
 const path = require('path');
 
 describe('Request Class', function () {

@@ -6,7 +6,7 @@ const SlaveArray = require('../lib/SlaveArray');
 const path = require('path');
 const Slave = require('../lib/Slave');
 const expect = require('chai').expect;
-const master = require('../lib/Master');
+const master = require('../').Master;
 const ResponseArray = require('../lib/ResponseArray');
 
 describe('SlaveArray Class', function () {

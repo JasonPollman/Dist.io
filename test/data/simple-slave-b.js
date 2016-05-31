@@ -1,5 +1,5 @@
 'use strict';
 
-const slave = require('../../lib/SlaveChildProcess');
+const slave = require('../../').Slave;
 slave.task('echo', (data, done) => { done(data); });
 module.exports = slave;
