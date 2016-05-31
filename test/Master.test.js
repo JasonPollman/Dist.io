@@ -12,7 +12,7 @@ const SlaveArray = require('../lib/SlaveArray');
 
 describe('Master Class', function () {
   describe('Master#close', function () {
-    it('Should gracefully close the given slave arguments', function (done) {
+    it('Should gracefully close the given slave arguments (promises)', function (done) {
       this.timeout(3000);
       this.slow(2000);
 
@@ -55,6 +55,96 @@ describe('Master Class', function () {
           done();
         })
         .catch(e => done(e));
+    });
+
+    it('Should gracefully close the given slave arguments (callbacks)', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      let slaves = Master.createSlaves(
+        11, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing close' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(11);
+
+      slaves[0].close(function (err, status) {
+        expect(err).to.equal(null);
+        expect(status).to.equal(true);
+        slaves = Master.slaves.inGroup('testing close');
+        expect(slaves).to.be.an.instanceof(SlaveArray);
+        expect(slaves.length).to.equal(10);
+
+        Master.close(slaves[0], function (status) { // eslint-disable-line no-shadow
+          expect(status).to.equal(true);
+          slaves = Master.slaves.inGroup('testing close');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(9);
+
+          Master.close(slaves[0], function (status) { // eslint-disable-line no-shadow
+            expect(status).to.equal(true);
+            slaves = Master.slaves.inGroup('testing close');
+            expect(slaves).to.be.an.instanceof(SlaveArray);
+            expect(slaves.length).to.equal(8);
+
+            Master.close(slaves[0], slaves[1], function (statuses) {
+              expect(statuses).to.be.an.instanceof(Array);
+              expect(statuses[0]).to.equal(true);
+              expect(statuses[1]).to.equal(true);
+              slaves = Master.slaves.inGroup('testing close');
+              expect(slaves).to.be.an.instanceof(SlaveArray);
+              expect(slaves.length).to.equal(6);
+
+              Master.close.group('testing close', function (statuses) { // eslint-disable-line no-shadow
+                expect(statuses).to.be.an.instanceof(Array);
+                slaves = Master.slaves.inGroup('testing close');
+                expect(slaves).to.be.an.instanceof(SlaveArray);
+                expect(slaves.length).to.equal(0);
+                done();
+              });
+            });
+          });
+        });
+      });
+    });
+  });
+
+  describe('Master#kill', function () {
+    it('Should kill the given slave arguments', function (done) {
+      this.slow(1000);
+
+      let slaves = Master.createSlaves(
+        10, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing kill' }
+      );
+
+      expect(slaves.length).to.equal(10);
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+
+      slaves[0].kill();
+      slaves = Master.slaves.inGroup('testing kill');
+
+      expect(slaves.length).to.equal(9);
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+
+      Master.kill(slaves[0], slaves[1]);
+      slaves = Master.slaves.inGroup('testing kill');
+
+      expect(slaves.length).to.equal(7);
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+
+      Master.kill.group('testing kill');
+      slaves = Master.slaves.inGroup('testing kill');
+
+      expect(slaves.length).to.equal(0);
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+
+      // Null check...
+      Master.kill.group('testing kill');
+      slaves = Master.slaves.inGroup('testing kill');
+
+      expect(slaves.length).to.equal(0);
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      done();
     });
   });
 
