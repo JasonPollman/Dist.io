@@ -20,15 +20,17 @@ describe('SlaveArray Class', function () {
         expect(e.message).to.equal('Cannot insert non-Slave object into SlaveArray!');
       }
 
+      let slave;
       try {
         const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-        const slave = new Slave(location); // eslint-disable-line
+        slave = new Slave(location); // eslint-disable-line
 
         const s = new SlaveArray(slave, slave, 1); // eslint-disable-line
         done(new Error('Expected to throw'));
       } catch (e) {
         expect(e).to.be.an.instanceof(TypeError);
         expect(e.message).to.equal('Cannot insert non-Slave object into SlaveArray!');
+        slave.kill();
       }
     });
   });
@@ -160,5 +162,10 @@ describe('SlaveArray Class', function () {
       expect(slaves.then(new Promise(() => new Promise(() => {})))).to.be.an.instanceof(Promise);
       done();
     });
+  });
+
+  after((done) => {
+    Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
+    done();
   });
 });

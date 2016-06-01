@@ -251,4 +251,9 @@ describe('Slave Class', function () {
         });
     });
   });
+
+  after((done) => {
+    Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
+    done();
+  });
 });

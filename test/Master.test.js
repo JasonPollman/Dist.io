@@ -13,7 +13,7 @@ const SlaveArray = require('../lib/SlaveArray');
 
 describe('Master Class', function () {
   describe('Master#close', function () {
-    it('Should gracefully close the given slave arguments (promises)', function (done) {
+    it('Should gracefully close the given slave arguments (Promises)', function (done) {
       this.timeout(3000);
       this.slow(2000);
 
@@ -107,6 +107,87 @@ describe('Master Class', function () {
           });
         });
       });
+    });
+  });
+
+  describe('Master#getSlaveWithPath', function () {
+    it('Should get all the active slaves with the given path', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      const slaves = Master.createSlaves(
+        11, path.join(__dirname, 'data', 'simple-slave-b-2.js'), { group: 'testing getSlaveWithPath' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(11);
+
+      const slavesWithPath = Master.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-b-2.js'));
+      expect(slavesWithPath).to.be.an.instanceof(SlaveArray);
+      expect(slavesWithPath.length).to.equal(11);
+      slaves.kill();
+      done();
+    });
+  });
+
+  describe('Master#slaveBelongsToGroup', function () {
+    it('Should determine if a slave belongs to a group correctly', function (done) {
+      this.timeout(2000);
+      this.slow(1000);
+
+      const slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing slaveBelongsToGroup' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(3);
+
+      expect(Master.slaveBelongsToGroup(slaves[0], 'testing slaveBelongsToGroup')).to.equal(true);
+      expect(Master.slaveBelongsToGroup(slaves[1], 'testing slaveBelongsToGroup')).to.equal(true);
+      expect(Master.slaveBelongsToGroup(slaves[2], 'testing slaveBelongsToGroup')).to.equal(true);
+      expect(Master.slaveBelongsToGroup(99999, 'testing slaveBelongsToGroup')).to.equal(false);
+      expect(Master.slaveBelongsToGroup('non-existent', 'testing slaveBelongsToGroup')).to.equal(false);
+      expect(Master.slaveBelongsToGroup(slaves, 'testing slaveBelongsToGroup')).to.equal(false);
+      expect(Master.slaveBelongsToGroup({}, 'testing slaveBelongsToGroup')).to.equal(false);
+      expect(Master.slaveBelongsToGroup([], 'testing slaveBelongsToGroup')).to.equal(false);
+      expect(Master.slaveBelongsToGroup(() => {}, 'testing slaveBelongsToGroup')).to.equal(false);
+
+      expect(Master.slaveBelongsToGroup(slaves[0], 'foo')).to.equal(false);
+      expect(Master.slaveBelongsToGroup(slaves[1], '')).to.equal(false);
+      expect(Master.slaveBelongsToGroup(slaves[2], 123)).to.equal(false);
+      expect(Master.slaveBelongsToGroup(slaves[2], {})).to.equal(false);
+      expect(Master.slaveBelongsToGroup(slaves[2], [])).to.equal(false);
+
+      expect(Master.slaveBelongsToGroup(slaves[0], slaves[0].group)).to.equal(true);
+      expect(Master.slaveBelongsToGroup(slaves[1], slaves[0].group)).to.equal(true);
+      expect(Master.slaveBelongsToGroup(slaves[2], slaves[0].group)).to.equal(true);
+      slaves.kill();
+      done();
+    });
+  });
+
+  describe('Master#slaves.notInGroup', function () {
+    it('Should get all the slaves not in the given group', function (done) {
+      this.timeout(2000);
+      this.slow(1000);
+
+      const outGroup = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing notInGroup' }
+      );
+
+      const inGroup = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing inGroup ' }
+      );
+
+      const outGroupRes = Master.slaves.notInGroup('testing notInGroup');
+      expect(outGroupRes).to.be.an.instanceof(SlaveArray);
+      expect(outGroupRes.indexOf(inGroup[0])).to.be.gte(0);
+      expect(outGroupRes.indexOf(inGroup[1])).to.be.gte(0);
+      expect(outGroupRes.indexOf(inGroup[2])).to.be.gte(0);
+      expect(outGroupRes.indexOf(outGroup[0])).to.equal(-1);
+      expect(outGroupRes.indexOf(outGroup[1])).to.equal(-1);
+      expect(outGroupRes.indexOf(outGroup[2])).to.equal(-1);
+      done();
     });
   });
 
@@ -486,6 +567,17 @@ describe('Master Class', function () {
 
 
   describe('Master#createSlaves', function () {
+    it('Should increment alias names', function (done) {
+      const slaves =
+        Master.createSlaves(3, path.join(__dirname, 'data', 'simple-slave-c.js'), { alias: 'alias-test' });
+
+      expect(slaves[0].alias).to.equal('alias-test');
+      expect(slaves[1].alias).to.equal('alias-test-1');
+      expect(slaves[2].alias).to.equal('alias-test-2');
+      slaves.kill();
+      done();
+    });
+
     it('Should throw when "count" is non-numeric', function (done) {
       expect(Master.createSlaves.bind(Master, '')).to.throw(TypeError);
       expect(Master.createSlaves.bind(Master, [])).to.throw(TypeError);

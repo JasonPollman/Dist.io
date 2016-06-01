@@ -24,6 +24,7 @@ parallel
   .with(slaves[1])
   .do('!')
   .with(slaves[2])
+  .times(1)
   .execute()
   .then(res => {
     console.log(res);
