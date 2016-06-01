@@ -191,6 +191,25 @@ describe('Master Class', function () {
     });
   });
 
+  describe('Master#slave', function () {
+    it('Should work as an alias for Slave#getSlave', function (done) {
+      this.timeout(2000);
+      this.slow(1000);
+
+      const slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'master#slave' }
+      );
+
+      expect(Master.slave(slaves[0].id)).to.equal(slaves[0]);
+      expect(Master.slave(slaves[1].id)).to.equal(slaves[1]);
+      expect(Master.slave(slaves[2].id)).to.equal(slaves[2]);
+      expect(Master.slave(slaves[0].alias)).to.equal(slaves[0]);
+      expect(Master.slave(slaves[1].alias)).to.equal(slaves[1]);
+      expect(Master.slave(slaves[2].alias)).to.equal(slaves[2]);
+      done();
+    });
+  });
+
   describe('Master#kill', function () {
     it('Should handle non-slave arguments', function () {
       expect(Master.kill.bind(Master, {}, [], () => {}, 'string', 123)).to.not.throw(Error);
@@ -294,6 +313,25 @@ describe('Master Class', function () {
       .catch(e => done(e));
 
       expect(p).to.be.an.instanceof(Promise);
+    });
+
+    it('Should return a response error if the slave isn\'t subscribed to the provided task', function (done) {
+      this.slow(1000);
+      const s = Master.create.slave(path.join(__dirname, 'data', 'simple-slave-b.js'));
+      expect(s).to.be.an.instanceof(Slave);
+
+      Master.tell(s).to(1123)
+        .then(res => {
+          expect(res).to.be.an.instanceof(Response);
+          expect(res.value).to.equal(undefined);
+          expect(res.error).to.be.an.instanceof(ResponseError);
+          expect(res.error.message).to.match(/^Slave #\d+ does not listen to task "1123"$/);
+          s.close((err, status) => {
+            expect(status).to.equal(true);
+            done();
+          });
+        })
+        .catch(e => done(e));
     });
 
     it('Should broadcast to multiple slaves (passing SlaveArray)', function (done) {
@@ -432,7 +470,7 @@ describe('Master Class', function () {
 
   describe('Master#tellSlave', function (done) {
     it('Should send task commands to a slave', function () {
-      const slave = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-b.js'), { alias: 'slavey' });
+      const slave = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-b.js'), { alias: 'slavey-2' });
       let completed = 0;
 
       Master.tellSlave(slave.id).to('echo', 'okay')
@@ -440,7 +478,7 @@ describe('Master Class', function () {
           expect(res).to.be.an.instanceof(Response);
           expect(res.value).to.equal('okay');
           if (++completed === 3) {
-            Master.close('slavey', status => {
+            Master.close('slavey-2', status => {
               expect(status).to.equal(true);
               done();
             });
