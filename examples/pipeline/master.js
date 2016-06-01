@@ -17,7 +17,7 @@ const dbSlave = master.createSlave(dbSlaveJS);
 // Create a new pipeline...
 const authenticateAndGetUserInfo = master.create.pipeline()
   // Authenticate the user token
-  .do('authenticate token').with(authSlave)
+  .addTask('authenticate token').for(authSlave)
   // Intercept the response, and end the pipeline chain
   // if the token is invalid.
   .intercept((res, end) => {
@@ -25,7 +25,7 @@ const authenticateAndGetUserInfo = master.create.pipeline()
   });
   // Get the user's info for the token.
 
-authenticateAndGetUserInfo.do('get user info for token with id').with(dbSlave)
+authenticateAndGetUserInfo.addTask('get user info for token with id').for(dbSlave)
   // Intercept the value and end the pipeline chain
   // if the user information dont exist.
   .intercept((res, end) => {

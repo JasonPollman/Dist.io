@@ -258,6 +258,7 @@ describe('Hello World', function () {
           .do('say hello', function (err, res) {
             expect(err).to.equal(null);
             checkSimpleResponseHello(res);
+            slaves.kill();
             done();
           });
       });
@@ -272,6 +273,7 @@ describe('Hello World', function () {
           .do('say hello')
           .then(res => {
             checkSimpleResponseHello(res);
+            slaves.kill();
             done();
           })
           .catch(e => done(e));
@@ -287,6 +289,7 @@ describe('Hello World', function () {
           .do('say hello')
           .then(res => {
             checkSimpleResponseHello(res);
+            slaves.kill();
             done();
           })
           .catch(e => done(e));
@@ -294,7 +297,7 @@ describe('Hello World', function () {
     });
 
     it('Master#workpool.while with wait argument true (Callbacks)', (done) => {
-      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-g' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -302,9 +305,283 @@ describe('Hello World', function () {
           .do('say hello', function (err, res) {
             expect(err).to.equal(null);
             checkSimpleResponseHello(res);
+            slaves.kill();
             done();
           });
       });
+    });
+  });
+
+  describe('Parallel', function () {
+    it('Should execute a bunch of tasks "simultaneously" (Promises)', (done) => {
+      let slaves;
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-h' })
+        .then(instances => { slaves = instances; })
+        .then(() => master.create.parallel())
+        .then(parallel => parallel
+            .addTask('say hello')
+            .for(slaves[0])
+            .addTask('say hello')
+            .for(slaves[1])
+            .addTask('say hello')
+            .for(slaves[2])
+            .execute()
+        )
+        .then(res => checkSimpleResponseHello(res))
+        .then(() => slaves.kill())
+        .then(() => done())
+        .catch(e => done(e));
+    });
+
+    it('Should execute a bunch of tasks "simultaneously" (Callbacks)', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-i' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.addTask('say hello').for(slaves[0]);
+          parallel.addTask('say hello').for(slaves[1]);
+          parallel.addTask('say hello').for(slaves[2]);
+          parallel.execute(function (err, res) {
+            expect(err).to.equal(null);
+            checkSimpleResponseHello(res);
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should should throw if ".for" wasn\'t called on a task', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-j' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.addTask('say hello').for(slaves[0]);
+          parallel.addTask('say hello');
+          parallel.addTask('say hello').for(slaves[2]);
+          parallel.execute(function (err, res) {
+            expect(err).to.be.an.instanceof(Error);
+            expect(err.message).to.equal('Task #1 is missing a slave. Did you forget to call ".for"?');
+            expect(res).to.equal(null);
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should should resolve an empty ReponseArray if no tasks have been added (Promises)', (done) => {
+      let slaves;
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-k' })
+        .then(instances => { slaves = instances; })
+        .then(() => master.create.parallel())
+        .then(parallel => parallel.execute())
+        .then(res => {
+          expect(res).to.be.an.instanceof(ResponseArray);
+          expect(res.length).to.equal(0);
+        })
+        .then(() => slaves.kill())
+        .then(() => done())
+        .catch(e => done(e));
+    });
+
+    it('Should should resolve an empty ReponseArray if no tasks have been added (Callbacks)', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-l' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.execute(function (err, res) {
+            expect(err).to.equal(null);
+            expect(res).to.be.an.instanceof(ResponseArray);
+            expect(res.length).to.equal(0);
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should iterate multiple times when using ".times" (Promises)', (done) => {
+      let slaves;
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-h' })
+        .then(instances => { slaves = instances; })
+        .then(() => master.create.parallel())
+        .then(parallel => parallel
+            .addTask('say hello')
+            .for(slaves[0])
+            .addTask('say hello')
+            .for(slaves[1])
+            .addTask('say hello')
+            .for(slaves[2])
+            .times(7)
+            .execute()
+        )
+        .then(res => {
+          expect(res).to.be.an.instanceof(Array);
+          expect(res.length).to.equal(7);
+          res.forEach(r => {
+            checkSimpleResponseHello(r);
+          });
+        })
+        .then(() => slaves.kill())
+        .then(() => done())
+        .catch(e => done(e));
+    });
+
+    it('Should iterate multiple times when using ".times" (Callbacks)', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-i' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.addTask('say hello').for(slaves[0]).times(7);
+          parallel.addTask('say hello').for(slaves[1]);
+          parallel.addTask('say hello').for(slaves[2]);
+          parallel.execute(function (err, res) {
+            expect(err).to.equal(null);
+            expect(res).to.be.an.instanceof(Array);
+            expect(res.length).to.equal(7);
+            res.forEach(r => {
+              checkSimpleResponseHello(r);
+            });
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should do nothing if a non-number is passed to ".times"', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-i' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.addTask('say hello').for(slaves[0]).times('string');
+          parallel.addTask('say hello').for(slaves[1]).times({});
+          parallel.addTask('say hello').for(slaves[2]).times(() => {});
+          parallel.execute(function (err, res) {
+            expect(err).to.equal(null);
+            checkSimpleResponseHello(res);
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should throw if a non-Slave argument is passed to ".for"', (done) => {
+      let slaves;
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-h' })
+        .then(instances => { slaves = instances; })
+        .then(() => master.create.parallel())
+        .then(parallel => {
+          try {
+            parallel
+              .addTask('say hello')
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Master#paralle.addTask.for expected argument #0 to be an instanceof Slave.');
+          }
+
+          try {
+            parallel
+              .addTask('say hello')
+              .for('non-existent slave');
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Master#paralle.addTask.for expected argument #0 to be an instanceof Slave.');
+          }
+
+          try {
+            parallel
+              .addTask('say hello')
+              .for([]);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Master#paralle.addTask.for expected argument #0 to be an instanceof Slave.');
+          }
+
+          try {
+            parallel
+              .addTask('say hello')
+              .for({});
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Master#paralle.addTask.for expected argument #0 to be an instanceof Slave.');
+          }
+        })
+        .then(() => slaves.kill())
+        .then(() => done())
+        .catch(e => done(e));
+    });
+
+    it('Should throw if the given task is invalid', (done) => {
+      let slaves;
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-h' })
+        .then(instances => { slaves = instances; })
+        .then(() => master.create.parallel())
+        .then(parallel => {
+          try {
+            parallel
+              .addTask([])
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Task command must be a string, number, or symbol, but got object.');
+          }
+
+          try {
+            parallel
+              .addTask({})
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Task command must be a string, number, or symbol, but got object.');
+          }
+
+          try {
+            parallel
+              .addTask(() => {})
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Task command must be a string, number, or symbol, but got function.');
+          }
+
+          try {
+            parallel
+              .addTask()
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Task command must be a string, number, or symbol, but got undefined.');
+          }
+
+          try {
+            parallel
+              .addTask(null)
+              .for(-123);
+
+            done(new Error('Expected to throw'));
+          } catch (e) {
+            expect(e).to.be.an.instanceof(TypeError);
+            expect(e.message).to.equal('Task command must be a string, number, or symbol, but got object.');
+          }
+        })
+        .then(() => slaves.kill())
+        .then(() => done())
+        .catch(e => done(e));
     });
   });
 });

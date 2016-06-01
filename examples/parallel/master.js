@@ -18,12 +18,12 @@ const slaves = master.createSlaves(5, slaveJS);
 const parallel = master.create.parallel();
 
 parallel
-  .do('hello')
-  .with(slaves[0])
-  .do('world')
-  .with(slaves[1])
-  .do('!')
-  .with(slaves[2])
+  .addTask('hello')
+  .for(slaves[0])
+  .addTask('world')
+  .for(slaves[1])
+  .addTask('!')
+  .for(slaves[2])
   .times(1)
   .execute()
   .then(res => {
