@@ -23,6 +23,8 @@ describe('Slave Class', function () {
       expect(slaves).to.be.an('array');
       expect(slaves.length).to.be.gte(3);
       slaves.forEach(s => {
+        expect(s.pid).to.be.a('number');
+        expect(s.pid).to.be.gte(0);
         s.kill();
       });
       done();
@@ -75,109 +77,210 @@ describe('Slave Class', function () {
     });
   });
 
-  it('Should spawn a new slave, then kill it', function (done) {
-    this.timeout(5500);
-    this.slow(5000);
+  describe('Slave#constructor', function () {
+    it('Should spawn a new slave, then kill it', function (done) {
+      this.timeout(5500);
+      this.slow(5000);
 
-    const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-    const slave = new Slave(location);
-    expect(slave).to.be.an.instanceof(Slave);
-    expect(slave.id).to.match(/^\d+$/);
-    expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-    expect(slave.location).to.equal(location);
+      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const slave = new Slave(location);
+      expect(slave).to.be.an.instanceof(Slave);
+      expect(slave.id).to.match(/^\d+$/);
+      expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
+      expect(slave.location).to.equal(location);
 
-    expect(slave.toString())
-      .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
+      expect(slave.toString())
+        .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
 
-    expect(slave.hasExited).to.equal(false);
-    expect(slave.isConnected).to.equal(true);
-    expect(slave.spawnError).to.equal(null);
+      expect(slave.hasExited).to.equal(false);
+      expect(slave.isConnected).to.equal(true);
+      expect(slave.spawnError).to.equal(null);
 
-    if (os.platform() !== 'win32') {
-      setTimeout(() => {
-        exec(`${pgrep} SimpleSlaveA`, function (err, stdout) {
-          expect(err).to.equal(null);
-          expect(stdout.trim()).to.match(/^\d+\s*$/m);
-          expect(slave.kill()).to.equal(slave);
-          exec(`${pgrep} SimpleSlaveA`, function (e, sout) {
+      if (os.platform() !== 'win32') {
+        setTimeout(() => {
+          exec(`${pgrep} SimpleSlaveA`, function (err, stdout) {
             expect(err).to.equal(null);
-            expect(sout.trim()).to.match(/^$/);
-            expect(slave.id).to.match(/^\d+$/);
-            expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-            expect(slave.location).to.equal(location);
+            expect(stdout.trim()).to.match(/^\d+\s*$/m);
+            expect(slave.kill()).to.equal(slave);
+            exec(`${pgrep} SimpleSlaveA`, function (e, sout) {
+              expect(err).to.equal(null);
+              expect(sout.trim()).to.match(/^$/);
+              expect(slave.id).to.match(/^\d+$/);
+              expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
+              expect(slave.location).to.equal(location);
 
-            expect(slave.toString())
-              .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
+              expect(slave.toString())
+                .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
 
-            expect(slave.hasExited).to.equal(true);
-            expect(slave.isConnected).to.equal(false);
-            expect(slave.spawnError).to.equal(null);
-            done();
+              expect(slave.hasExited).to.equal(true);
+              expect(slave.isConnected).to.equal(false);
+              expect(slave.spawnError).to.equal(null);
+              done();
+            });
           });
-        });
-      }, 2000);
-    } else {
+        }, 2000);
+      } else {
+        done();
+      }
+    });
+
+    it('Should handle spawn errors', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+
+      let location = path.join(__dirname, 'data', 'doesnt-exist.js');
+      try {
+        const slave = new Slave(location); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a regular file, ' +
+          'but received error: ENOENT: no such file or directory, ' +
+          'stat \'/Users/Jason/Source/Dist.io/test/data/doesnt-exist.js\''
+        );
+      }
+
+      try {
+        const slave = new Slave(); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "undefined"');
+      }
+
+      try {
+        const slave = new Slave(''); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: ""');
+      }
+
+      try {
+        const slave = new Slave([]); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "object"');
+      }
+
+      try {
+        const slave = new Slave(() => {}); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "function"');
+      }
+
+      try {
+        const slave = new Slave(null); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "object"');
+      }
+
+      location = path.join(__dirname, 'data');
+      try {
+        const slave = new Slave(location); // eslint-disable-line
+      } catch (e) {
+        expect(e.message).to.equal(
+          'Slave constructor argument #0 requires a regular file, ' +
+          'but /Users/Jason/Source/Dist.io/test/data isn\'t a file.'
+        );
+      }
       done();
-    }
+    });
+
+    it('Should set the slave title option', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location, { title: 'slave-title-test' });
+      slave.kill();
+      done();
+    });
+
+    it('Should set slave process arguments', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location, { title: 'slave-title-test', args: ['a', '--foo=bar', '-x'] });
+      slave.kill();
+      done();
+    });
   });
 
-  it('Should handle request timeouts', function (done) {
-    this.timeout(3000);
-    this.slow(2500);
-    let completed = 0;
+  describe('Slave#exec, Slave#do', function () {
+    it('Should handle request timeouts', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+      let completed = 0;
 
-    let location = path.join(__dirname, 'data', 'simple-slave-d.js');
-    let slave = new Slave(location);
-    slave.exec('echo', null, { timeout: 1000 })
-      .then((res) => {
-        expect(res).to.be.an.instanceof(TimeoutResponse);
-        expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 1000ms./);
-        expect(res.error.name).to.equal('ResponseError: Error');
-        if (++completed === 2) done();
-      })
-      .catch(e => {
-        done(e);
+      let location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      let slave = new Slave(location);
+      slave.do('echo', null, { timeout: 1000 })
+        .then((res) => {
+          expect(res).to.be.an.instanceof(TimeoutResponse);
+          expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 1000ms./);
+          expect(res.error.name).to.equal('ResponseError: Error');
+          if (++completed === 2) {
+            slave.kill();
+            done();
+          }
+        })
+        .catch(e => {
+          done(e);
+        });
+
+      location = path.join(__dirname, 'data', 'simple-slave-c.js');
+      slave = new Slave(location);
+      slave.exec(1234, null)
+        .then((res) => {
+          expect(res).to.be.an.instanceof(Response);
+          expect(res.error.message).to.match(/Slave #\d+ does not listen to task "1234"/);
+          expect(res.error.name).to.equal('ResponseError: ReferenceError');
+          if (++completed === 2) {
+            slave.kill();
+            done();
+          }
+        })
+        .catch(e => {
+          done(e);
+        });
+    });
+
+    it('Should reject on invalid command types', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+      let completed = 0;
+
+      slave.exec({}, null, { timeout: 1000 })
+        .then(() => {
+          done(new Error('Expected to throw'));
+        })
+        .catch(e => {
+          expect(e).to.be.an.instanceof(TypeError);
+          expect(e.message).to.equal('Slave#exec expected argument #0 to be a command string, but got: object');
+          if (++completed === 3) {
+            slave.kill();
+            done();
+          }
+        });
+
+      slave.exec(() => {}, null, { timeout: 1000 })
+        .then(() => {
+          done(new Error('Expected to throw'));
+        })
+        .catch(e => {
+          expect(e).to.be.an.instanceof(TypeError);
+          expect(e.message).to.equal('Slave#exec expected argument #0 to be a command string, but got: function');
+          if (++completed === 3) {
+            slave.kill();
+            done();
+          }
+        });
+
+      slave.do([], null, { timeout: 1000 }, function (err, res) {
+        expect(res).to.equal(null);
+        expect(err).to.be.an.instanceof(TypeError);
+        expect(err.message).to.equal('Slave#exec expected argument #0 to be a command string, but got: object');
+        if (++completed === 3) {
+          slave.kill();
+          done();
+        }
       });
-
-    location = path.join(__dirname, 'data', 'simple-slave-c.js');
-    slave = new Slave(location);
-    slave.exec(1234, null)
-      .then((res) => {
-        expect(res).to.be.an.instanceof(Response);
-        expect(res.error.message).to.match(/Slave #\d+ does not listen to task "1234"/);
-        expect(res.error.name).to.equal('ResponseError: ReferenceError');
-        if (++completed === 2) done();
-      })
-      .catch(e => {
-        done(e);
-      });
-  });
-
-  it('Should handle spawn errors', function (done) {
-    this.timeout(3000);
-    this.slow(2500);
-
-    let location = path.join(__dirname, 'data', 'doesnt-exist.js');
-    try {
-      const slave = new Slave(location); // eslint-disable-line
-    } catch (e) {
-      expect(e.message).to.equal('Slave constructor argument #0 requires a regular file, ' +
-        'but received error: ENOENT: no such file or directory, ' +
-        'stat \'/Users/Jason/Source/Dist.io/test/data/doesnt-exist.js\''
-      );
-    }
-
-    location = path.join(__dirname, 'data');
-    try {
-      const slave = new Slave(location); // eslint-disable-line
-    } catch (e) {
-      expect(e.message).to.equal(
-        'Slave constructor argument #0 requires a regular file, ' +
-        'but /Users/Jason/Source/Dist.io/test/data isn\'t a file.'
-      );
-    }
-
-    done();
+    });
   });
 
   it('Should expect a non-empty string filepath for the "file" argument', function (done) {
@@ -216,10 +319,12 @@ describe('Slave Class', function () {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
-      slave.ack()
+      slave.ack({ foo: 'bar' })
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
           expect(res.value).to.be.an('object');
+          expect(res.value.data).to.equal(null);
+          expect(res.value.meta).to.eql({ foo: 'bar' });
           expect(res.value.from).to.be.an('number');
           expect(res.value.sent).to.be.an('number');
           expect(res.value.responsed).to.be.an('number');

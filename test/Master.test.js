@@ -110,6 +110,61 @@ describe('Master Class', function () {
     });
   });
 
+  describe('Master#shutdown', function () {
+    it('Should shutdown the given slave arguments after all messages have been sent (Promises)', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      let slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing shutdown' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(3);
+
+      Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => done(e));
+
+      Master.shutdown(slaves)
+        .then(statuses => {
+          expect(statuses).to.eql([true, true, true]);
+          slaves = Master.slaves.inGroup('testing shutdown');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(0);
+          done();
+        })
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => {
+          expect(e).to.be.an.instanceof(Error);
+        });
+    });
+
+    it('Should shutdown the slave immediately if there are no pending requests', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      const slaves = Master.createSlaves(
+        1, path.join(__dirname, 'data', 'simple-slave-e.js'), { group: 'testing-qwerty' }
+      );
+
+      slaves[0].shutdown((err, status) => {
+        expect(status).to.equal(true);
+        expect(err).to.equal(null);
+        expect(slaves[0].isConnected).to.equal(true);
+        expect(slaves[0].hasExited).to.equal(true);
+        done();
+      });
+    });
+  });
+
   describe('Master#getSlaveWithPath', function () {
     it('Should get all the active slaves with the given path', function (done) {
       this.timeout(3000);
@@ -525,14 +580,22 @@ describe('Master Class', function () {
       this.timeout(6000);
       this.slow(5000);
 
-      const a = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
+      Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
         onUncaughtException: (e) => {
           expect(e).to.be.an.instanceof(Error);
           expect(e.message).to.equal('uncaught exception');
         },
       });
 
-      Master.kill(a);
+      const c = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'));
+      c.onUncaughtException = (e) => {
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('uncaught exception');
+      };
+
+      // Does nothing, but shouldn't cause any side effects.
+      const d = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'));
+      d.onUncaughtException = {};
 
       const b = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-h.js'), {
         onUncaughtException: (er) => {
@@ -644,11 +707,13 @@ describe('Master Class', function () {
     it('Should broadcast messages to all idle slaves using Master#broadcast.to.idle', function (done) {
       const s = Master.createSlaves(2, path.join(__dirname, 'data', 'simple-slave-b.js'));
 
-      Master.broadcast(Master.commands.ACK).to.idle()
+      Master.broadcast(Master.commands.ACK, null, { foo: 'bar' }).to.idle()
         .then(res => {
           expect(res).to.be.an.instanceof(ResponseArray);
           expect(res.length).to.be.gte(2);
           res.each(r => {
+            expect(r.value.meta).to.eql({ foo: 'bar' });
+            expect(r.value.data).to.eql(null);
             expect(r.value.message).to.match(
               /Slave acknowledgement from=\d+, received=\d+, responded=\d+, started=\d+, uptime=\d+/
             );

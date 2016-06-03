@@ -17,6 +17,17 @@ let slaveA;
 let slaveB;
 let slaves;
 
+/**
+ * A simple error handler.
+ * @param {Error} e The error passed to the error handler.
+ * @return {undefined}
+ */
+function onError(e) {
+  console.log(e);
+  process.exit(1);
+}
+
+
 // Create a single slave...
 master.create.slave(slaveJS)
   .then(slave => { slaveA = slave; })
@@ -27,16 +38,14 @@ master.create.slave(slaveJS)
   // Very important: close the slave.
   // The slave will never exit if this isn't called.
   .then(() => slaveA.exit())
-  .catch(e => { throw e; });
+  .catch(onError);
 
 master.create.slave(slaveJS)
   .then(slave => { slaveB = slave; })
   .then(() => tell(slaveB).to('say hello'))
   .then(() => tell(slaveB).to('say goodbye'))
   .then(() => slaveB.exit())
-  // This will fail since now the slave has been closed.
-  .then(() => tell(slaveB).to('say goodbye'))
-  .catch(e => console.log(e));
+  .catch(onError);
 
 // Create multiple slaves...
 // Using the alternate syntax here: slave(s).do vs. master.tell.slave(s).to()
@@ -45,4 +54,4 @@ master.create.slaves(5, slaveJS)
   .then(() => slaves.do('say hello'))
   .then(() => slaves.do('say goodbye'))
   .then(() => slaves.exit())
-  .catch(e => { throw e; });
+  .catch(onError);

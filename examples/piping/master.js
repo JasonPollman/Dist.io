@@ -18,6 +18,16 @@ const fooLocation = path.join(__dirname, 'slave-foo.js');
 const barLocation = path.join(__dirname, 'slave-bar.js');
 const tell = master.tell;
 
+/**
+ * A simple error handler.
+ * @param {Error} e The error passed to the error handler.
+ * @return {undefined}
+ */
+function onError(e) {
+  console.log(e);
+  process.exit(1);
+}
+
 let foo;
 
 // Create slave bar.
@@ -51,4 +61,4 @@ master.create.slave(fooLocation)
   })
   // Close the slaves.
   .then(() => master.close(foo, bar))
-  .catch(e => console.log(e));
+  .catch(onError);

@@ -11,7 +11,16 @@
 const master = require('../../').Master;
 const path = require('path');
 const slaveJS = path.join(__dirname, 'slave.js');
-const tell = master.tell;
+
+/**
+ * A simple error handler.
+ * @param {Error} e The error passed to the error handler.
+ * @return {undefined}
+ */
+function onError(e) {
+  console.log(e);
+  process.exit(1);
+}
 
 // Create a single slave...
 const slaves = master.createSlaves(5, slaveJS);
@@ -27,10 +36,7 @@ parallel
   .times(1)
   .execute()
   .then(res => {
-    console.log(res);
     console.log(res.sortBy('from').joinValues(' '));
     slaves.exit();
   })
-  .catch(e => {
-    console.log(e);
-  });
+  .catch(onError);
