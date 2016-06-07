@@ -11,7 +11,5 @@ const slave = require('../../').Slave;
 
 slave
   .task('echo', (data, done) => {
-    setTimeout(() => {
-      done(`${data} from slave ${slave.id}`);
-    }, 100);
+    done(`${data} from slave ${slave.id}`);
   });

@@ -147,6 +147,43 @@ describe('Master Class', function () {
         });
     });
 
+    it('Should shutdown the given slave arguments after all messages have been sent (Callbacks)', function (done) {
+      this.timeout(3000);
+      this.slow(2000);
+
+      let slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing shutdown' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(3);
+
+      Master.broadcast(Master.commands.ACK).to(slaves, err => {
+        expect(err).to.equal(null);
+      });
+
+      Master.broadcast(Master.commands.ACK).to(slaves, err => {
+        expect(err).to.equal(null);
+      });
+
+      Master.broadcast(Master.commands.ACK).to(slaves, err => {
+        expect(err).to.equal(null);
+      });
+
+      Master.shutdown(slaves, function (err, statuses) {
+        expect(err).to.equal(null);
+        expect(statuses).to.eql([true, true, true]);
+        slaves = Master.slaves.inGroup('testing shutdown');
+        expect(slaves).to.be.an.instanceof(SlaveArray);
+        expect(slaves.length).to.equal(0);
+        done();
+      });
+
+      Master.broadcast(Master.commands.ACK).to(slaves, err => {
+        expect(err).to.be.an.instanceof(Error);
+      });
+    });
+
     it('Should shutdown the slave immediately if there are no pending requests', function (done) {
       this.timeout(3000);
       this.slow(2000);

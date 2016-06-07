@@ -1,7 +1,8 @@
 {
   "opts": {
     "recurse": true,
-    "destination": "./docs/"
+    "destination": "./docs/",
+    "template": "node_modules/minami"
   },
   "tags": {
     "allowUnknownTags": true,
@@ -11,7 +12,9 @@
     "includePattern": ".+\\.js(doc)?$",
     "excludePattern": "(^|\\/|\\\\)_",
     "exclude": [
-      "node_modules"
+      "node_modules",
+      "examples",
+      "test"
     ]
   }
 }

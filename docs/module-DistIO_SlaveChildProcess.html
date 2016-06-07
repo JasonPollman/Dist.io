@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: DistIO/SlaveChildProcess</title>
+    <title>DistIO/SlaveChildProcess - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Module: DistIO/SlaveChildProcess</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master-Master.html#broadcast">broadcast</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createParallel">createParallel</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createPipeline">createPipeline</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createScatter">createScatter</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlave">createSlave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlaves">createSlaves</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createWorkpool">createWorkpool</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slave">slave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slaveBelongsToGroup">slaveBelongsToGroup</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#tellSlave">tellSlave</a></li></ul></li><li><a href="module-DistIO_Request-Request.html">Request</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Request-Request.html#clearTimeout">clearTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#hasTimedout">hasTimedout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#onTimeout">onTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#send">send</a></li></ul></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-Response.html#pipe">pipe</a></li><li data-type='method'><a href="module-DistIO_Response-Response.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#joinValues">joinValues</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#sortBy">sortBy</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_Response-SlaveArray.html">SlaveArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#.isMasterMessage">isMasterMessage</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#invokeTaskListener">invokeTaskListener</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#task">task</a></li></ul></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllBusySlaves">getAllBusySlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllIdleSlaves">getAllIdleSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllSlaves">getAllSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getLeastBusy">getLeastBusy</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlave">getSlave</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesInGroup">getSlavesInGroup</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#ack">ack</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#noop">noop</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master.html#~do">do</a></li><li data-type='method'><a href="module-DistIO_Master.html#~flattenSlaveList">flattenSlaveList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~idleInList">idleInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~inGroup">inGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInGroup">leastBusyInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInList">leastBusyInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~notInGroup">notInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~task">task</a></li><li data-type='method'><a href="module-DistIO_Master.html#~validateCommand">validateCommand</a></li><li data-type='method'><a href="module-DistIO_Master.html#~while">while</a></li></ul></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllResponses">validateArgumentsAreAllResponses</a></li><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllSlaves">validateArgumentsAreAllSlaves</a></li></ul></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave.html#~canInteract">canInteract</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~cleanupSlaveReferences">cleanupSlaveReferences</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~initializeSlaveEventsWithSlaveAndChildProcess">initializeSlaveEventsWithSlaveAndChildProcess</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveExceptionMessage">isSlaveExceptionMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveMessage">isSlaveMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~sendCommandMessageToChildWithMetadata">sendCommandMessageToChildWithMetadata</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendExceptionMessageToMaster">sendExceptionMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendMessageToMaster">sendMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Events</h3><ul><li><a href="module-DistIO_Slave.html#~event:closed">closed</a></li><li><a href="module-DistIO_Slave.html#~event:exited">exited</a></li><li><a href="module-DistIO_Slave.html#~event:killed">killed</a></li><li><a href="module-DistIO_Slave.html#~event:post-sent">post-sent</a></li><li><a href="module-DistIO_Slave.html#~event:pre-send">pre-send</a></li><li><a href="module-DistIO_Slave.html#~event:response">response</a></li><li><a href="module-DistIO_Slave.html#~event:shutting-down">shutting-down</a></li><li><a href="module-DistIO_Slave.html#~event:uncaughtException">uncaughtException</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">DistIO/SlaveChildProcess</h1>
+    
 
     
 
@@ -95,7 +107,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line212">line 212</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line249">line 249</a>
     </li></ul></dd>
     
 
@@ -147,6 +159,78 @@
 
         
             
+<h4 class="name" id="~INIT"><span class="type-signature">(inner, constant) </span>INIT<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    The time this process was started.
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line29">line 29</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
 <h4 class="name" id="~slave"><span class="type-signature">(inner, constant) </span>slave<span class="type-signature"></span></h4>
 
 
@@ -191,7 +275,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line20">line 20</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -263,7 +347,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line131">line 131</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line167">line 167</a>
     </li></ul></dd>
     
 
@@ -390,7 +474,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line171">line 171</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line207">line 207</a>
     </li></ul></dd>
     
 
@@ -418,7 +502,7 @@
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -562,7 +646,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line139">line 139</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line175">line 175</a>
     </li></ul></dd>
     
 
@@ -590,7 +674,7 @@
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -711,7 +795,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line181">line 181</a>
+        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line218">line 218</a>
     </li></ul></dd>
     
 
@@ -739,7 +823,7 @@
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -770,17 +854,13 @@
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a></li><li><a href="module-DistIO_Request-Request.html">Request</a></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Events</h3><ul><li><a href="Slave.html#event:closed">closed</a></li><li><a href="Slave.html#event:exited">exited</a></li><li><a href="Slave.html#event:killed">killed</a></li><li><a href="Slave.html#event:post-sent">post-sent</a></li><li><a href="Slave.html#event:pre-send">pre-send</a></li><li><a href="Slave.html#event:response">response</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat May 28 2016 02:33:45 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jun 03 2016 00:23:32 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

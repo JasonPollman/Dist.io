@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Module: DistIO/Slave</title>
+    <title>DistIO/Slave - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Module: DistIO/Slave</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master-Master.html#broadcast">broadcast</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createParallel">createParallel</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createPipeline">createPipeline</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createScatter">createScatter</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlave">createSlave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlaves">createSlaves</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createWorkpool">createWorkpool</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slave">slave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slaveBelongsToGroup">slaveBelongsToGroup</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#tellSlave">tellSlave</a></li></ul></li><li><a href="module-DistIO_Request-Request.html">Request</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Request-Request.html#clearTimeout">clearTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#hasTimedout">hasTimedout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#onTimeout">onTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#send">send</a></li></ul></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-Response.html#pipe">pipe</a></li><li data-type='method'><a href="module-DistIO_Response-Response.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#joinValues">joinValues</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#sortBy">sortBy</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_Response-SlaveArray.html">SlaveArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#.isMasterMessage">isMasterMessage</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#invokeTaskListener">invokeTaskListener</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#task">task</a></li></ul></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllBusySlaves">getAllBusySlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllIdleSlaves">getAllIdleSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllSlaves">getAllSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getLeastBusy">getLeastBusy</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlave">getSlave</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesInGroup">getSlavesInGroup</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#ack">ack</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#noop">noop</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master.html#~do">do</a></li><li data-type='method'><a href="module-DistIO_Master.html#~flattenSlaveList">flattenSlaveList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~idleInList">idleInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~inGroup">inGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInGroup">leastBusyInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInList">leastBusyInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~notInGroup">notInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~task">task</a></li><li data-type='method'><a href="module-DistIO_Master.html#~validateCommand">validateCommand</a></li><li data-type='method'><a href="module-DistIO_Master.html#~while">while</a></li></ul></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllResponses">validateArgumentsAreAllResponses</a></li><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllSlaves">validateArgumentsAreAllSlaves</a></li></ul></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave.html#~canInteract">canInteract</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~cleanupSlaveReferences">cleanupSlaveReferences</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~initializeSlaveEventsWithSlaveAndChildProcess">initializeSlaveEventsWithSlaveAndChildProcess</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveExceptionMessage">isSlaveExceptionMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveMessage">isSlaveMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~sendCommandMessageToChildWithMetadata">sendCommandMessageToChildWithMetadata</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendExceptionMessageToMaster">sendExceptionMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendMessageToMaster">sendMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Events</h3><ul><li><a href="module-DistIO_Slave.html#~event:closed">closed</a></li><li><a href="module-DistIO_Slave.html#~event:exited">exited</a></li><li><a href="module-DistIO_Slave.html#~event:killed">killed</a></li><li><a href="module-DistIO_Slave.html#~event:post-sent">post-sent</a></li><li><a href="module-DistIO_Slave.html#~event:pre-send">pre-send</a></li><li><a href="module-DistIO_Slave.html#~event:response">response</a></li><li><a href="module-DistIO_Slave.html#~event:shutting-down">shutting-down</a></li><li><a href="module-DistIO_Slave.html#~event:uncaughtException">uncaughtException</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">DistIO/Slave</h1>
+    
 
     
 
@@ -44,7 +56,7 @@
 
     
 
-    <h4 class="name" id="module:DistIO/Slave"><span class="type-signature"></span>module:DistIO/Slave<span class="type-signature"> :<a href="Slave.html">Slave</a></span></h4>
+    <h4 class="name" id="module:DistIO/Slave"><span class="type-signature"></span>module:DistIO/Slave<span class="type-signature"> :Slave</span></h4>
 
     
 
@@ -95,7 +107,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line698">line 698</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line912">line 912</a>
     </li></ul></dd>
     
 
@@ -198,7 +210,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line41">line 41</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line47">line 47</a>
     </li></ul></dd>
     
 
@@ -270,7 +282,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line61">line 61</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line67">line 67</a>
     </li></ul></dd>
     
 
@@ -343,7 +355,7 @@ This will be added to each outgoing request, and a property of each incoming res
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line55">line 55</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line61">line 61</a>
     </li></ul></dd>
     
 
@@ -416,7 +428,7 @@ This will be added to each outgoing request, and a property of each incoming res
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line48">line 48</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line54">line 54</a>
     </li></ul></dd>
     
 
@@ -478,7 +490,7 @@ This will be added to each outgoing request, and a property of each incoming res
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line35">line 35</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line41">line 41</a>
     </li></ul></dd>
     
 
@@ -550,7 +562,7 @@ This will be added to each outgoing request, and a property of each incoming res
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line73">line 73</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line79">line 79</a>
     </li></ul></dd>
     
 
@@ -622,7 +634,7 @@ This will be added to each outgoing request, and a property of each incoming res
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line67">line 67</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line73">line 73</a>
     </li></ul></dd>
     
 
@@ -695,7 +707,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line30">line 30</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line36">line 36</a>
     </li></ul></dd>
     
 
@@ -716,6 +728,159 @@ Keyed by filename.
 
     
         <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~canInteract"><span class="type-signature">(inner) </span>canInteract<span class="signature">(slave)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Determines if the slave can execute tasks. And used to check for shutdown conditions.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>slave</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Slave</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The slave to deterine interactivity status.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line131">line 131</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    True if the slave can interact, false otherwise.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
 
         
             
@@ -771,7 +936,7 @@ Keyed by filename.
             <td class="type">
             
                 
-<span class="param-type"><a href="Slave.html">Slave</a></span>
+<span class="param-type">Slave</span>
 
 
             
@@ -822,7 +987,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line80">line 80</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line86">line 86</a>
     </li></ul></dd>
     
 
@@ -850,7 +1015,7 @@ Keyed by filename.
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -920,7 +1085,7 @@ Keyed by filename.
             <td class="type">
             
                 
-<span class="param-type"><a href="Slave.html">Slave</a></span>
+<span class="param-type">Slave</span>
 
 
             
@@ -1017,7 +1182,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line158">line 158</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line185">line 185</a>
     </li></ul></dd>
     
 
@@ -1045,7 +1210,7 @@ Keyed by filename.
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1166,7 +1331,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line108">line 108</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line115">line 115</a>
     </li></ul></dd>
     
 
@@ -1198,7 +1363,7 @@ Keyed by filename.
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1319,7 +1484,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line92">line 92</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line99">line 99</a>
     </li></ul></dd>
     
 
@@ -1351,7 +1516,7 @@ Keyed by filename.
 
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1444,7 +1609,7 @@ Keyed by filename.
             <td class="type">
             
                 
-<span class="param-type"><a href="Slave.html">Slave</a></span>
+<span class="param-type">Slave</span>
 
 
             
@@ -1564,7 +1729,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line195">line 195</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line222">line 222</a>
     </li></ul></dd>
     
 
@@ -1592,7 +1757,7 @@ Keyed by filename.
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1713,7 +1878,7 @@ Keyed by filename.
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line124">line 124</a>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line143">line 143</a>
     </li></ul></dd>
     
 
@@ -1741,7 +1906,7 @@ Keyed by filename.
         
 
 
-<dl>
+<dl class="param-type">
     <dt>
         Type
     </dt>
@@ -1763,6 +1928,1098 @@ Keyed by filename.
     
 
     
+        <h3 class="subsection-title">Events</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:closed">closed</h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>err</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+|
+
+<span class="param-type">null</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">An error, if one occured during close.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>status</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The close status sent by the slave.
+Triggered when the slave is closed.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line779">line 779</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:exited">exited</h4>
+
+    
+
+
+
+<div class="description">
+    Emitted when slave interaction is no longer possible.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line756">line 756</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:killed">killed</h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>signal</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The signal sent to kill the slave.
+Triggered when the slave is killed (or a singal is sent to it).</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line749">line 749</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:post-sent">post-sent</h4>
+
+    
+
+
+
+<div class="description">
+    Emitted just after sending the request to the slave object.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Request</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The request object that was sent.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line265">line 265</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:pre-send">pre-send</h4>
+
+    
+
+
+
+<div class="description">
+    Allows the user to intercept messages prior to sending.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Request</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The request object to be sent</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line254">line 254</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:response">response</h4>
+
+    
+
+
+
+<div class="description">
+    Emitted everytime the slave receives a response to a request.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Response</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The resposne from the request.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>request</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Request</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The request object originally sent to the slave.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line879">line 879</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:shutting-down">shutting-down</h4>
+
+    
+
+
+
+<div class="description">
+    Emitted when the slave is scheduled for shutdown.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>slave</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Slave</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The slave.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The arguments passed to shutdown</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line808">line 808</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="~event:uncaughtException">uncaughtException</h4>
+
+    
+
+
+
+<div class="description">
+    Emitted when a slave exception occurs.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>The</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Error</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">error emitted from the slave.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Slave.js.html">lib/Slave.js</a>, <a href="lib_Slave.js.html#line166">line 166</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
 </article>
 
 </section>
@@ -1772,17 +3029,13 @@ Keyed by filename.
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a></li><li><a href="module-DistIO_Request-Request.html">Request</a></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Events</h3><ul><li><a href="Slave.html#event:closed">closed</a></li><li><a href="Slave.html#event:exited">exited</a></li><li><a href="Slave.html#event:killed">killed</a></li><li><a href="Slave.html#event:post-sent">post-sent</a></li><li><a href="Slave.html#event:pre-send">pre-send</a></li><li><a href="Slave.html#event:response">response</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat May 28 2016 02:33:45 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jun 03 2016 00:23:32 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

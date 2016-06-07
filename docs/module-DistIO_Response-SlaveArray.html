@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>Request - Documentation</title>
+    <title>SlaveArray - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">Request</h1>
+    <h1 class="page-title">SlaveArray</h1>
     
 
     
@@ -41,12 +41,12 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="module-DistIO_Request.html">module:DistIO/Request</a>~</span>
+            <span class="ancestors"><a href="module-DistIO_Response.html">DistIO/Response</a>~</span>
         
-        Request
+        SlaveArray
         </h2>
         
-            <div class="class-description">A simple class that represents a request.</div>
+            <div class="class-description">An array of response objects.</div>
         
     
 </header>
@@ -60,14 +60,14 @@
     <h2>Constructor</h2>
     
 
-    <h4 class="name" id="Request"><span class="type-signature"></span>new Request<span class="signature">(slave, command, meta, data, secretId, secretNumber, slaveSymbol, callback<span class="signature-attributes">opt</span>)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id="SlaveArray"><span class="type-signature"></span>new SlaveArray<span class="signature">(&hellip;A)</span><span class="type-signature"></span></h4>
 
     
 
 
 
 <div class="description">
-    Slave constructor.
+    ResponseArray constructor.
 </div>
 
 
@@ -105,13 +105,13 @@
 
         <tr>
             
-                <td class="name"><code>slave</code></td>
+                <td class="name"><code>A</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Slave</span>
+<span class="param-type">Response</span>
 
 
             
@@ -124,231 +124,14 @@
                 
 
                 
-                </td>
-            
-
-            
-
-            <td class="description last">The slave associated with this request.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>command</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
+                    &lt;repeatable><br>
                 
                 </td>
             
 
             
 
-            <td class="description last">The command for this request.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>meta</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">Meta data for this request.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The data to send with this request.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secretId</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A string to prevent accidentally sending a slave request.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>secretNumber</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">A number to help prevent accidentally sending a slave request by mistake.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>slaveSymbol</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Symbol</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The private slave symbol.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>callback</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">function</span>
-
-
-            
-            </td>
-
-            
-                <td class="attributes">
-                
-                    &lt;optional><br>
-                
-
-                
-
-                
-                </td>
-            
-
-            
-
-            <td class="description last">The callback to invoke when this request is responded to.</td>
+            <td class="description last">list of response object to add to the ResponseArray.</td>
         </tr>
 
     
@@ -389,7 +172,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line32">line 32</a>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line32">line 32</a>
     </li></ul></dd>
     
 
@@ -419,6 +202,17 @@
     </div>
 
     
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li>Array</li>
+    </ul>
+
+
+    
 
     
 
@@ -429,382 +223,6 @@
     
 
     
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="callback"><span class="type-signature"></span>callback<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Returns the request's callback.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line224">line 224</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="command"><span class="type-signature"></span>command<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The request's command
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line208">line 208</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="created"><span class="type-signature"></span>created<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Returns the time the Request was created.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line216">line 216</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="id"><span class="type-signature"></span>id<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The request id.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line184">line 184</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="rid"><span class="type-signature"></span>rid<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The request id (an alias for Request#id).
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line192">line 192</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="ttl"><span class="type-signature"></span>ttl<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    The request time to live.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line200">line 200</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-    
 
     
         <h3 class="subsection-title">Methods</h3>
@@ -814,118 +232,14 @@
 
     
 
-    <h4 class="name" id="clearTimeout"><span class="type-signature"></span>clearTimeout<span class="signature">()</span><span class="type-signature"> &rarr; {Request}</span></h4>
+    <h4 class="name" id="close"><span class="type-signature"></span>close<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
 
 
 <div class="description">
-    Clears the Request timeout.
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line276">line 276</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    The current request instance.
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">Request</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="hasTimedout"><span class="type-signature"></span>hasTimedout<span class="signature">(response)</span><span class="type-signature"> &rarr; {Boolean}</span></h4>
-
-    
-
-
-
-<div class="description">
-    Checks whether or not the Request has timedout.
+    Closes all of the slaves in the array.
 </div>
 
 
@@ -949,6 +263,8 @@
         <th>Type</th>
 
         
+        <th>Attributes</th>
+        
 
         
 
@@ -961,23 +277,33 @@
 
         <tr>
             
-                <td class="name"><code>response</code></td>
+                <td class="name"><code>args</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Response</span>
+<span class="param-type">*</span>
 
 
             
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
 
             
 
-            <td class="description last">The received message.</td>
+            <td class="description last">Arguments to pass to slave#close.</td>
         </tr>
 
     
@@ -1018,7 +344,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line254">line 254</a>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line74">line 74</a>
     </li></ul></dd>
     
 
@@ -1045,7 +371,7 @@
 
         
 <div class="param-desc">
-    True if the message has timedout, false otherwise.
+    A promise for completion
 </div>
 
 
@@ -1056,7 +382,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Boolean</span>
+<span class="param-type">Promise</span>
 
 
     </dd>
@@ -1071,14 +397,883 @@
 
     
 
-    <h4 class="name" id="onTimeout"><span class="type-signature"></span>onTimeout<span class="signature">(callback)</span><span class="type-signature"> &rarr; {Request}</span></h4>
+    <h4 class="name" id="do"><span class="type-signature"></span>do<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
 
 
 <div class="description">
-    A callback that is invoked when the request times out.
+    An alias for SlaveArray#exec
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line65">line 65</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="each"><span class="type-signature"></span>each<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {*}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Loops through each item in the response array.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Arguments to pass to proto-lib#each function.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line48">line 48</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The return value of this._.each()
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">*</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="exec"><span class="type-signature"></span>exec<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Broadcasts a message to all slaves.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Arguments to pass to Master#broadcast function.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line57">line 57</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="exit"><span class="type-signature"></span>exit<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Alias for SlaveArray#close.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Arguments to pass to slave#close.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line134">line 134</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="kill"><span class="type-signature"></span>kill<span class="signature">()</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Kills all of the slaves in the array.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line105">line 105</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="push"><span class="type-signature"></span>push<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {Number}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Overrides Array.prototype.push.
+Checks that all elements provided are Slave objects.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The arguments to pass to Array.prototype.push.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line144">line 144</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The new length of the SlaveArray.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="then"><span class="type-signature"></span>then<span class="signature">(cb)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Allows us to chain promises against the instantation of a Slave objects.
 </div>
 
 
@@ -1114,7 +1309,7 @@
 
         <tr>
             
-                <td class="name"><code>callback</code></td>
+                <td class="name"><code>cb</code></td>
             
 
             <td class="type">
@@ -1130,7 +1325,7 @@
 
             
 
-            <td class="description last">The callback to invoked when the request times out.</td>
+            <td class="description last">The callback to invoke.</td>
         </tr>
 
     
@@ -1171,7 +1366,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line267">line 267</a>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line116">line 116</a>
     </li></ul></dd>
     
 
@@ -1198,7 +1393,7 @@
 
         
 <div class="param-desc">
-    The current request instance.
+    A promise for completion.
 </div>
 
 
@@ -1209,7 +1404,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Request</span>
+<span class="param-type">Promise</span>
 
 
     </dd>
@@ -1224,14 +1419,15 @@
 
     
 
-    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">()</span><span class="type-signature"> &rarr; {Request}</span></h4>
+    <h4 class="name" id="unshift"><span class="type-signature"></span>unshift<span class="signature">(&hellip;args)</span><span class="type-signature"> &rarr; {Number}</span></h4>
 
     
 
 
 
 <div class="description">
-    Sends the request.
+    Overrides Array.prototype.unshift.
+Checks that all elements provided are Slave objects.
 </div>
 
 
@@ -1240,6 +1436,67 @@
 
 
 
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>args</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The arguments to pass to Array.prototype.unshift</td>
+        </tr>
+
+    
+    </tbody>
+</table>
 
 
 
@@ -1275,7 +1532,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line232">line 232</a>
+        <a href="lib_SlaveArray.js.html">lib/SlaveArray.js</a>, <a href="lib_SlaveArray.js.html#line155">line 155</a>
     </li></ul></dd>
     
 
@@ -1302,7 +1559,7 @@
 
         
 <div class="param-desc">
-    The current request instance.
+    The new length of the SlaveArray.
 </div>
 
 
@@ -1313,7 +1570,7 @@
     </dt>
     <dd>
         
-<span class="param-type">Request</span>
+<span class="param-type">Number</span>
 
 
     </dd>

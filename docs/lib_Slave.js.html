@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/Slave.js</title>
+    <title>lib/Slave.js - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Source: lib/Slave.js</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master-Master.html#broadcast">broadcast</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createParallel">createParallel</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createPipeline">createPipeline</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createScatter">createScatter</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlave">createSlave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlaves">createSlaves</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createWorkpool">createWorkpool</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slave">slave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slaveBelongsToGroup">slaveBelongsToGroup</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#tellSlave">tellSlave</a></li></ul></li><li><a href="module-DistIO_Request-Request.html">Request</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Request-Request.html#clearTimeout">clearTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#hasTimedout">hasTimedout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#onTimeout">onTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#send">send</a></li></ul></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-Response.html#pipe">pipe</a></li><li data-type='method'><a href="module-DistIO_Response-Response.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#joinValues">joinValues</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#sortBy">sortBy</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_Response-SlaveArray.html">SlaveArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#.isMasterMessage">isMasterMessage</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#invokeTaskListener">invokeTaskListener</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#task">task</a></li></ul></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllBusySlaves">getAllBusySlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllIdleSlaves">getAllIdleSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllSlaves">getAllSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getLeastBusy">getLeastBusy</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlave">getSlave</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesInGroup">getSlavesInGroup</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#ack">ack</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#noop">noop</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master.html#~do">do</a></li><li data-type='method'><a href="module-DistIO_Master.html#~flattenSlaveList">flattenSlaveList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~idleInList">idleInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~inGroup">inGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInGroup">leastBusyInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInList">leastBusyInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~notInGroup">notInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~task">task</a></li><li data-type='method'><a href="module-DistIO_Master.html#~validateCommand">validateCommand</a></li><li data-type='method'><a href="module-DistIO_Master.html#~while">while</a></li></ul></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllResponses">validateArgumentsAreAllResponses</a></li><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllSlaves">validateArgumentsAreAllSlaves</a></li></ul></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave.html#~canInteract">canInteract</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~cleanupSlaveReferences">cleanupSlaveReferences</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~initializeSlaveEventsWithSlaveAndChildProcess">initializeSlaveEventsWithSlaveAndChildProcess</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveExceptionMessage">isSlaveExceptionMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveMessage">isSlaveMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~sendCommandMessageToChildWithMetadata">sendCommandMessageToChildWithMetadata</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendExceptionMessageToMaster">sendExceptionMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendMessageToMaster">sendMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Events</h3><ul><li><a href="module-DistIO_Slave.html#~event:closed">closed</a></li><li><a href="module-DistIO_Slave.html#~event:exited">exited</a></li><li><a href="module-DistIO_Slave.html#~event:killed">killed</a></li><li><a href="module-DistIO_Slave.html#~event:post-sent">post-sent</a></li><li><a href="module-DistIO_Slave.html#~event:pre-send">pre-send</a></li><li><a href="module-DistIO_Slave.html#~event:response">response</a></li><li><a href="module-DistIO_Slave.html#~event:shutting-down">shutting-down</a></li><li><a href="module-DistIO_Slave.html#~event:uncaughtException">uncaughtException</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/Slave.js</h1>
+    
 
     
 
@@ -49,6 +61,12 @@ const Request = require('./Request');
 const Response = require('./Response');
 const TimeoutResponse = require('./TimeoutResponse');
 const Commands = require('./Commands');
+const SlaveArray = require('./SlaveArray');
+
+const cliArgs = require('minimist')(process.argv.slice(2), {
+  number: ['dist-io-slave-id'],
+  string: ['dist-io-slave-alias', 'dist-io-spawn-chain'],
+});
 
 /**
  * Store valid slave file paths to prevent fs.stat I/O on the same path multiple times.
@@ -106,6 +124,7 @@ let slaveIds = 0;
  * @return {undefined}
  */
 function cleanupSlaveReferences(slave) {
+  slave[settings].process.unref();
   slave[settings].exited = true;
   slave[settings].closed = true;
   delete slaves[slave.id];
@@ -145,6 +164,18 @@ function isSlaveExceptionMessage(m) {
 }
 
 /**
+ * Determines if the slave can execute tasks. And used to check for shutdown conditions.
+ * @param {Slave} slave The slave to deterine interactivity status.
+ * @return {Boolean} True if the slave can interact, false otherwise.
+ */
+function canInteract(slave) {
+  return !slave[settings].spawnError
+    &amp;&amp; !slave[settings].exited
+    &amp;&amp; !slave[settings].closed
+    &amp;&amp; !slave[settings].rejectingRequests;
+}
+
+/**
  * Listens for messages received from the slave.
  * @param {*} m The message data.
  * @return {undefined}
@@ -171,7 +202,15 @@ function slaveMessageListener(m) {
       const e = new Error(m.error.message || 'Unknown error');
       e.stack = m.error.stack;
       e.name = m.error.name;
-      if (slaves[m.from]) slaves[m.from][settings].onUncaughtException(e);
+      if (slaves[m.from]) {
+        /**
+         * Emitted when a slave exception occurs.
+         * @event uncaughtException
+         * @argument {Error} The error emitted from the slave.
+         */
+        slaves[m.from].emit('uncaughtException', e);
+        slaves[m.from][settings].onUncaughtException(e);
+      }
     }
   }
 }
@@ -241,11 +280,11 @@ function sendCommandMessageToChildWithMetadata(command, slave, meta, data, done)
 
   // If a timeout is set on the metadata, set a timeout handler...
   request.onTimeout(() => {
+    // Remove the request from the pending heap...
+    delete pendingRequests[slave.id][request.id];
     // Create a new Timeout response...
     const response = new TimeoutResponse(slave, request);
     request.callback.call(response, response, request);
-    // Remove the request from the pending heap...
-    delete pendingRequests[slave.id][request.id];
   });
 
   // Add the request to the pending heap...
@@ -254,8 +293,8 @@ function sendCommandMessageToChildWithMetadata(command, slave, meta, data, done)
 
   /**
    * Allows the user to intercept messages prior to sending.
-   * @event Slave#pre-send
-   * @property {Request} request The request object that to be sent.
+   * @event pre-send
+   * @argument {Request} request The request object to be sent
    */
   slave.emit('pre-send', request);
 
@@ -264,9 +303,9 @@ function sendCommandMessageToChildWithMetadata(command, slave, meta, data, done)
   slave[settings].sent++;
 
   /**
-   * Emitter just after sending the request to the slave object.
-   * @event Slave#post-sent
-   * @property {Request} request The request object that to be sent.
+   * Emitted just after sending the request to the slave object.
+   * @event post-sent
+   * @argument {Request} request The request object that was sent.
    */
   slave.emit('post-send', request);
 }
@@ -291,12 +330,32 @@ class Slave extends EventEmitter {
   }
 
   /**
+   * Returns the slaves with the given file path.
+   * @param {String} fp The id of the slave to retrieve.
+   * @return {SlaveArray&lt;Slave>} The slave with the provided path, if any exist.
+   */
+  static getSlavesWithPath(fp) {
+    const slavesAtPath = new SlaveArray();
+    if (typeof fp !== 'string') return slavesAtPath;
+
+    fp = path.resolve(path.normalize(fp));
+
+    slaves._.every(s => {
+      if (s.location === fp) slavesAtPath.push(s);
+      return true;
+    });
+    return slavesAtPath;
+  }
+
+  /**
    * Returns all the slaves in the given group.
    * @param {String} g The name of the group to get the slaves from.
-   * @return {ResponseArray&lt;Slave>} An array of slaves belonging to the given group
+   * @return {SlaveArray&lt;Slave>} An array of slaves belonging to the given group
    */
   static getSlavesInGroup(g) {
-    const group = [];
+    const group = new SlaveArray();
+    if (typeof g !== 'string') return group;
+
     slaves._.every((s) => {
       if (s.group === g) group.push(s);
       return true;
@@ -325,9 +384,15 @@ class Slave extends EventEmitter {
    * @return {Slave|null} The slave, if it was resolved, null otherwise.
    */
   static getSlave(idOrAliasOrSlave) {
-    idOrAliasOrSlave = idOrAliasOrSlave instanceof Slave ? idOrAliasOrSlave : Slave.getSlaveWithId(idOrAliasOrSlave);
-    idOrAliasOrSlave = idOrAliasOrSlave instanceof Slave ? idOrAliasOrSlave : Slave.getSlaveWithAlias(idOrAliasOrSlave);
-    return idOrAliasOrSlave || null;
+    if (!idOrAliasOrSlave &amp;&amp; idOrAliasOrSlave !== 0) return null;
+
+    let s = idOrAliasOrSlave instanceof Slave
+      ? idOrAliasOrSlave
+      : Slave.getSlaveWithId(idOrAliasOrSlave);
+
+    s = s instanceof Slave ? s : Slave.getSlaveWithAlias(idOrAliasOrSlave);
+
+    return s || null;
   }
 
   /**
@@ -340,10 +405,35 @@ class Slave extends EventEmitter {
 
   /**
    * Returns a shallow copy of the slaves object as an array.
-   * @return {Array&lt;Slaves>} [description]
+   * @return {Array&lt;Slaves>} All slaves.
    */
   static getAllSlaves() {
-    return slaves._.toArray();
+    return new SlaveArray(...slaves._.toArray());
+  }
+
+  /**
+   * Returns all idle slaves.
+   * @return {Array&lt;Slaves>} All idle slaves.
+   */
+  static getAllIdleSlaves() {
+    return new SlaveArray(...slaves._.toArray().filter(s => s.isIdle));
+  }
+
+  /**
+   * Returns all busy slaves.
+   * @return {Array&lt;Slaves>} All busy slaves.
+   */
+  static getAllBusySlaves() {
+    return new SlaveArray(...slaves._.toArray().filter(s => s.isBusy));
+  }
+
+  /**
+   * Returns the least busy slave in the given list of slaves.
+   * @return {Slave} The least busy slave.
+   */
+  static getLeastBusy(...slaveList) {
+    if (slaveList.length === 0) return null;
+    return slaveList._.min(s => (s instanceof Slave ? s.pendingRequests : Number.MAX_VALUE));
   }
 
   /**
@@ -357,12 +447,20 @@ class Slave extends EventEmitter {
     const options = typeof opts === 'object' ? opts : {};
 
     if (!file || typeof file !== 'string') {
-      throw new ReferenceError(
-        `Slave constructor argument #0 requires a non-empty string, but got: "${file ? file.toString() : file}"`
+      throw new TypeError(
+        'Slave constructor argument #0 requires a non-empty string, but got: ' +
+        `"${typeof file === 'string' ? '' : typeof file}"`
       );
     }
 
-    file = path.resolve(file);
+    file = path.resolve(path.normalize(file));
+
+    if (cliArgs['dist-io-spawn-chain'].indexOf(__filename) > -1) {
+      throw new TypeError(
+        'Cannot create slave: circular spawn dependency (' +
+        `${cliArgs['dist-io-spawn-chain'].join(' ➔ ')} ➔ ${__filename}`
+      );
+    }
 
     // Do some checking on the spawn file.
     // This might save some problems later.
@@ -432,6 +530,12 @@ class Slave extends EventEmitter {
       spawnError: false,
 
       /**
+       * Used by shutdown to signify that the slave can no longer recieve incoming messages.
+       * @type {Boolean}
+       */
+      rejectingRequests: false,
+
+      /**
        * The total number of messages sent by the master process to the slave process.
        * @type {Number}
        */
@@ -450,7 +554,7 @@ class Slave extends EventEmitter {
        */
       onUncaughtException: options.onUncaughtException instanceof Function
         ? options.onUncaughtException
-        : (e) => { throw e; },
+        : () => {},
 
       /**
        * The group this slave belongs to.
@@ -472,7 +576,22 @@ class Slave extends EventEmitter {
     const args = options.args._.clone();
 
     // Add in some custom cli args...
-    args.push(`--dist-io-slave-id=${this[settings].id}`, `--dist-io-slave-alias=${this[settings].alias}`);
+    args.push(
+      `--dist-io-slave-id=${this[settings].id}`,
+      `--dist-io-slave-alias=${this[settings].alias}`
+    );
+
+    if (cliArgs['--dist-io-slave-chain']) {
+      const chain = cliArgs['`--dist-io-slave-chain`'].slice(0);
+      chain.push(__filename);
+      args.push(chain);
+    }
+
+    console.log(args);
+
+    if (typeof options.title === 'string') {
+      args.push(`--dist-io-slave-title=${options.title}`);
+    }
 
     // Fork the child process...
     this[settings].process = fork(file, args, options.forkOptions || { stdio: 'pipe' });
@@ -520,6 +639,14 @@ class Slave extends EventEmitter {
   }
 
   /**
+   * The slave's process id.
+   * @return {Number} The slave's PID.
+   */
+  get pid() {
+    return this[settings].process.pid;
+  }
+
+  /**
    * Alias for the slave's id.
    * @return {Number} The slave's id.
    */
@@ -541,6 +668,33 @@ class Slave extends EventEmitter {
    */
   get location() {
     return this[settings].location;
+  }
+
+  /**
+   * Determines if the slave is not busy (idle)
+   * @return {Boolean} True if the slave is idle, false otherwise.
+   */
+  get isIdle() {
+    return this.pendingRequests === 0;
+  }
+
+  /**
+   * Determines if the slave is busy
+   * @return {Boolean} True if the slave is budy, false otherwise.
+   */
+  get isBusy() {
+    return !this.isIdle;
+  }
+
+  /**
+   * Gets the number of pending request for this slave.
+   * @return {Number} The number of pending requests for this slave.
+   */
+  get pendingRequests() {
+    if (pendingRequests[this.id]) {
+      return pendingRequests[this.id]._.size();
+    }
+    return 0;
   }
 
   /**
@@ -577,6 +731,24 @@ class Slave extends EventEmitter {
   }
 
   /**
+   * Allows us to chain promises against instantation of a Slave object.
+   * @param {Function} cb The callback to invoke.
+   * @return {Promise} A promise for completion.
+   */
+  then(cb) {
+    if (cb instanceof Function) {
+      const res = cb.call(this, this);
+      if (res instanceof Promise) return res;
+      return new Promise(resolve => {
+        resolve(res);
+      });
+    }
+    return new Promise(resolve => {
+      resolve();
+    });
+  }
+
+  /**
    * A string representation of this object.
    * @return {String} The string representation of this Slave object.
    */
@@ -593,7 +765,7 @@ class Slave extends EventEmitter {
    * @return {Promise} A promise for completion.
    */
   ack(meta) {
-    return this.exec(Commands.ACK, typeof meta === 'object' &amp;&amp; meta ? meta : { timeout: 3000 });
+    return this.exec(Commands.ACK, null, typeof meta === 'object' &amp;&amp; meta ? meta : { timeout: 10000 });
   }
 
   /**
@@ -602,7 +774,7 @@ class Slave extends EventEmitter {
    * @return {Promise} A promise for completion.
    */
   noop(meta) {
-    return this.exec(Commands.NULL, typeof meta === 'object' &amp;&amp; meta ? meta : { timeout: 3000 });
+    return this.exec(Commands.NULL, null, typeof meta === 'object' &amp;&amp; meta ? meta : { timeout: 10000 });
   }
 
   /**
@@ -615,15 +787,15 @@ class Slave extends EventEmitter {
       this[settings].process.kill(signal || 'SIGKILL');
       cleanupSlaveReferences(this);
       /**
-       * @event Slave#killed
-       * @property {String} signal The signal sent to kill the slave.
+       * @event killed
+       * @argument {String} signal The signal sent to kill the slave.
        * Triggered when the slave is killed (or a singal is sent to it).
        */
       this.emit('killed', signal || 'SIGKILL');
 
       /**
        * Emitted when slave interaction is no longer possible.
-       * @event Slave#exited
+       * @event exited
        */
       this.emit('exited');
     }
@@ -633,33 +805,77 @@ class Slave extends EventEmitter {
   /**
    * Gracefully shuts down the child process.
    * @param {Function=} done A callback for completion.
-   * @return {Slave} The current Slave instance.
+   * @return {Promise} A promise for completion.
    */
   close(...args) {
-    const done = [...args]._.getCallback();
-
+    const done = args._.getCallback();
     return new Promise((resolve, reject) => {
       if (!this[settings].spawnError &amp;&amp; !this[settings].exited &amp;&amp; !this[settings].closed) {
         this[settings].closed = true;
         sendCommandMessageToChildWithMetadata(Commands.EXIT, this, null, null, response => {
           this[settings].gotExitResponse = true;
           cleanupSlaveReferences(this);
-          done.call(this, response.error, response.value);
 
           /**
-           * @event Slave#closed
-           * @property {Error|null} err An error, if one occured during shutdown.
-           * @property {String} status The shutdown status sent by the slave.
-           * Triggered when the slave is shutdown.
+           * @event closed
+           * @property {Error|null} err An error, if one occured during close.
+           * @property {String} status The close status sent by the slave.
+           * Triggered when the slave is closed.
            */
           this.emit('closed', response.error, response.value);
           this.emit('exited');
+
+          done.call(this, response.error, response.value);
           return response.error ? reject(response.error) : resolve(response.value);
         });
       } else {
         resolve(true);
       }
     });
+  }
+
+  /**
+   * Gracefully shuts down the slave, after all remaning messages are received.
+   * @param {Function=} done A callback for completion.
+   * @return {Promise} A promise for completion.
+   */
+  shutdown(...args) {
+    const done = args._.getCallback();
+    if (!pendingRequests[this.id] || pendingRequests[this.id] === 0) return this.close(done);
+    this[settings].rejectingRequests = true;
+    delete slaves[this.id];
+
+    /**
+     * Emitted when the slave is scheduled for shutdown.
+     * @event shutting-down
+     * @argument {Slave} slave The slave.
+     * @argument {...*} args The arguments passed to shutdown
+     */
+    this.emit('shutdown', this, ...args);
+    return new Promise((resolve, reject) => {
+      this.on('response', () => {
+        if (pendingRequests[this.id]._.size() === 0) {
+          this.close()
+            .then(status => {
+              done.call(this, null, status);
+              resolve(status);
+            })
+            .catch(e => {
+              done.call(this, e, null);
+              reject(e);
+            });
+        }
+      });
+    });
+  }
+
+  /**
+   * Alias for Slave#close.
+   * @param {...*} args Arguments to send to Slave#close
+   * @return {Promise} A promise for completion.
+   */
+  exit(...args) {
+    return this.close(...args);
   }
 
   /**
@@ -677,7 +893,7 @@ class Slave extends EventEmitter {
 
     return new Promise((resolve, reject) => {
       // Check to make sure the slave hasn't exited, or that it didn't spawn.
-      if (!this[settings].spawnError &amp;&amp; !this[settings].exited &amp;&amp; !this[settings].closed) {
+      if (canInteract(this)) {
         if (typeof command !== 'string' &amp;&amp; typeof command !== 'symbol') {
           if (typeof command === 'number') {
             // Convert the command to a string...
@@ -702,20 +918,30 @@ class Slave extends EventEmitter {
 
             /**
              * Emitted everytime the slave receives a response to a request.
-             * @event Slave#response
-             * @property {Request} request The request object that to be sent.
+             * @event response
+             * @argument {Response} request The resposne from the request.
+             * @argument {Request} request The request object originally sent to the slave.
              */
             this.emit('response', response, request);
 
             resolve(response);
-            done.call(response, response.error, response.data, response, request);
+            done.call(response, null, response, request);
           });
       } else { // The slave has been shutdown, reject with error...
-        const err = new Error(`${this.toString()} has been closed.`);
+        const err = new Error(`${this.toString()} has been shutdown, closed, or killed.`);
         reject(err);
         done.call(this, err, null, this);
       }
     });
+  }
+
+  /**
+   * An alias for Slave#exec
+   * @param {...*} Arguments to pass to Slave#exec
+   * @return {Promise} A promise for completion.
+   */
+  do(...args) {
+    return this.exec(...args);
   }
 }
 
@@ -733,17 +959,13 @@ module.exports = Slave;
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a></li><li><a href="module-DistIO_Request-Request.html">Request</a></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Events</h3><ul><li><a href="Slave.html#event:closed">closed</a></li><li><a href="Slave.html#event:exited">exited</a></li><li><a href="Slave.html#event:killed">killed</a></li><li><a href="Slave.html#event:post-sent">post-sent</a></li><li><a href="Slave.html#event:pre-send">pre-send</a></li><li><a href="Slave.html#event:response">response</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat May 28 2016 02:33:45 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jun 03 2016 00:23:32 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

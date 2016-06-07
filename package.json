@@ -30,7 +30,8 @@
     "eslint-plugin-import": "^1.8.0",
     "eslint-plugin-jsx-a11y": "^1.2.2",
     "eslint-plugin-react": "^5.1.1",
-    "istanbul": "^0.4.3"
+    "istanbul": "^0.4.3",
+    "minami": "^1.1.1"
   },
   "dependencies": {
     "proto-lib": "^0.2.10"

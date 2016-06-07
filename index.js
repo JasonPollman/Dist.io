@@ -26,7 +26,7 @@ class DistIO {
   }
 
   /**
-   * Returns the Slave Class.
+   * Returns the SlaveChildProcess singleton.
    * Require is deferred using a getter.
    * @type {Function}
    */

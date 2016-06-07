@@ -2,22 +2,34 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>JSDoc: Source: lib/ResponseArray.js</title>
+    <title>lib/ResponseArray.js - Documentation</title>
 
-    <script src="scripts/prettify/prettify.js"> </script>
-    <script src="scripts/prettify/lang-css.js"> </script>
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
     <!--[if lt IE 9]>
       <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
     <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
     <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
 </head>
-
 <body>
 
-<div id="main">
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
 
-    <h1 class="page-title">Source: lib/ResponseArray.js</h1>
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master-Master.html#broadcast">broadcast</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createParallel">createParallel</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createPipeline">createPipeline</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createScatter">createScatter</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlave">createSlave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createSlaves">createSlaves</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#createWorkpool">createWorkpool</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slave">slave</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#slaveBelongsToGroup">slaveBelongsToGroup</a></li><li data-type='method'><a href="module-DistIO_Master-Master.html#tellSlave">tellSlave</a></li></ul></li><li><a href="module-DistIO_Request-Request.html">Request</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Request-Request.html#clearTimeout">clearTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#hasTimedout">hasTimedout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#onTimeout">onTimeout</a></li><li data-type='method'><a href="module-DistIO_Request-Request.html#send">send</a></li></ul></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-Response.html#pipe">pipe</a></li><li data-type='method'><a href="module-DistIO_Response-Response.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#joinValues">joinValues</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#sortBy">sortBy</a></li><li data-type='method'><a href="module-DistIO_Response-ResponseArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_Response-SlaveArray.html">SlaveArray</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#each">each</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#push">push</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Response-SlaveArray.html#unshift">unshift</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#.isMasterMessage">isMasterMessage</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#invokeTaskListener">invokeTaskListener</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html#task">task</a></li></ul></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllBusySlaves">getAllBusySlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllIdleSlaves">getAllIdleSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getAllSlaves">getAllSlaves</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getLeastBusy">getLeastBusy</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlave">getSlave</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesInGroup">getSlavesInGroup</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlavesWithPath">getSlavesWithPath</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithAlias">getSlaveWithAlias</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#.getSlaveWithId">getSlaveWithId</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#ack">ack</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#close">close</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#do">do</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exec">exec</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#exit">exit</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#kill">kill</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#noop">noop</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#shutdown">shutdown</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#then">then</a></li><li data-type='method'><a href="module-DistIO_Slave-Slave.html#toString">toString</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Master.html#~do">do</a></li><li data-type='method'><a href="module-DistIO_Master.html#~flattenSlaveList">flattenSlaveList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~idleInList">idleInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~inGroup">inGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInGroup">leastBusyInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~leastBusyInList">leastBusyInList</a></li><li data-type='method'><a href="module-DistIO_Master.html#~notInGroup">notInGroup</a></li><li data-type='method'><a href="module-DistIO_Master.html#~task">task</a></li><li data-type='method'><a href="module-DistIO_Master.html#~validateCommand">validateCommand</a></li><li data-type='method'><a href="module-DistIO_Master.html#~while">while</a></li></ul></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllResponses">validateArgumentsAreAllResponses</a></li><li data-type='method'><a href="module-DistIO_Response.html#~validateArgumentsAreAllSlaves">validateArgumentsAreAllSlaves</a></li></ul></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a><ul class='methods'><li data-type='method'><a href="module-DistIO_Slave.html#~canInteract">canInteract</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~cleanupSlaveReferences">cleanupSlaveReferences</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~initializeSlaveEventsWithSlaveAndChildProcess">initializeSlaveEventsWithSlaveAndChildProcess</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveExceptionMessage">isSlaveExceptionMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~isSlaveMessage">isSlaveMessage</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~sendCommandMessageToChildWithMetadata">sendCommandMessageToChildWithMetadata</a></li><li data-type='method'><a href="module-DistIO_Slave.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a><ul class='methods'><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendExceptionMessageToMaster">sendExceptionMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~sendMessageToMaster">sendMessageToMaster</a></li><li data-type='method'><a href="module-DistIO_SlaveChildProcess.html#~slaveMessageListener">slaveMessageListener</a></li></ul></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Events</h3><ul><li><a href="module-DistIO_Slave.html#~event:closed">closed</a></li><li><a href="module-DistIO_Slave.html#~event:exited">exited</a></li><li><a href="module-DistIO_Slave.html#~event:killed">killed</a></li><li><a href="module-DistIO_Slave.html#~event:post-sent">post-sent</a></li><li><a href="module-DistIO_Slave.html#~event:pre-send">pre-send</a></li><li><a href="module-DistIO_Slave.html#~event:response">response</a></li><li><a href="module-DistIO_Slave.html#~event:shutting-down">shutting-down</a></li><li><a href="module-DistIO_Slave.html#~event:uncaughtException">uncaughtException</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">lib/ResponseArray.js</h1>
+    
 
     
 
@@ -35,10 +47,25 @@
 'use strict';
 require('proto-lib').get('_');
 const Response = require('./Response');
+const ResponseError = require('./ResponseError');
 
 /**
  * @module DistIO/Response
  */
+
+ /**
+  * Validates that all arguments are Response objects.
+  * @param {...*} responses The responses to validate.
+  * @throws {TypeError} If any of the arguments are non-Response objects.
+  * @return {undefined}
+  */
+function validateArgumentsAreAllResponses(...responses) {
+  responses.forEach(r => {
+    if (!(r instanceof Response) &amp;&amp; !(r instanceof ResponseError)) {
+      throw new TypeError('Cannot insert non-Response object into ResponseArray!');
+    }
+  });
+}
 
 /**
  * An array of response objects.
@@ -51,10 +78,7 @@ class ResponseArray extends Array {
    * @return {ResponseArray} The newly created response array.
    */
   constructor(...args) {
-    const a = [...args];
-    a.forEach(e => {
-      if (!(e instanceof Response)) throw new TypeError('Response arrays only allow Response objects.');
-    });
+    validateArgumentsAreAllResponses(...args);
     super(...args);
   }
 
@@ -68,11 +92,79 @@ class ResponseArray extends Array {
   }
 
   /**
+   * Joins all the data from the responses.
+   * @param {...*} args Arguments to pass to Array#join.
+   * @return {String} The joined values.
+   */
+  joinValues(...args) {
+    return this.values.join(...args);
+  }
+
+  /**
+   * Sorts the array by the given property.
+   * @param {String} prop The property to sory by.
+   * @param {String} order If 'desc', it will sort in descending order, ascending otherwise.
+   * @return {ResponseArray} The sorted response array.
+   */
+  sortBy(prop, order) {
+    if (this.length > 0) {
+      if (this[0][prop] !== undefined) {
+        if (order === 'desc') {
+          this.sort((a, b) => (a[prop] > b[prop] ? -1 : a[prop] &lt; b[prop] ? 1 : 0)); // eslint-disable-line no-nested-ternary, max-len
+        } else {
+          this.sort((a, b) => (a[prop] &lt; b[prop] ? -1 : a[prop] > b[prop] ? 1 : 0)); // eslint-disable-line no-nested-ternary, max-len
+        }
+      } else {
+        throw new TypeError(`Response has no property "${prop}"`);
+      }
+    }
+    return this;
+  }
+
+  /**
+   * Overrides Array.prototype.push.
+   * Checks that all elements provided are Slave objects.
+   * @param {...*} args The arguments to pass to Array.prototype.push.
+   * @return {Number} The new length of the ResponseArray.
+   */
+  push(...args) {
+    validateArgumentsAreAllResponses(...args);
+    return super.push(...args);
+  }
+
+  /**
+   * Overrides Array.prototype.unshift.
+   * Checks that all elements provided are Slave objects.
+   * @param {...*} args The arguments to pass to Array.prototype.unshift
+   * @return {Number} The new length of the ResponseArray.
+   */
+  unshift(...args) {
+    validateArgumentsAreAllResponses(...args);
+    return super.push(...args);
+  }
+
+  /**
    * Returns the errors from all of the responses.
    * @return {Array&lt;ResponseError>} An array of ResponseErrors.
    */
   get errors() {
     return this.map(elem => elem.error);
+  }
+
+  /**
+   * Sums the values of each response in the array.
+   * @return {Number|NaN} The sum of all the values in the array.
+   */
+  get sum() {
+    return this.values.reduce((p, c) => p + c, 0);
+  }
+
+  /**
+   * Multiplies the values of each response in the array.
+   * @return {Number|NaN} The sum of all the values in the array.
+   */
+  get product() {
+    return this.values.reduce((p, c) => p * c, 1);
   }
 
   /**
@@ -110,17 +202,13 @@ module.exports = ResponseArray;
 
 </div>
 
-<nav>
-    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-DistIO.html">DistIO</a></li><li><a href="module-DistIO_Commands.html">DistIO/Commands</a></li><li><a href="module-DistIO_Master.html">DistIO/Master</a></li><li><a href="module-DistIO_Request.html">DistIO/Request</a></li><li><a href="module-DistIO_Response.html">DistIO/Response</a></li><li><a href="module-DistIO_ResponseError.html">DistIO/ResponseError</a></li><li><a href="module-DistIO_Slave.html">DistIO/Slave</a></li><li><a href="module-DistIO_SlaveChildProcess.html">DistIO/SlaveChildProcess</a></li><li><a href="module-DistIO_TimeoutResponse.html">DistIO/TimeoutResponse</a></li></ul><h3>Classes</h3><ul><li><a href="module-DistIO_Master-Master.html">Master</a></li><li><a href="module-DistIO_Request-Request.html">Request</a></li><li><a href="module-DistIO_ResponseError-ResponseError.html">ResponseError</a></li><li><a href="module-DistIO_Response-Response.html">Response</a></li><li><a href="module-DistIO_Response-ResponseArray.html">ResponseArray</a></li><li><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a></li><li><a href="module-DistIO_Slave-Slave.html">Slave</a></li><li><a href="module-DistIO_TimeoutResponse-TimeoutResponse.html">TimeoutResponse</a></li><li><a href="module-DistIO-DistIO.html">DistIO</a></li></ul><h3>Events</h3><ul><li><a href="Slave.html#event:closed">closed</a></li><li><a href="Slave.html#event:exited">exited</a></li><li><a href="Slave.html#event:killed">killed</a></li><li><a href="Slave.html#event:post-sent">post-sent</a></li><li><a href="Slave.html#event:pre-send">pre-send</a></li><li><a href="Slave.html#event:response">response</a></li></ul><h3>Namespaces</h3><ul><li><a href="module-DistIO_Request-RequestProtected.html">RequestProtected</a></li><li><a href="module-DistIO_Slave-SlaveOptions.html">SlaveOptions</a></li></ul>
-</nav>
-
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Sat May 28 2016 02:33:45 GMT-0400 (EDT)
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Fri Jun 03 2016 00:23:32 GMT-0400 (EDT) using the Minami theme.
 </footer>
 
-<script> prettyPrint(); </script>
-<script src="scripts/linenumber.js"> </script>
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
 </body>
 </html>

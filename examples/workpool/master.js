@@ -13,7 +13,7 @@ const path = require('path');
 const slaveJS = path.join(__dirname, 'slave.js');
 
 // Create a single slave...
-const slaves = master.createSlaves(5, slaveJS);
+const slaves = master.createSlaves(4, slaveJS);
 const workpool = master.create.workpool(slaves);
 
 /**
@@ -27,8 +27,28 @@ function onError(e) {
 }
 
 workpool
-  .while((i) => i < 20)
+  .while(i => i < 10)
   .do('echo', 'hello world #!')
-  .then(res => console.log(res.sortBy('sent').values))
-  .then(() => master.close(master.slaves.all))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => workpool.do('echo', 'hello world #!'))
+  .then(res => console.log(res.value))
+  .then(() => slaves.shutdown())
   .catch(onError);

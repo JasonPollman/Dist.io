@@ -1,5 +1,5 @@
 /* eslint-env node, mocha */
-/* eslint-disable prefer-arrow-callback, func-names, no-shadow */
+/* eslint-disable prefer-arrow-callback, func-names, no-shadow, require-jsdoc */
 'use strict';
 
 const master = require('../').Master;
@@ -77,7 +77,8 @@ describe('Hello World', function () {
         .catch(e => done(e));
     });
 
-    it('Should send messages to the slave and return the data (Callbacks)', (done) => {
+    it('Should send messages to the slave and return the data (Callbacks)', function (done) {
+      this.timeout(8000);
       const slaves = master.createSlaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-b' });
 
       tell(slaves).to('say hello', function (err, res) {
@@ -242,7 +243,7 @@ describe('Hello World', function () {
       } catch (e) {
         expect(e).to.be.an.instanceof(Error);
         expect(e.message).to.equal(
-          'Master#createWorkpool.while expected argument #0 (predicate) to be a function, but got string'
+          'Workpool#while expected argument #0 (predicate) to be a function, but got string.'
         );
         slave.exit();
         done();
@@ -277,37 +278,6 @@ describe('Hello World', function () {
             done();
           })
           .catch(e => done(e));
-      });
-    });
-
-    it('Master#workpool.while with wait argument true (Promises)', (done) => {
-      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-f' }, function (slaves) { // eslint-disable-line max-len
-        const workpool = master.create.workpool(slaves);
-
-        workpool
-          .while(true, (i) => i < 3)
-          .do('say hello')
-          .then(res => {
-            checkSimpleResponseHello(res);
-            slaves.kill();
-            done();
-          })
-          .catch(e => done(e));
-      });
-    });
-
-    it('Master#workpool.while with wait argument true (Callbacks)', (done) => {
-      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-g' }, function (slaves) { // eslint-disable-line max-len
-        const workpool = master.create.workpool(slaves);
-
-        workpool
-          .while(true, (i) => i < 3)
-          .do('say hello', function (err, res) {
-            expect(err).to.equal(null);
-            checkSimpleResponseHello(res);
-            slaves.kill();
-            done();
-          });
       });
     });
   });
