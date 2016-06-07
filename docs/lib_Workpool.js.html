@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>RequestProtected - Documentation</title>
+    <title>lib/Workpool.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,102 +28,227 @@
 
 <div id="main">
     
-    <h1 class="page-title">RequestProtected</h1>
+    <h1 class="page-title">lib/Workpool.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="module-DistIO_Request.html">DistIO/Request</a>~</span>
-        
-        RequestProtected
-        </h2>
-        
-    
-</header>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @file
+ * Includes the Workpool class, an implementation of the workpool distributed computing pattern.
+ * @copyright © 2016 Jason James Pollman
+ */
 
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description">Protected properties for this Request instance.</div>
-        
+'use strict';
 
-        
+/**
+ * @module Workpool
+ */
+
+/**
+ * Used to privatize members of the Workpool class.
+ */
+const workpool = Symbol();
+
+const ResponseArray = require('./ResponseArray');
+
+/**
+ * An abstraction around the parallel, distrubuted computing workpool pattern.
+ */
+class Workpool {
+  /**
+   * @param {...Slaves} The list of slaves to start this workpool with.
+   */
+  constructor(...slaves) {
+    const queue = [];
+    this[workpool] = { lastIndex: -1, slaves, queue };
+
+    if (slaves.length === 0) throw new Error('No slaves given to start workpool with!');
+
+    slaves.forEach(s => {
+      // Setup a listener for when a slave receives a response to pop the next task of the queue
+      // and execute it while there are idle slaves.
+      s.on('response', () => this.tickTaskQueue());
+    });
+  }
+
+  /**
+   * "Ticks" the task queue (invokes the next task to be done)
+   * @return {undefined}
+   */
+  tickTaskQueue() {
+    if (this[workpool].queue.length > 0) this[workpool].queue.shift()();
+  }
+
+  /**
+   * Adds a "while" workpool task to the task queue.
+   * @param {Function} predicate The predicate from the .while() call.
+   * @param {String} command The command to execute.
+   * @param {*} data Data for the command.
+   * @param {Object} meta Metadata for the command.
+   * @param {Function=} done An optional callback for completion.
+   * @return {Promise} A promise for completion.
+   */
+  addWhileTask(predicate, command, data, meta, done) {
+    if (data instanceof Function) data = undefined;
+    if (meta instanceof Function) meta = undefined;
+
+    let i = 0;
+    let predicateFailed = false;
+    let received = 0;
+    let sent = 0;
+    let executeWithIdle = null;
+
+    const responses = new ResponseArray();
+
+    return new Promise((resolve, reject) => {
+      const ifPredicatePassesExecWithSlave = (s) => {
+        if (!predicateFailed &amp;&amp; predicate(i++, responses)) {
+          sent++;
+          s.exec(command, data, meta)
+            .then(res => {
+              ++received;
+              responses.push(res);
+              if (received === sent &amp;&amp; predicateFailed) {
+                resolve(responses);
+                done.call(this, null, responses);
+              } else {
+                this[workpool].queue.push(executeWithIdle);
+                this.tickTaskQueue();
+              }
+            })
+            .catch(e => {
+              done.call(this, e, null);
+              reject(e);
+            });
+        } else {
+          predicateFailed = true;
+          if (received === sent) {
+            resolve(responses);
+            done.call(this, null, responses);
+          }
+        }
+      };
+
+      executeWithIdle = () => {
+        const idleSlaves = require('./Master').slaves // eslint-disable-line global-require
+          .idleInList(...this[workpool].slaves);
+
+        idleSlaves.forEach(s => ifPredicatePassesExecWithSlave(s));
+      };
+
+      this[workpool].queue.push(executeWithIdle);
+      this.tickTaskQueue();
+    });
+  }
+
+  /**
+   * Retrieves the next slave that should do work in the workpool.
+   * If no slaves are available to do work, then null will be returned.
+   * @return {Slave|Null} A slave that's ready for work, or null.
+   */
+  nextSlave() {
+    if (this[workpool].lastIndex === this[workpool].slaves.length - 1) this[workpool].lastIndex = -1;
+
+    const slaves = require('./Master').slaves // eslint-disable-line global-require
+      .idleInList(...this[workpool].slaves);
+
+    let slave;
+
+    if (slaves.length > 1) {
+      slave = slaves
+      ._.where(s => this[workpool].slaves.indexOf(s) > this[workpool].lastIndex)
+      ._.first();
+    } else if (slaves.length === 1) {
+      slave = slaves[0];
+    }
 
 
-<dl class="details">
+    if (slave) this[workpool].lastIndex = this[workpool].slaves.indexOf(slave);
+    return slave || null;
+  }
 
-    
+  /**
+   * Adds a task to the workpool queue.
+   * @param {String} command The command to execute.
+   * @param {*} data Data for the command.
+   * @param {Object} meta Metadata for the command.
+   * @param {Function=} done An optional callback for completion.
+   * @return {Promise} A promise for completion.
+   */
+  addTask(command, data, meta, done) {
+    if (data instanceof Function) data = undefined;
+    if (meta instanceof Function) meta = undefined;
 
-    
+    return new Promise((resolve, reject) => {
+      const doTask = () => {
+        const s = this.nextSlave();
+        if (s) {
+          s.exec(command, data, meta)
+            .then(res => {
+              resolve(res);
+              done.call(this, null, res);
+            })
+            .catch(e => {
+              reject(e);
+              done.call(this, e, null);
+            });
+        } else {
+          this[workpool].queue.push(doTask);
+        }
+      };
 
-    
+      this[workpool].queue.push(doTask);
+      this.tickTaskQueue();
+    });
+  }
 
-    
+  /**
+   * Executes a while-loop style workpool task.
+   * @param {Function} predicate A function, that when invoked will keep adding tasks to the workpool until
+   * a falsy value is returned.
+   * @return {Promise} The same promise returned from Workpool#addWhileTask
+   */
+  while(predicate) {
+    if (!(predicate instanceof Function)) {
+      throw new TypeError(
+        `Workpool#while expected argument #0 (predicate) to be a function, but got ${typeof predicate}.`
+      );
+    } else {
+      return {
+        do: (command, ...rest) => {
+          const done = rest._.getAndStripCallback();
+          return this.addWhileTask(predicate, command, rest[0], rest[1], done);
+        },
+      };
+    }
+  }
 
-    
+  /**
+   * Adds a task to the workpool queue.
+   * @param {String} command The command to execute
+   * @param {...*} rest The rest of the arguments to pass to Workpool#addTask
+   * @return {Promise} The same promise returned from Workpool#addTask
+   */
+  do(command, ...rest) {
+    const done = rest._.getAndStripCallback();
+    return this.addTask(command, rest[0], rest[1], done);
+  }
+}
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_Request.js.html">lib/Request.js</a>, <a href="lib_Request.js.html#line86">line 86</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-
-    
-
-    
-</article>
-
-</section>
+/**
+ * The Workpool class.
+ * @type {Function}
+ */
+module.exports = Workpool;
+</code></pre>
+        </article>
+    </section>
 
 
 

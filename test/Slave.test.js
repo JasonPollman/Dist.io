@@ -10,6 +10,8 @@ const pgrep = 'pgrep';
 const os = require('os');
 const Response = require('../lib/Response');
 const TimeoutResponse = require('../lib/TimeoutResponse');
+const ResponseError = require('../lib/ResponseError');
+const master = require('../lib/Master');
 
 describe('Slave Class', function () {
   describe('Slave#getAllSlaves', function () {
@@ -240,6 +242,98 @@ describe('Slave Class', function () {
         });
     });
 
+    it('Should handle request timeouts (with Slave.defaultTimeout set), part I', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      Slave.defaultTimeout = 100;
+      slave.do('echo', null)
+        .then((res) => {
+          expect(res).to.be.an.instanceof(TimeoutResponse);
+          expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 100ms./);
+          expect(res.error.name).to.equal('ResponseError: Error');
+          slave.kill();
+          done();
+        })
+        .catch(e => {
+          done(e);
+        });
+      Slave.defaultTimeout = null;
+    });
+
+    it('Should handle request timeouts (with Slave.defaultTimeout set), part II', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      Slave.defaultTimeout = 10;
+      slave.do('echo', null, { catchAll: true })
+        .then(() => done(new Error('Expected to throw')))
+        .catch(e => {
+          expect(e).to.be.an.instanceof(ResponseError);
+          expect(e.message).to.match(/Request #\d+ with command "\w+" timed out after 10ms./);
+          expect(e.name).to.equal('ResponseError: Error');
+          slave.kill();
+          done();
+        });
+      Slave.defaultTimeout = undefined;
+      expect(Slave.defaultTimeout).to.equal(null);
+    });
+
+    it('Should handle request timeouts (with Slave#defaultTimeout set), part I', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      slave.defaultTimeout = 50;
+      slave.defaultTimeout = undefined;
+      expect(slave.defaultTimeout).to.equal(null);
+      slave.defaultTimeout = null;
+      expect(slave.defaultTimeout).to.equal(null);
+      slave.defaultTimeout = false;
+      expect(slave.defaultTimeout).to.equal(null);
+      slave.defaultTimeout = 50;
+      slave.defaultTimeout = 'foo';
+      slave.defaultTimeout = [];
+      slave.defaultTimeout = () => {};
+      expect(slave.defaultTimeout).to.equal(50);
+      slave.do('echo', null)
+        .then((res) => {
+          expect(res).to.be.an.instanceof(TimeoutResponse);
+          expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 50ms./);
+          expect(res.error.name).to.equal('ResponseError: Error');
+          slave.kill();
+          done();
+        })
+        .catch(e => {
+          done(e);
+        });
+
+      slave.defaultTimeout = undefined;
+      expect(slave.defaultTimeout).to.equal(null);
+    });
+
+    it('Should handle request timeouts (with Slave#defaultTimeout set), part II', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+      const slave2 = new Slave(location);
+
+      slave2.defaultTimeout = 2;
+      slave2.defaultTimeout = 'foo';
+      slave.defaultTimeout = [];
+      slave.defaultTimeout = () => {};
+      expect(slave.defaultTimeout).to.equal(null);
+      expect(slave2.defaultTimeout).to.equal(2);
+      master.tell(slave, slave2).to('echo', null, { catchAll: true })
+        .then(() => done(new Error('Expected to throw')))
+        .catch(e => {
+          expect(e).to.be.an.instanceof(ResponseError);
+          expect(e.message).to.match(/Request #\d+ with command "\w+" timed out after 2ms./);
+          expect(e.name).to.equal('ResponseError: Error');
+          slave.kill();
+          slave2.kill();
+          done();
+        });
+    });
+
     it('Should reject on invalid command types', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
@@ -348,7 +442,7 @@ describe('Slave Class', function () {
       slave.noop()
         .then(res => {
           expect(res).to.be.an.instanceof(Response);
-          expect(res.value).to.equal(undefined);
+          expect(res.value).to.equal(null);
           done();
         })
         .catch(e => {

@@ -1,13 +1,25 @@
 /* eslint-env node, mocha */
-/* eslint-disable prefer-arrow-callback, func-names */
+/* eslint-disable prefer-arrow-callback, func-names, require-jsdoc */
 'use strict';
 
 process.argv.push(
   '--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias', '--dist-io-slave-title=slave-child-test'
 );
 
+function throwError() {
+  throw new Error('foo');
+}
+
 const slave = require('./data/simple-slave-b');
 const expect = require('chai').expect;
+
+slave.task('throw', () => {
+  throw new Error('oops');
+});
+
+slave.task('throw2', (data, done) => {
+  done(new Error('oops'));
+});
 
 describe('SlaveChildProcess Class', function () {
   describe('SlaveChildProcess#id', function () {
@@ -31,39 +43,304 @@ describe('SlaveChildProcess Class', function () {
     });
   });
 
-  it('Should respond to commands', function (done) {
-    this.timeout(5500);
-    this.slow(5000);
+  describe('SlaveChildProcess command response, part I', function () {
+    it('Should respond to known commands', function (done) {
+      process.send = (m) => {
+        expect(m.data).to.equal('world!');
+        done();
+      };
 
-    process.send = (m) => {
-      expect(m.data).to.equal('world!');
-      done();
-    };
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: 'echo',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: 'world!',
+        meta: null,
+      };
 
-    const request = {
-      rid: 0,
-      title: 'MasterIOMessage',
-      for: 0,
-      command: 'echo',
-      secretNumber: 123456789,
-      secretId: 'secret id',
-      data: 'world!',
-      meta: null,
-    };
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('echo');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
 
-    slave.on('task started', (task, data, meta) => {
-      expect(task).to.equal('echo');
-      expect(data).to.equal(request.data);
-      expect(meta).to.equal(request.meta);
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('echo');
+        expect(res).to.equal('world!');
+        expect(err).to.equal(null);
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      process.emit('message', request);
     });
 
-    slave.on('task completed', (task, res, data, meta) => {
-      expect(task).to.equal('echo');
-      expect(res).to.equal('world!');
-      expect(data).to.equal(request.data);
-      expect(meta).to.equal(request.meta);
+    it('Should respond to unknown commands with an error', function (done) {
+      process.send = (m) => {
+        expect(m.data).to.equal(undefined);
+        expect(m.error).to.be.an('object');
+        expect(m.error.message).to.equal(`Slave #${slave.id} does not listen to task "doesnt exist"`);
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: 'doesnt exist',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: 'world!',
+        meta: null,
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('doesnt exist');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('doesnt exist');
+        expect(res).to.equal(null);
+        expect(err).to.be.an.instanceof(ReferenceError);
+        expect(err.message).to.equal(`Slave #${slave.id} does not listen to task "doesnt exist"`);
+        expect(err.name).to.equal('ReferenceError');
+        expect(err.stack).to.be.a('string');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      process.emit('message', request);
     });
 
-    process.emit('message', request);
+    it('Should respond to errors within a user "task" callback with an error', function (done) {
+      process.send = (m) => {
+        expect(m.data).to.equal(undefined);
+        expect(m.error).to.be.an('object');
+        expect(m.error.message).to.equal('oops');
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: 'throw',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: 'world!',
+        meta: null,
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('throw');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('throw');
+        expect(res).to.equal(null);
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('oops');
+        expect(err.name).to.equal('Error');
+        expect(err.stack).to.be.a('string');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      process.emit('message', request);
+    });
+
+    it('Should respond to errors returned from a user "task" callback (using the done function) with an error', function (done) { // eslint-disable-line max-len
+      process.send = (m) => {
+        expect(m.data).to.equal(undefined);
+        expect(m.error).to.be.an('object');
+        expect(m.error.message).to.equal('oops');
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: 'throw2',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: 'world!',
+        meta: null,
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('throw2');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('throw2');
+        expect(res).to.equal(null);
+        expect(err).to.be.an.instanceof(Error);
+        expect(err.message).to.equal('oops');
+        expect(err.name).to.equal('Error');
+        expect(err.stack).to.be.a('string');
+        expect(data).to.equal(request.data);
+        expect(meta).to.equal(request.meta);
+      });
+
+      process.emit('message', request);
+    });
+  });
+
+  describe('SlaveChildProcess Basic Built in Commands', function () {
+    it('ACK Command', function (done) {
+      process.send = (m) => {
+        expect(m).to.be.an('object');
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: '__dist.io__ack__',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: null,
+        meta: null,
+        sent: Date.now(),
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('__dist.io__ack__');
+        expect(data).to.equal(null);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('__dist.io__ack__');
+        expect(data).to.equal(null);
+        expect(err).to.equal(null);
+        expect(meta).to.equal(request.meta);
+        expect(res).to.be.an('object');
+        expect(res.from).to.equal(slave.id);
+        expect(res.sent).to.be.a('number');
+        expect(res.responded).to.be.a('number');
+        expect(res.uptime).to.be.a('number');
+        expect(res.message).to.match(
+          /^Slave acknowledgement from=\d+, received=\d+ responded=\d+, started=\d+, uptime=\d+$/
+        );
+      });
+
+      process.emit('message', request);
+    });
+
+    it('NULL Command', function (done) {
+      process.send = (m) => {
+        expect(m).to.be.an('object');
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: '__dist.io__null__',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: null,
+        meta: null,
+        sent: Date.now(),
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('__dist.io__null__');
+        expect(data).to.equal(null);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('__dist.io__ack__');
+        expect(err).to.equal(null);
+        expect(data).to.equal(null);
+        expect(meta).to.equal(request.meta);
+        expect(res).to.be.equal(null);
+      });
+
+      process.emit('message', request);
+    });
+
+    it('EXIT Command', function (done) {
+      process.send = (m) => {
+        expect(m).to.be.an('object');
+        expect(m.data).to.equal(true);
+        expect(process.listenerCount('message')).to.equal(0);
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: '__dist.io__exit__',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: null,
+        meta: null,
+        sent: Date.now(),
+      };
+
+      slave.on('task started', function testListener(task, data, meta) {
+        slave.removeListener('task started', testListener);
+        expect(task).to.equal('__dist.io__exit__');
+        expect(data).to.equal(null);
+        expect(meta).to.equal(request.meta);
+      });
+
+      slave.on('task completed', function testListener(task, err, res, data, meta) {
+        slave.removeListener('task completed', testListener);
+        expect(task).to.equal('__dist.io__exit__');
+        expect(err).to.equal(null);
+        expect(data).to.equal(null);
+        expect(meta).to.equal(request.meta);
+        expect(res).to.be.equal(true);
+      });
+
+      process.emit('message', request);
+    });
+  });
+
+  describe('Sending exceptions to the master process', function () {
+    it('Should send an uncaught exception to the master process', function (done) {
+      process.send = (m) => {
+        expect(m.data).to.equal(undefined);
+        expect(m.error).to.be.an('object');
+        expect(m.error.message).to.equal('foo');
+        expect(m.error.name).to.equal('Error');
+        done();
+      };
+
+      try {
+        throwError();
+      } catch (e) {
+        process.emit('uncaughtException', e);
+      }
+    });
   });
 });

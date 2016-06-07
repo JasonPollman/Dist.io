@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>DistIO/SlaveChildProcess - Documentation</title>
+    <title>Workpool - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">DistIO/SlaveChildProcess</h1>
+    <h1 class="page-title">Workpool</h1>
     
 
     
@@ -40,8 +40,13 @@
 
 <header>
     
+        <h2>
+            <span class="ancestors"><a href="module-Workpool.html">Workpool</a>~</span>
         
-            
+        Workpool
+        </h2>
+        
+            <div class="class-description">An abstraction around the parallel, distrubuted computing workpool pattern.</div>
         
     
 </header>
@@ -51,27 +56,83 @@
     
         
 
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Workpool"><span class="type-signature"></span>new Workpool<span class="signature">(&hellip;The)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
         
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>The</code></td>
             
 
+            <td class="type">
+            
+                
+<span class="param-type">Slaves</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">list of slaves to start this workpool with.</td>
+        </tr>
+
     
-
-    <h4 class="name" id="module:DistIO/SlaveChildProcess"><span class="type-signature"></span>module:DistIO/SlaveChildProcess<span class="type-signature"> :SlaveChildProcess</span></h4>
-
-    
-
-
-
-<div class="description">
-    A singleton instance of the SlaveChildProcess class.
-</div>
-
-
-
-
-
-
-
+    </tbody>
+</table>
 
 
 
@@ -107,7 +168,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line291">line 291</a>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line23">line 23</a>
     </li></ul></dd>
     
 
@@ -133,7 +194,6 @@
 
 
 
-        
     
     </div>
 
@@ -142,228 +202,11 @@
     
 
     
-        <h3 class="subsection-title">Classes</h3>
-
-        <dl>
-            <dt><a href="module-DistIO_SlaveChildProcess-SlaveChildProcess.html">SlaveChildProcess</a></dt>
-            <dd></dd>
-        </dl>
-    
 
      
 
     
 
-    
-        <h3 class="subsection-title">Members</h3>
-
-        
-            
-<h4 class="name" id="~INIT"><span class="type-signature">(inner, constant) </span>INIT<span class="type-signature"> :Number</span></h4>
-
-
-
-
-<div class="description">
-    The time this process was started.
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">Number</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line29">line 29</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~slave"><span class="type-signature">(inner, constant) </span>slave<span class="type-signature"></span></h4>
-
-
-
-
-<div class="description">
-    Used by the SlaveChildProcess class to privatize properties.
-</div>
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line23">line 23</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
-            
-<h4 class="name" id="~slaveInstance"><span class="type-signature">(inner, constant) </span>slaveInstance<span class="type-signature"> :SlaveChildProcess</span></h4>
-
-
-
-
-<div class="description">
-    A singleton instanceof SlaveChildProcess
-</div>
-
-
-
-    <h5>Type:</h5>
-    <ul>
-        <li>
-            
-<span class="param-type">SlaveChildProcess</span>
-
-
-        </li>
-    </ul>
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line189">line 189</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-        
     
 
     
@@ -374,14 +217,14 @@
 
     
 
-    <h4 class="name" id="~sendExceptionMessageToMaster"><span class="type-signature">(inner) </span>sendExceptionMessageToMaster<span class="signature">(res)</span><span class="type-signature"> &rarr; {undefined}</span></h4>
+    <h4 class="name" id="addTask"><span class="type-signature"></span>addTask<span class="signature">(command, data, meta, done<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
 
 
 <div class="description">
-    Sends an exception response message to the master process.
+    Adds a task to the workpool queue.
 </div>
 
 
@@ -405,154 +248,7 @@
         <th>Type</th>
 
         
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The data to send.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line240">line 240</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">undefined</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~sendMessageToMaster"><span class="type-signature">(inner) </span>sendMessageToMaster<span class="signature">(req, res)</span><span class="type-signature"> &rarr; {undefined}</span></h4>
-
-    
-
-
-
-<div class="description">
-    Sends the response message to the master process.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
+        <th>Attributes</th>
         
 
         
@@ -566,598 +262,7 @@
 
         <tr>
             
-                <td class="name"><code>req</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The original request from the master.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The results from the request execution.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line197">line 197</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">undefined</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~slaveMessageListener"><span class="type-signature">(inner) </span>slaveMessageListener<span class="signature">(m)</span><span class="type-signature"> &rarr; {undefined}</span></h4>
-
-    
-
-
-
-<div class="description">
-    A listener attached to process.on('message', ...).
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>m</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The message contents.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line260">line 260</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">undefined</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-        <h3 class="subsection-title">Events</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id="~event:sendingexception">sending exception</h4>
-
-    
-
-
-
-<div class="description">
-    Emitted when a slave process is sending an exception to it's master
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>exception</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Obkect</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The exception response object the slave is sending.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line241">line 241</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~event:sendingmessage">sending message</h4>
-
-    
-
-
-
-<div class="description">
-    Emitted when a slave process is sending a message to it's master
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>response</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Obkect</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The response message the slave is sending.</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line221">line 221</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id="~event:taskcompleted">task completed</h4>
-
-    
-
-
-
-<div class="description">
-    Emitted when a slave process finishes a task, right before the data is sent back to the master.
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>task</code></td>
+                <td class="name"><code>command</code></td>
             
 
             <td class="type">
@@ -1170,110 +275,815 @@
             </td>
 
             
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
 
             
 
-            <td class="description last">The name of the task that was completed.</td>
+            <td class="description last">The command to execute.</td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>e</code></td>
+                <td class="name"><code>data</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">Error</span>
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Data for the command.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meta</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Metadata for the command.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>done</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An optional callback for completion.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line144">line 144</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="addWhileTask"><span class="type-signature"></span>addWhileTask<span class="signature">(predicate, command, data, meta, done<span class="signature-attributes">opt</span>)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Adds a "while" workpool task to the task queue.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>predicate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The predicate from the .while() call.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>command</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The command to execute.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Data for the command.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>meta</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">Metadata for the command.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>done</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+                    &lt;optional><br>
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">An optional callback for completion.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line57">line 57</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A promise for completion.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="do"><span class="type-signature"></span>do<span class="signature">(command, &hellip;rest)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Adds a task to the workpool queue.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>command</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The command to execute</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>rest</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">*</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                    &lt;repeatable><br>
+                
+                </td>
+            
+
+            
+
+            <td class="description last">The rest of the arguments to pass to Workpool#addTask</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line198">line 198</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The same promise returned from Workpool#addTask
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="nextSlave"><span class="type-signature"></span>nextSlave<span class="signature">()</span><span class="type-signature"> &rarr; {Slave|Null}</span></h4>
+
+    
+
+
+
+<div class="description">
+    Retrieves the next slave that should do work in the workpool.
+If no slaves are available to do work, then null will be returned.
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line115">line 115</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A slave that's ready for work, or null.
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Slave</span>
 |
 
-<span class="param-type">null</span>
+<span class="param-type">Null</span>
 
 
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">An error, if one occured during the task</td>
-        </tr>
+    </dd>
+</dl>
 
     
 
-        <tr>
-            
-                <td class="name"><code>res</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
 
 
+        
             
-            </td>
-
-            
-
-            
-
-            <td class="description last">The response value that's being sent back to the master.</td>
-        </tr>
 
     
 
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The data sent from the master.</td>
-        </tr>
+    <h4 class="name" id="tickTaskQueue"><span class="type-signature"></span>tickTaskQueue<span class="signature">()</span><span class="type-signature"> &rarr; {undefined}</span></h4>
 
     
 
-        <tr>
-            
-                <td class="name"><code>The</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
 
 
-            
-            </td>
+<div class="description">
+    "Ticks" the task queue (invokes the next task to be done)
+</div>
 
-            
 
-            
 
-            <td class="description last">metadata sent from the master.</td>
-        </tr>
 
-    
-    </tbody>
-</table>
+
+
+
 
 
 
@@ -1309,7 +1119,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line145">line 145</a>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line44">line 44</a>
     </li></ul></dd>
     
 
@@ -1332,6 +1142,24 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">undefined</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
@@ -1340,14 +1168,14 @@
 
     
 
-    <h4 class="name" id="~event:taskstarted">task started</h4>
+    <h4 class="name" id="while"><span class="type-signature"></span>while<span class="signature">(predicate)</span><span class="type-signature"> &rarr; {Promise}</span></h4>
 
     
 
 
 
 <div class="description">
-    Emitted right before a slave is called upon to do a task (just before the .task() invocation).
+    Executes a while-loop style workpool task.
 </div>
 
 
@@ -1383,13 +1211,13 @@
 
         <tr>
             
-                <td class="name"><code>task</code></td>
+                <td class="name"><code>predicate</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">String</span>
+<span class="param-type">function</span>
 
 
             
@@ -1399,53 +1227,8 @@
 
             
 
-            <td class="description last">The name of the task that was completed.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>data</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">*</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The data to send back to the master.</td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>The</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">metadata, which will also be sent back to the master.</td>
+            <td class="description last">A function, that when invoked will keep adding tasks to the workpool until
+a falsy value is returned.</td>
         </tr>
 
     
@@ -1486,7 +1269,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="lib_SlaveChildProcess.js.html">lib/SlaveChildProcess.js</a>, <a href="lib_SlaveChildProcess.js.html#line123">line 123</a>
+        <a href="lib_Workpool.js.html">lib/Workpool.js</a>, <a href="lib_Workpool.js.html#line177">line 177</a>
     </li></ul></dd>
     
 
@@ -1509,10 +1292,36 @@
 
 
 
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    The same promise returned from Workpool#addWhileTask
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Promise</span>
+
+
+    </dd>
+</dl>
+
+    
 
 
 
         
+    
+
+    
+
     
 </article>
 
