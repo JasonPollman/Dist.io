@@ -184,6 +184,33 @@ describe('Master Class', function () {
       });
     });
 
+    it('Should shutdown the given slave arguments after all messages have been sent (Using SlaveArray)', function (done) { // eslint-disable-line max-len
+      this.timeout(3000);
+      this.slow(2000);
+
+      let slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing shutdown' }
+      );
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(3);
+
+      slaves.shutdown()
+        .then(statuses => {
+          expect(statuses).to.eql([true, true, true]);
+          slaves = Master.slaves.inGroup('testing shutdown');
+          expect(slaves).to.be.an.instanceof(SlaveArray);
+          expect(slaves.length).to.equal(0);
+          done();
+        })
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => {
+          expect(e).to.be.an.instanceof(Error);
+        });
+    });
+
     it('Should shutdown the slave immediately if there are no pending requests', function (done) {
       this.timeout(3000);
       this.slow(2000);
@@ -496,6 +523,45 @@ describe('Master Class', function () {
       slave.shouldCatchAll = undefined;
       expect(slave.shouldCatchAll).to.equal(null);
       Slave.shouldCatchAll = null;
+      expect(Slave.shouldCatchAll).to.equal(null);
+    });
+
+    it('Should throw ResponseErrors if meta.catchAll is true (using the Master class)', function (done) {
+      this.timeout(2000);
+      this.slow(1000);
+
+      const slave = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-b.js'));
+      Master.shouldCatchAll = true;
+      Master.shouldCatchAll = 'string';
+      Master.shouldCatchAll = [];
+      Master.shouldCatchAll = () => {};
+      expect(Master.shouldCatchAll).to.equal(true);
+      slave.exec('foobar', null)
+        .then(() => done(new Error('Expected to throw')))
+        .catch(e => {
+          expect(e).to.be.an.instanceof(ResponseError);
+          expect(e.message).to.match(/^Slave #\d+ does not listen to task "foobar"$/);
+
+          Master.tell(slave).to('foobar', null, { catchAll: true })
+            .then(() => done(new Error('Expected to throw')))
+            .catch(er => {
+              expect(er).to.be.an.instanceof(ResponseError);
+              expect(er.message).to.match(/^Slave #\d+ does not listen to task "foobar"$/);
+
+              Master.broadcast('foobar', null, { catchAll: true }).to(slave)
+                .then(() => done(new Error('Expected to throw')))
+                .catch(err => {
+                  expect(err).to.be.an.instanceof(ResponseError);
+                  expect(err.message).to.match(/^Slave #\d+ does not listen to task "foobar"$/);
+                  slave.exit();
+                  done();
+                });
+            });
+        });
+
+      slave.shouldCatchAll = undefined;
+      expect(slave.shouldCatchAll).to.equal(null);
+      Master.shouldCatchAll = null;
       expect(Slave.shouldCatchAll).to.equal(null);
     });
 

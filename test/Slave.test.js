@@ -261,7 +261,27 @@ describe('Slave Class', function () {
       Slave.defaultTimeout = null;
     });
 
-    it('Should handle request timeouts (with Slave.defaultTimeout set), part II', function (done) {
+    it('Should handle request timeouts (with Master#defaultTimeout set), part II', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      master.defaultTimeout = 100;
+      expect(master.defaultTimeout).to.equal(Slave.defaultTimeout);
+      slave.do('echo', null)
+        .then((res) => {
+          expect(res).to.be.an.instanceof(TimeoutResponse);
+          expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 100ms./);
+          expect(res.error.name).to.equal('ResponseError: Error');
+          slave.kill();
+          done();
+        })
+        .catch(e => {
+          done(e);
+        });
+      master.defaultTimeout = null;
+    });
+
+    it('Should handle request timeouts (with Slave.defaultTimeout set), part III', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
