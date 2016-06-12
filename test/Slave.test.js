@@ -261,7 +261,25 @@ describe('Slave Class', function () {
       Slave.defaultTimeout = null;
     });
 
-    it('Should handle request timeouts (with Master#defaultTimeout set), part II', function (done) {
+    it('Should handle request timeouts (with Slave.defaultTimeout set), part II', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      Slave.defaultTimeout = 10;
+      slave.do('echo', null, { catchAll: true })
+        .then(() => done(new Error('Expected to throw')))
+        .catch(e => {
+          expect(e).to.be.an.instanceof(ResponseError);
+          expect(e.message).to.match(/Request #\d+ with command "\w+" timed out after 10ms./);
+          expect(e.name).to.equal('ResponseError: Error');
+          slave.kill();
+          done();
+        });
+      Slave.defaultTimeout = undefined;
+      expect(Slave.defaultTimeout).to.equal(null);
+    });
+
+    it('Should handle request timeouts (with Master#defaultTimeout set), part I', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
@@ -279,24 +297,6 @@ describe('Slave Class', function () {
           done(e);
         });
       master.defaultTimeout = null;
-    });
-
-    it('Should handle request timeouts (with Slave.defaultTimeout set), part III', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
-
-      Slave.defaultTimeout = 10;
-      slave.do('echo', null, { catchAll: true })
-        .then(() => done(new Error('Expected to throw')))
-        .catch(e => {
-          expect(e).to.be.an.instanceof(ResponseError);
-          expect(e.message).to.match(/Request #\d+ with command "\w+" timed out after 10ms./);
-          expect(e.name).to.equal('ResponseError: Error');
-          slave.kill();
-          done();
-        });
-      Slave.defaultTimeout = undefined;
-      expect(Slave.defaultTimeout).to.equal(null);
     });
 
     it('Should handle request timeouts (with Slave#defaultTimeout set), part I', function (done) {

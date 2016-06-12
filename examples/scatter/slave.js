@@ -1,6 +1,6 @@
 /**
  * @file
- * A simple slave hello world example.
+ * A simple slave example that just sends back any data it receives.
  * @see ./master.js for more information.
  */
 

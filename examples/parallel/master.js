@@ -5,7 +5,7 @@
  * task, wait for a response, then perform the "say goodbye"task.
  */
 
-/* eslint-disable no-console */
+/* eslint-disable no-console, newline-per-chained-call */
 
 'use strict';
 const master = require('../../').Master;
@@ -27,16 +27,40 @@ const slaves = master.createSlaves(5, slaveJS);
 const parallel = master.create.parallel();
 
 parallel
-  .addTask('hello')
-  .for(slaves[0])
-  .addTask('world')
-  .for(slaves[1])
-  .addTask('!')
-  .for(slaves[2])
-  .times(1)
+  .addTask('hello').for(slaves[0])  // Add a task for slave one.
+  .addTask('world').for(slaves[1])  // Add a task for slave two.
+  .addTask('!').for(slaves[2])      // Add a task for slave three.
+  .execute()                        // When done adding tasks, execute them in parallel.
+  .then(res => {
+    // The ResponseArray object returned here, has two really nice convenience methods:
+    // ResponseArray#sortBy and ResponseArray#joinValues.
+    console.log(res.sortBy('rid').joinValues(' '));
+    // Don't forget to close the slave processes...
+    slaves.exit();
+  })
+  .catch(onError);
+
+
+// We don't have to chain...
+const newSlaves = master.createSlaves(5, slaveJS);
+const myParallel = master.create.parallel();
+myParallel.addTask('hello').for(newSlaves.random);
+myParallel.addTask('world').for(newSlaves.random);
+myParallel.addTask('!').for(newSlaves.random);
+
+myParallel.execute()
+  .then(res => {
+    console.log(res.sortBy('rid').joinValues(' '));
+    newSlaves.exit();
+  })
+  .catch(onError);
+
+// Add another task, post first execution, then execute again...
+myParallel
+  .addTask('?').for(newSlaves.random)
   .execute()
   .then(res => {
-    console.log(res.sortBy('from').joinValues(' '));
-    slaves.exit();
+    console.log(res.sortBy('rid').joinValues(' '));
+    newSlaves.exit();
   })
   .catch(onError);

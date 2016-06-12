@@ -18,4 +18,7 @@ slave
   })
   .task('!', (data, done) => {
     done('!');
+  })
+  .task('?', (data, done) => {
+    done('?');
   });

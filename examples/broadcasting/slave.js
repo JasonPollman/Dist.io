@@ -11,7 +11,5 @@ const slave = require('../../').Slave;
  * The "foo" task. Simply sends back "bar" to the master.
  */
 slave.task('foo', (data, done) => {
-  setTimeout(() => {
-    done('bar');
-  }, 1000);
+  done('bar');
 });

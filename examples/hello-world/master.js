@@ -31,13 +31,9 @@ function onError(e) {
 // Create a single slave...
 master.create.slave(slaveJS)
   .then(slave => { slaveA = slave; })
-  // Tell the slave to do a task
-  .then(() => slaveA.exec('say hello'))
-  // Tell the slave to do another task
-  .then(() => slaveA.exec('say goodbye'))
-  // Very important: close the slave.
-  // The slave will never exit if this isn't called.
-  .then(() => slaveA.exit())
+  .then(() => slaveA.exec('say hello'))     // Tell the slave to do a task
+  .then(() => slaveA.exec('say goodbye'))   // Tell the slave to do another task
+  .then(() => slaveA.exit())                // **Very Important** Close the slave, otherwise the child will next exit.
   .catch(onError);
 
 master.create.slave(slaveJS)
@@ -48,7 +44,7 @@ master.create.slave(slaveJS)
   .catch(onError);
 
 // Create multiple slaves...
-// Using the alternate syntax here: slave(s).do vs. master.tell.slave(s).to()
+// Using the alternate syntax here: slave.do() vs. master.tell.slave().to()
 master.create.slaves(5, slaveJS)
   .then(instances => { slaves = instances; })
   .then(() => slaves.do('say hello'))

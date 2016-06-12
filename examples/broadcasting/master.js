@@ -39,10 +39,9 @@ function onError(e) {
 const slaves = master.create.slaves(10, slaveLocation);
 
 // Send an acknowledgement message to all the slaves...
+// The result is an array of responses (a ResponseArray object)
 broadcast(master.commands.ACK).to(slaves)
-  .then(res => {
-    res.each(r => console.log(r.value.message));
-  })
+  .then(res => res.each(r => console.log(r.value.message)))
   .catch(onError);
 
 // Send command to do task "foo" to slaves...

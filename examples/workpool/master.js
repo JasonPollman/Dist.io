@@ -27,9 +27,9 @@ function onError(e) {
 }
 
 workpool
-  .while(i => i < 10)
+  .while(i => i < 1000)
   .do('echo', 'hello world #!')
-  .then(res => console.log(res.value))
+  .then(res => console.log(res.values))
   .then(() => workpool.do('echo', 'hello world #!'))
   .then(res => console.log(res.value))
   .then(() => workpool.do('echo', 'hello world #!'))
