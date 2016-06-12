@@ -10,8 +10,8 @@ const master = require('../').Master;
 const ResponseArray = require('../lib/ResponseArray');
 
 describe('SlaveArray Class', function () {
-  describe('SlaveArray#constructor', function (done) {
-    it('Should throw when given non-Slave objects', () => {
+  describe('SlaveArray#constructor', function () {
+    it('Should throw when given non-Slave objects', (done) => {
       try {
         const s = new SlaveArray(1, 2, 3); // eslint-disable-line
         done(new Error('Expected to throw'));
@@ -31,23 +31,50 @@ describe('SlaveArray Class', function () {
         expect(e).to.be.an.instanceof(TypeError);
         expect(e.message).to.equal('Cannot insert non-Slave object into SlaveArray!');
         slave.kill();
+        done();
       }
     });
   });
 
-  describe('SlaveArray#exit', function (done) {
-    it('Should behave exactly like SlaveArray#close', () => {
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+  describe('SlaveArray#exit', function () {
+    this.slow(1000);
+
+    it('Should behave exactly like SlaveArray#close', (done) => {
+      const location = path.join(__dirname, 'data', 'simple-slave-b.js');
       const slave = new Slave(location); // eslint-disable-line
       const s = new SlaveArray(slave);
 
-      s.exit()
-        .then(status => {
-          expect(status).to.equal(true);
-        })
-        .catch(e => {
-          done(e);
-        });
+      const p = s.exit();
+      expect(p).to.be.an.instanceof(Promise);
+
+      p.then(status => {
+        expect(status).to.equal(true);
+        done();
+      })
+      .catch(e => {
+        done(e);
+      });
+    });
+  });
+
+  describe('SlaveArray#random', function () {
+    it('Should return a random slave...', (done) => {
+      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const slave = new Slave(location); // eslint-disable-line
+      const slave2 = new Slave(location); // eslint-disable-line
+      const slave3 = new Slave(location); // eslint-disable-line
+      const s = new SlaveArray(slave, slave2, slave3);
+
+      for (let i = 0; i < 100; i++) {
+        expect(s.random).to.be.oneOf([slave, slave2, slave3]);
+      }
+      done();
+    });
+
+    it('Should return null if the array is smpty', (done) => {
+      const s = new SlaveArray();
+      for (let i = 0; i < 100; i++) expect(s.random).to.equal(null);
+      done();
     });
   });
 

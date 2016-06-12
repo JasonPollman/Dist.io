@@ -87,6 +87,9 @@ describe('Response Class', function () {
   });
 
   describe('Response#pipe', function () {
+    this.timeout(3000);
+    this.slow(1000);
+
     it('Should pipe responses from one slave to the next', function (done) {
       const s1 = master.create.slave(path.join(__dirname, 'data', 'simple-slave-c.js'));
       const s2 = master.create.slave(path.join(__dirname, 'data', 'simple-slave-b.js'));

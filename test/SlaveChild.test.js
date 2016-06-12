@@ -202,6 +202,70 @@ describe('SlaveChildProcess Class', function () {
 
       process.emit('message', request);
     });
+
+    it('Should not intercept non-master messages', (done) => {
+      process.send = () => {
+        done(new Error('Should have never gotten here...'));
+      };
+
+      const request = {
+        rid: 0,
+        title: 'blah...',
+        for: 0,
+        command: 'doesnt exist',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: 'world!',
+        meta: null,
+      };
+
+      process.emit('message', request);
+      done();
+    });
+  });
+
+  describe('SlaveChildProcess#isPaused, SlaveChildProcess#pause, SlaveChildProcess#resume', function () {
+    it('Shouldn\'t be paused, by default', () => {
+      expect(slave.isPaused).to.equal(false);
+    });
+
+    it('Should pause when SlaveChildProcess#pause is called', () => {
+      expect(slave.pause()).to.equal(slave);
+      expect(slave.isPaused).to.equal(true);
+    });
+
+    it('Should resume when SlaveChildProcess#resume is called', () => {
+      expect(slave.pause()).to.equal(slave);
+      expect(slave.isPaused).to.equal(true);
+      expect(slave.resume()).to.equal(slave);
+      expect(slave.isPaused).to.equal(false);
+    });
+
+    it('Should respond with an error when paused', function (done) {
+      process.send = (m) => {
+        expect(m.data).to.equal(undefined);
+        expect(m.error).to.be.an('object');
+        expect(m.error.message).to.equal(`Slave #${slave.id} is not currently accepting messages.`);
+        expect(m.error.name).to.equal('Error');
+        done();
+      };
+
+      const request = {
+        rid: 0,
+        title: 'MasterIOMessage',
+        for: 0,
+        command: 'paused',
+        secretNumber: 123456789,
+        secretId: 'secret id',
+        data: null,
+        meta: null,
+        sent: Date.now(),
+      };
+
+      slave.pause();
+      process.emit('message', request);
+      slave.resume();
+    });
   });
 
   describe('SlaveChildProcess Basic Built in Commands', function () {

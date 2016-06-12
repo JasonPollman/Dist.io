@@ -243,6 +243,9 @@ describe('Slave Class', function () {
     });
 
     it('Should handle request timeouts (with Slave.defaultTimeout set), part I', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
@@ -262,6 +265,9 @@ describe('Slave Class', function () {
     });
 
     it('Should handle request timeouts (with Slave.defaultTimeout set), part II', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
@@ -280,6 +286,9 @@ describe('Slave Class', function () {
     });
 
     it('Should handle request timeouts (with Master#defaultTimeout set), part I', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
@@ -300,6 +309,9 @@ describe('Slave Class', function () {
     });
 
     it('Should handle request timeouts (with Slave#defaultTimeout set), part I', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
 
@@ -332,6 +344,9 @@ describe('Slave Class', function () {
     });
 
     it('Should handle request timeouts (with Slave#defaultTimeout set), part II', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
       const location = path.join(__dirname, 'data', 'simple-slave-d.js');
       const slave = new Slave(location);
       const slave2 = new Slave(location);

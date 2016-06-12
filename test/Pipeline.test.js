@@ -13,6 +13,90 @@ describe('Pipeline Pattern', function () {
   this.timeout(3000);
   this.slow(1000);
 
+  it('Master#createPipeline.addTask should return an object with a id symbol', function (done) {
+    const slaveA = master.createSlave(a);
+    const slaveB = master.createSlave(b);
+    const pipeline = master.create.pipeline();
+
+    const addedTask = pipeline.addTask('auth');
+    expect(addedTask).to.be.an('object');
+    expect(addedTask.id).to.be.a('symbol');
+
+    const addedTaskPostSlaveAssignment = addedTask.for(slaveA);
+    expect(addedTaskPostSlaveAssignment.id).to.be.a('symbol');
+
+    const addedTaskPostSlaveAssignmentB = addedTask.for(slaveB);
+    expect(addedTaskPostSlaveAssignmentB.id).to.be.a('symbol');
+
+    expect(addedTaskPostSlaveAssignment.id).to.equal(addedTask.id);
+    expect(addedTaskPostSlaveAssignmentB.id).to.equal(addedTask.id);
+    done();
+  });
+
+  it('Master#createPipeline.removeTask should remove a task', function (done) {
+    const slaveA = master.createSlave(a);
+    const slaveB = master.createSlave(b);
+    const pipeline = master.create.pipeline();
+
+    const addedTask = pipeline.addTask('auth').for(slaveA);
+    expect(pipeline.taskCount()).to.equal(1);
+    const addedTask2 = pipeline.addTask('auth').for(slaveA);
+    expect(pipeline.taskCount()).to.equal(2);
+    const addedTask3 = pipeline.addTask('auth').for(slaveB);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(Symbol())).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask('string')).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask([])).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(123)).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(addedTask)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(2);
+    expect(pipeline.removeTask(addedTask2.id)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(1);
+    expect(pipeline.removeTask(addedTask3)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(0);
+    done();
+  });
+
+  it('Master#createPipeline.execute should simply resolve with null if the pipeline is empty', function (done) {
+    const slaveA = master.createSlave(a);
+    const slaveB = master.createSlave(b);
+    const pipeline = master.create.pipeline();
+
+    const addedTask = pipeline.addTask('auth').for(slaveA);
+    expect(pipeline.taskCount()).to.equal(1);
+    const addedTask2 = pipeline.addTask('auth').for(slaveA);
+    expect(pipeline.taskCount()).to.equal(2);
+    const addedTask3 = pipeline.addTask('auth').for(slaveB);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(Symbol())).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask('string')).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask([])).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(123)).to.equal(false);
+    expect(pipeline.taskCount()).to.equal(3);
+    expect(pipeline.removeTask(addedTask)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(2);
+    expect(pipeline.removeTask(addedTask2.id)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(1);
+    expect(pipeline.removeTask(addedTask3)).to.equal(true);
+    expect(pipeline.taskCount()).to.equal(0);
+
+    pipeline.execute('token-1', (err, res) => {
+      expect(err).to.equal(null);
+      expect(res).to.equal(null);
+
+      pipeline.execute()
+        .then(() => done())
+        .catch(done);
+    });
+  });
+
   it('Should pipe reponses from one result to the next (Promises)', function (done) {
     const slaveA = master.createSlave(a);
     const slaveB = master.createSlave(b);
