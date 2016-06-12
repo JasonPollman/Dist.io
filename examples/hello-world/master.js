@@ -27,7 +27,6 @@ function onError(e) {
   process.exit(1);
 }
 
-
 // Create a single slave...
 master.create.slave(slaveJS)
   .then(slave => { slaveA = slave; })

@@ -1,7 +1,7 @@
 /**
  * @file
- * Slave bar.
- * Creates pairs from the data provided (a list of boys and girls).
+ * A silly DB slave example.
+ * Returns the user data for the given token.
  */
 
 'use strict';

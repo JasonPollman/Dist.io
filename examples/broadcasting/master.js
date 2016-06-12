@@ -40,6 +40,7 @@ const slaves = master.create.slaves(10, slaveLocation);
 
 // Send an acknowledgement message to all the slaves...
 // The result is an array of responses (a ResponseArray object)
+// ResponseArray#each is a convenience method to iterate over all responses in the array.
 broadcast(master.commands.ACK).to(slaves)
   .then(res => res.each(r => console.log(r.value.message)))
   .catch(onError);
@@ -51,6 +52,7 @@ broadcast('foo').to(slaves)
 
 // Alternative syntax...
 // Create 10 different slaves...
+// Tell them all to ACK
 master.create.slaves(10, slaveLocation)
   .then(newSlaves => tell(newSlaves).to(master.commands.ACK))
   .then(res => res.each(r => console.log(r.value.message)))

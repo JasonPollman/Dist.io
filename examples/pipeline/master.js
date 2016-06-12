@@ -54,8 +54,8 @@ function onPipelineComplete(res) {
   if (++done === 2000) master.close.all();
 }
 
-// Execute the pipeline 2000 times.
-for (let i = 0; i < 1000; i++) {
+// Execute the pipeline 100 times.
+for (let i = 0; i < 100; i++) {
   // Execute the pipeline against token-1...
   authenticateAndGetUserInfo.execute('token-1')
     .then(onPipelineComplete)

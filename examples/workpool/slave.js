@@ -1,6 +1,7 @@
 /**
  * @file
  * A simple slave hello world example.
+ * This slave just returns the valud of the data with the slave's id concatenated.
  * @see ./master.js for more information.
  */
 

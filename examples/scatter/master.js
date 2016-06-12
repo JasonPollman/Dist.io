@@ -1,8 +1,9 @@
 /**
  * @file
- * A simple master hello world example.
- * It creates 7 slaves asyncrnously, and each will perform the "say hello"
- * task, wait for a response, then perform the "say goodbye"task.
+ * A simple example of "scattering" data between slaves.
+ * This example scatters an array of two items between two slaves.
+ * The messages will be sent in parallel among slaves, and when all responses
+ * have been received, the promise will be resolved.
  */
 
 /* eslint-disable no-console */
@@ -23,7 +24,7 @@ function onError(e) {
 }
 
 // Create a single slave...
-const slaves = master.createSlaves(5, slaveJS);
+const slaves = master.createSlaves(2, slaveJS);
 const scatter = master.create.scatter('echo');
 
 scatter
@@ -32,8 +33,8 @@ scatter
   .then(res => {
     // You can use Response#sortBy to sort a response by any of its properties.
     // And Response#joinValues will join all the response's values like Array#join.
-    console.log(res.sortBy('sent').joinValues(','));
-    console.log(res.sortBy('value', 'desc').joinValues(','));
+    console.log(res.sortBy('sent').joinValues(', '));
+    console.log(res.sortBy('value', 'desc').joinValues(', '));
     slaves.exit();
   })
   .catch(onError);

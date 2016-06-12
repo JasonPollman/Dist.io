@@ -34,34 +34,39 @@ parallel
   .then(res => {
     // The ResponseArray object returned here, has two really nice convenience methods:
     // ResponseArray#sortBy and ResponseArray#joinValues.
-    console.log(res.sortBy('rid').joinValues(' '));
+    // Here we're sorting by request id...
+    console.log(res.sortBy('rid').joinValues(' ')); // -> hello world !
     // Don't forget to close the slave processes...
     slaves.exit();
   })
   .catch(onError);
 
 
-// We don't have to chain...
+// We don't have to chain!
+// Create a whold new parallel object...
 const newSlaves = master.createSlaves(5, slaveJS);
 const myParallel = master.create.parallel();
-myParallel.addTask('hello').for(newSlaves.random);
+myParallel.addTask('hello').for(newSlaves.random); // Gets a random slave...
 myParallel.addTask('world').for(newSlaves.random);
+
+// Store off a reference to this task, so we can remove it later.
 const exclamationTask = myParallel.addTask('!').for(newSlaves.random);
 
 myParallel.execute()
   .then(res => {
-    console.log(res.sortBy('rid').joinValues(' '));
+    console.log(res.sortBy('rid').joinValues(' ')); // -> hello world !
     newSlaves.exit();
   })
   .catch(onError);
 
-// Add another task, post first execution, then execute again...
+// Remove a task, then add another task, then execute again...
 myParallel
-  .removeTask(exclamationTask)
+  .removeTask(exclamationTask) // Remove a task...
+  .addTask('?').for(newSlaves.random)
   .addTask('?').for(newSlaves.random)
   .execute()
   .then(res => {
-    console.log(res.sortBy('rid').joinValues(' '));
+    console.log(res.sortBy('rid').joinValues(' ')); // -> hello world ? ?
     newSlaves.exit();
   })
   .catch(onError);
