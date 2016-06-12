@@ -46,7 +46,7 @@ const newSlaves = master.createSlaves(5, slaveJS);
 const myParallel = master.create.parallel();
 myParallel.addTask('hello').for(newSlaves.random);
 myParallel.addTask('world').for(newSlaves.random);
-myParallel.addTask('!').for(newSlaves.random);
+const exclamationTask = myParallel.addTask('!').for(newSlaves.random);
 
 myParallel.execute()
   .then(res => {
@@ -57,6 +57,7 @@ myParallel.execute()
 
 // Add another task, post first execution, then execute again...
 myParallel
+  .removeTask(exclamationTask)
   .addTask('?').for(newSlaves.random)
   .execute()
   .then(res => {

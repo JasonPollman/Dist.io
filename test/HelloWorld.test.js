@@ -391,6 +391,36 @@ describe('Hello World', function () {
   });
 
   describe('Parallel', function () {
+    it('Master#createParallel.removeTask should remove a task', function (done) {
+      const a = path.join(__dirname, 'data', 'slave-pipeline-a.js');
+      const b = path.join(__dirname, 'data', 'slave-pipeline-b.js');
+      const slaveA = master.createSlave(a);
+      const slaveB = master.createSlave(b);
+      const parallel = master.create.parallel();
+
+      const addedTask = parallel.addTask('auth').for(slaveA);
+      expect(parallel.taskCount()).to.equal(1);
+      const addedTask2 = parallel.addTask('auth').for(slaveA);
+      expect(parallel.taskCount()).to.equal(2);
+      const addedTask3 = parallel.addTask('auth').for(slaveB);
+      expect(parallel.taskCount()).to.equal(3);
+      expect(parallel.removeTask(Symbol()).removed).to.equal(false);
+      expect(parallel.taskCount()).to.equal(3);
+      expect(parallel.removeTask('string').removed).to.equal(false);
+      expect(parallel.taskCount()).to.equal(3);
+      expect(parallel.removeTask([]).removed).to.equal(false);
+      expect(parallel.taskCount()).to.equal(3);
+      expect(parallel.removeTask(123).removed).to.equal(false);
+      expect(parallel.taskCount()).to.equal(3);
+      expect(parallel.removeTask(addedTask).removed).to.equal(true);
+      expect(parallel.taskCount()).to.equal(2);
+      expect(parallel.removeTask(addedTask2.id).removed).to.equal(true);
+      expect(parallel.taskCount()).to.equal(1);
+      expect(parallel.removeTask(addedTask3).removed).to.equal(true);
+      expect(parallel.taskCount()).to.equal(0);
+      done();
+    });
+
     it('Should execute a bunch of tasks "simultaneously" (Promises)', (done) => {
       let slaves;
       master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-h' })
