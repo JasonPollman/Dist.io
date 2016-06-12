@@ -7,4 +7,7 @@ slave
   })
   .task('say goodbye', (data, done) => {
     done('goodbye');
+  })
+  .task(1, (data, done) => {
+    done(1);
   });

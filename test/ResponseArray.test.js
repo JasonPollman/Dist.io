@@ -64,7 +64,7 @@ describe('ResponseArray Class', function () {
         expect(responses.length).to.equal(2);
         expect(responses.product).to.be.a('number');
 
-        responses.sortBy('value');
+        responses.sortBy('sent');
         expect(responses.product).to.equal(slaves[0].id * slaves[1].id);
 
         responses[0].value = NaN;
@@ -156,6 +156,25 @@ describe('ResponseArray Class', function () {
         responses.sortBy('value', 'desc');
         expect(responses[0].value).to.equal(slaves[1].id);
         expect(responses[1].value).to.equal(slaves[0].id);
+        master.kill(slaves);
+        done();
+      });
+    });
+
+    it('Should sort responses by their properties, >3', function (done) {
+      this.timeout(5000);
+      this.slow(3000);
+
+      const slaves = master.create.slaves(50, path.join(__dirname, 'data', 'simple-slave-i.js'));
+      master.tell(...slaves).to('random', function (err, responses) {
+        expect(err).to.equal(null);
+
+        expect(responses).to.be.an.instanceof(ResponseArray);
+        expect(responses.length).to.equal(50);
+        expect(responses.sortBy).to.be.a('function');
+
+        responses.sortBy('value');
+        responses.sortBy('value', 'desc');
         master.kill(slaves);
         done();
       });

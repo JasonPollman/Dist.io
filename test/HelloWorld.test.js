@@ -265,8 +265,52 @@ describe('Hello World', function () {
       });
     });
 
+    it('Master#workpool.while #2 (Callbacks)', (done) => {
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+        const workpool = master.create.workpool(slaves);
+
+        workpool
+          .while((i) => i < 3)
+          .do('say hello', () => {}, () => {}, function (err, res) {
+            expect(err).to.equal(null);
+            checkSimpleResponseHello(res);
+            slaves.kill();
+            done();
+          });
+      });
+    });
+
+    it('Master#workpool.while #3 (Callbacks)', (done) => {
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+        const workpool = master.create.workpool(slaves);
+
+        workpool
+          .do('say hello', () => {}, () => {}, function (err, res) {
+            expect(err).to.equal(null);
+            checkSimpleResponseHelloSingle(res);
+            slaves.kill();
+            done();
+          });
+      });
+    });
+
+    it('Master#workpool.while #4 (Callbacks, Single Slave)', (done) => {
+      master.create.slaves(1, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+        const workpool = master.create.workpool(slaves);
+
+        workpool
+          .while((i) => i < 3)
+          .do('say hello', () => {}, () => {}, function (err, res) {
+            expect(err).to.equal(null);
+            checkSimpleResponseHello(res);
+            slaves.kill();
+            done();
+          });
+      });
+    });
+
     it('Master#workpool.while (Promises)', (done) => {
-      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-f' }, function (slaves) { // eslint-disable-line max-len
+      master.create.slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-y' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -276,6 +320,70 @@ describe('Hello World', function () {
             checkSimpleResponseHello(res);
             slaves.kill();
             done();
+          })
+          .catch(e => done(e));
+      });
+    });
+
+    it('Master#workpool.while (Promises, Single Slave, Async)', (done) => {
+      this.timeout(5000);
+
+      master.create.slaves(1, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-z' }, function (slaves) { // eslint-disable-line max-len
+        const workpool = master.create.workpool(slaves);
+        let completed = 0;
+
+        workpool
+          .while((i) => i < 3)
+          .do('say hello')
+          .then(res => {
+            checkSimpleResponseHello(res);
+            if (++completed === 2) {
+              done();
+              slaves.kill();
+            }
+          })
+          .catch(e => done(e));
+
+        workpool
+          .while((i) => i < 3)
+          .do('say hello')
+          .then(res => {
+            checkSimpleResponseHello(res);
+            if (++completed === 2) {
+              done();
+              slaves.kill();
+            }
+          })
+          .catch(e => done(e));
+      });
+    });
+
+    it('Master#workpool.do (Promises, Single Slave, Async)', (done) => {
+      this.timeout(5000);
+
+      master.create.slaves(1, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-z' }, function (slaves) { // eslint-disable-line max-len
+        const workpool = master.create.workpool(slaves);
+        let completed = 0;
+
+        workpool
+          .do('say hello')
+          .then(res => {
+            checkSimpleResponseHelloSingle(res);
+            if (++completed === 2) {
+              done();
+              slaves.kill();
+            }
+          })
+          .catch(e => done(e));
+
+        workpool
+          .do('say hello')
+          .then(res => {
+            checkSimpleResponseHelloSingle(res);
+            if (++completed === 2) {
+              done();
+              slaves.kill();
+            }
           })
           .catch(e => done(e));
       });
@@ -314,6 +422,27 @@ describe('Hello World', function () {
           parallel.execute(function (err, res) {
             expect(err).to.equal(null);
             checkSimpleResponseHello(res);
+            slaves.kill();
+            done();
+          });
+        });
+    });
+
+    it('Should execute a bunch of tasks "simultaneously" (With numeric task)', (done) => {
+      master.create
+        .slaves(3, path.join(__dirname, 'data', 'slave-hello-world.js'), { group: 'hw-i' }, function (slaves) {
+          const parallel = master.create.parallel();
+
+          parallel.addTask(1).for(slaves[0]);
+          parallel.addTask(1).for(slaves[1]);
+          parallel.addTask(1).for(slaves[2]);
+          parallel.execute(null, { catchAll: true }, function (err, res) {
+            expect(err).to.equal(null);
+            expect(res).to.be.an.instanceof(ResponseArray);
+            expect(res[0].value).to.equal(1);
+            expect(res[1].value).to.equal(1);
+            expect(res[2].value).to.equal(1);
+            expect(res.length).to.equal(3);
             slaves.kill();
             done();
           });

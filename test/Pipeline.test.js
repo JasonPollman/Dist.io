@@ -195,6 +195,7 @@ describe('Pipeline Pattern', function () {
       })
       .addTask('get')
       .for(slaveB)
+      .intercept('foo') // Silent fail...
       .execute('token-1', function (e, res) {
         expect(e).to.equal(null);
         expect(res).to.be.an.instanceof(Response);
@@ -220,6 +221,7 @@ describe('Pipeline Pattern', function () {
       })
       .addTask('get')
       .for(slaveB)
+      .intercept([]) // Silent fail...
       .execute('token-1')
       .then(res => {
         expect(res).to.be.an.instanceof(Response);

@@ -66,6 +66,11 @@ describe('Master Class', function () {
         11, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing close' }
       );
 
+      expect(Master.slaves.leastBusyInGroup('testing close')).to.be.an.instanceof(Slave);
+      expect(Master.slaves.leastBusyInList(slaves[0])).to.equal(slaves[0]);
+      expect(Master.slaves.leastBusyInList(slaves[0], slaves[1])).to.be.oneOf(slaves);
+      expect(Master.slaves.leastBusyInList([slaves[0]], slaves, slaves[1])).to.be.oneOf(slaves);
+
       expect(slaves).to.be.an.instanceof(SlaveArray);
       expect(slaves.length).to.equal(11);
 
@@ -123,6 +128,12 @@ describe('Master Class', function () {
       expect(slaves.length).to.equal(3);
 
       Master.broadcast(Master.commands.ACK).to(slaves)
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to.all()
+        .catch(e => done(e));
+
+      Master.broadcast(Master.commands.ACK).to.group('testing shutdown')
         .catch(e => done(e));
 
       Master.broadcast(Master.commands.ACK).to(slaves)

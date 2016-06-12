@@ -261,6 +261,7 @@ describe('Slave Class', function () {
         .catch(e => {
           done(e);
         });
+      Slave.defaultTimeout = 0;
       Slave.defaultTimeout = null;
     });
 
@@ -425,6 +426,22 @@ describe('Slave Class', function () {
       expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: ""');
     }
     done();
+  });
+
+  it('Should have a #then property', function (done) {
+    const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+    const slave = new Slave(location);
+    slave.then();
+    slave.then('string');
+    slave.then(123);
+    slave.then({});
+
+    const p = new Promise(() => {});
+    expect(slave.then(() => p)).to.equal(p);
+    slave.then(() => {
+      slave.kill();
+      done();
+    });
   });
 
   it('Should handle very short request timeouts', function (done) {
