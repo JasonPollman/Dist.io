@@ -3,8 +3,21 @@
   "version": "0.1.0",
   "description": "Distributed programming paradigms for forked node processes",
   "main": "index.js",
+  "author": "Jason James Pollman <jasonjpollman@gmail.com>",
+  "license": "ISC",
   "scripts": {
     "test": "istanbul cover _mocha"
+  },
+  "engines": {
+    "node": ">=5.10.1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/JasonPollman/Dist.io"
+  },
+  "bugs": {
+    "email": "jasonjpollman@gmail.com",
+    "url": "https://github.com/JasonPollman/Dist.io/issues"
   },
   "keywords": [
     "parallel",
@@ -21,8 +34,6 @@
     "slave",
     "mpi"
   ],
-  "author": "Jason James Pollman <jasonjpollman@gmail.com>",
-  "license": "ISC",
   "devDependencies": {
     "chai": "^3.5.0",
     "eslint": "^2.10.2",
