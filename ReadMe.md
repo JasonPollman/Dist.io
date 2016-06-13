@@ -771,15 +771,15 @@ The name of the task (or command) that was completed for this response.
 A *ResponseError*, if once occurred while the request was being completed.    
 This value can be modified.
 
-*(Getter/Setter)* **Response#data** → *{\*}*    
+*(Getter/Setter)* **Response#data** → *{*\**}*    
 The data sent back from the slave child process (using *done(...)*).    
 This value can be modified.
 
-*(Getter/Setter)* **Response#value** → *{\*}*    
+*(Getter/Setter)* **Response#value** → *{*\**}*    
 Alias for *Response#data*.    
 This value can be modified.
 
-*(Getter/Setter)* **Response#val** → *{\*}*    
+*(Getter/Setter)* **Response#val** → *{*\**}*    
 Alias for *Response#data*.    
 This value can be modified.
 
@@ -810,7 +810,7 @@ Sorts the response array by the given *Response* object property. Any property f
 *(Getter)* **Response#errors** → *{Array<Error>}*    
 Returns an array of all the errors in the response array.
 
-*(Getter)* **Response#values** → *{Array<\*>}*    
+*(Getter)* **Response#values** → *{Array<*\**>}*    
 Returns an array of all the values in the response array.
 
 *(Getter)* **Response#sum** → *{Number|NaN}*    
