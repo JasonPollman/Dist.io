@@ -16,28 +16,20 @@ const dbSlave = master.createSlave(dbSlaveJS);
 
 // Create a new pipeline...
 const authenticateAndGetUserInfo = master.create.pipeline()
-  // Authenticate the user token
-  .addTask('authenticate token').for(authSlave)
-  // Intercept the response, and end the pipeline chain
-  // if the token is invalid.
+  .addTask('authenticate token')
+  .for(authSlave)
+  // Intercept the response, and end the pipeline chain if the token is invalid.
   .intercept((res, end) => {
     if (res.value === false) end('bad token');
-  });
-  // Get the user's info for the token.
-
-authenticateAndGetUserInfo.addTask('get user info for token with id').for(dbSlave)
-  // Intercept the value and end the pipeline chain
-  // if the user information dont exist.
+  })
+  .addTask('get user info for token with id')
+  .for(dbSlave)
   .intercept((res, end) => {
     if (!res.value.username || !res.value.password) end('bad user');
-    // Add a custom field to the response.
-    res.value.lastAccess = Date.now();
   });
 
-let done = 0;
-
 /**
- * Executed when the pipeline is completed.
+ * Invoked when the pipeline is completed.
  * @param {Response} res The result from the pipeline.
  * @return {undefined}
  */
@@ -51,16 +43,17 @@ function onPipelineComplete(res) {
     console.log('Token authenticated: success!');
     console.log(`User=${user.username}, Password=${user.password}\n`);
   }
-  if (++done === 2000) master.close.all();
 }
 
-// Execute the pipeline 100 times.
-for (let i = 0; i < 100; i++) {
-  // Execute the pipeline against token-1...
-  authenticateAndGetUserInfo.execute('token-1')
-    .then(onPipelineComplete)
-    .then(() => authenticateAndGetUserInfo.execute('token-2'))
-    // Execute the pipeline against token-2...
-    .then(onPipelineComplete)
-    .catch(e => console.log(e));
-}
+// Execute the pipeline against token-1...
+authenticateAndGetUserInfo
+  .execute('token-1')
+  .then(onPipelineComplete)
+  // Execute the pipeline against token-2...
+  .then(() => authenticateAndGetUserInfo.execute('token-2'))
+  .then(onPipelineComplete)
+  .then(() => master.close.all())
+  .catch(e => {
+    console.log(e);
+    process.exit(1);
+  });

@@ -87,8 +87,7 @@ slave.task('say hello', (data, done) => {
   - [Pipeline](#pipeline)
   - [Workpool](#workpool)
   - [Scatter](#scatter)
-1. [Master vs. Slave?](#master-vs-slave)
-1. [The SlaveChildProcess](the-slavechildprocess)
+1. [Master vs. Slave vs. SlaveChildProcess?](#master-vs-slave-vs-slavechildprocess)
 1. [Controlling Slaves](#controlling-slaves)
   - [Master#tell](#mastertell)
   - [Slave#exec](#slaveexec)
@@ -106,16 +105,173 @@ slave.task('say hello', (data, done) => {
 **Examples are located in the [examples](https://github.com/JasonPollman/Dist.io/tree/master/examples) directory of this repo.**    
 To browse the JSDOCs, checkout: [Dist.io API](http://www.jasonpollman.com/distio-api/)
 
-## Master vs. Slave?
+## Patterns
+
+### Parallel
+**Executes a set of tasks among the given slaves in parallel.**    
+If the same slave is used twice, it's tasks will be sent immediately one after the next, so if your slave child process is async, they will be executed in async by the slave.
+
+```js
+const parallelTask = master.create.parallel()
+  .addTask('foo', data, metadata).for(slaveA)
+  .addTask('bar', data, metadata).for(slaveB)
+  .addTask('baz', data, metadata).for(slaveC);
+
+// Execute the tasks...
+parallelTask.execute().then( ... );
+
+// You can re-use the same task again and again...
+parallelTask.execute().then( ... );
+
+// If you store off a reference to a task, you can remove it.
+const someTaskList = master.create.parallel();
+const taskFoo = someTaskList.addTask('foo', data, metadata).for(slaveA);
+const taskBar = someTaskList.addTask('bar', data, metadata).for(slaveB);
+const taskBaz = someTaskList.addTask('baz', data, metadata).for(slaveC);
+
+// Execute the tasks...
+someTaskList.execute().then(...);
+
+// Remove foo, then execute again...
+someTaskList
+  .removeTask(taskFoo)
+  .execute()
+  .then( ... );
+```
+
+**Parallel Looping***
+You can call *Master.create.parallel#times* to create a parallel "loop".
+```js
+const slaves = master.create.slaves(5, 'path/to/slaves');
+
+master.create.parallel()
+  .addTask('foo', master.slaves.leastBusy(slaves))
+  .times(100)
+  .execute()
+  .then(arrayOfResponseArrays => {
+    // This will resolve with an Array of ResponseArrays.
+    // Which will include the ResponseArray for each "time"
+    // the tasks were executed.
+  });
+```
+
+### Pipeline
+**A pipeline is similar to async's *waterfall*.**    
+Except in Dist.io, one slave will execute a task, its results are passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
+
+```js
+master.create.pipeline()
+  .addTask('task a')
+  .for(slaveA)
+  .addTask('task b') // Results of a's response.value piped to 'task b'.
+  .for(slaveB)
+  .execute(initialData)
+  .then (res => {
+    // initialData passed to slaveA's task a,
+    // result of task a (res.value) passed to slaveB's task b
+    // result of task b === res.
+  });
+
+// You can intercept and mutate values during each step in the pipeline...
+master.create.pipeline()
+  .addTask('task a')
+  .for(slaveA)
+  // Intercept and mutate the value before passing to b...
+  .intercept((res, end) => {
+    return res.value += ' intercepted just before b!'
+  });
+  .addTask('task b')
+  .for(slaveB)
+  .intercept((res, end) => {
+    res.value += ' intercepted just before c!';
+    if (/intercepted just before b!/.test(res.value)) {
+      // Calling end breaks the pipeline and immediately resolves with
+      // res.value equal to the value passed to end.
+      // Task c, in this case, will never get executed.
+      end('breaking pipeline before c.');
+    }
+  });
+  .addTask('task c')
+  .for(slaveC)
+  .intercept((res, end) => {
+    return res.value += ' intercept before final resolution!'
+  });
+  .execute(initialData)
+  .then (res => {
+    // res.value === 'breaking pipeline before c.'
+  });
+```
+
+### Workpool
+**A workpool is a special kind of distributed pattern where the master chooses slaves based on their availability.**    
+The workpool will choose the next *idle* slave in the slave list. If no slave is idle, it will wait for one to become idle before sending the task.    
+
+Slaves are chosen in an idle fist, round-robin fashion to ensure that all slaves are utilized and one slave isn't favored over another. However, if only one slave is idle and the rest are always busy, that slave will, of course, always be chosen.
+
+Workpool tasks are queued up and sent out to as many idle slaves in the workpool at a time.
+
+This workpool is often used in scenarios like the Monte Carlo program.
+
+```js
+const workpool = master.create.workpool(...slaves);
+
+// An idle slave will be chosen, or the task is deferred until a slave becomes idle.
+workpool.do('task', data, metadata).then(res => {
+  // res is a Response object
+});
+
+workpool.do('another task', data, metadata).then( ... );
+
+// You can execute a task in a "loop" using workpool's "while" predicate function.
+workpool
+  .while(i => (i < 30))
+  .do('task', data, metadata)
+  .then( ... );
+
+workpool
+  .while((i, responsesUpToNow) => {
+    if(responsesUpToNow.values.indexOf('some value') > -1) {
+      // Return falsy to break the loop.
+      return false;
+    }
+  })
+  .do('task', data, metadata)
+  .then(resArray => {
+    // res is a ResponseArray object
+  });
+```
+
+### Scatter
+**Scatters the list of data arguments to the given slaves and task in parallel.**
+
+```js
+master.create.scatter('task name')
+  .data('hello', 'world')
+  .gather(slavesA, slavesB)
+  .then(res => { ... })
+  .catch(/* Handle Errors */);
+
+// Tasks are assigned in a round-robin fashion, so here, slaveA
+// will get both the 'a' and null data objects.
+master.create.scatter('task name')
+  .data('a', 'b', { foo: 'bar' }, null)
+  .gather(slavesA, slavesB, slavesC)
+  .then(res => { ... })
+  .catch(/* Handle Errors */);
+```
+
+#### More patterns to come...
+
+## Master vs. Slave vs. SlaveChildProcess?
 Dist.io is divided into two parts: the *master process* and the *slave process(es)*.    
 
 **A master controls zero or more slave processes...**
 
 - The master process is created when ```require('dist.io').Master``` is called and is an instance of the *Master* class.
 - A slave process is created when ```require('dist.io').Slave``` is called and is an instance of the *SlaveChildProcess* class.
-- The *Slave* class referenced below is the "handle" between the master and the slave child process and lives within the master process.
+- The *Slave* class referenced below is the "handle" between the master and the slave child process and represents a slave child process within the master process.
 
-*Note, a process can be both a master and a slave process, however this isn't advised, and be careful not to create a circular spawn dependency!*
+*Note, a process can be both a master and a slave child process, however this isn't advised (and be careful not to create a circular spawn dependency!)*
 
 #### Example
 ``master.js``
@@ -151,8 +307,6 @@ slave
     done('return some value for task bar...');
   });
 ```
-
-## The SlaveChildProcess
 
 ## Controlling Slaves
 **Dist.io allows you to control slaves using a few different syntactic dialects.**    
