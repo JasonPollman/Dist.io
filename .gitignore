@@ -3,3 +3,4 @@ coverage/*
 *.log
 out/*
 gulpfile.js
+docs/*
