@@ -82,27 +82,28 @@ slave.task('say hello', (data, done) => {
 1. [Install](#install)
 1. [Basic Usage](#basic-usage)
 1. [Examples](#examples)
-1. [Master vs. Slave?](#master-vs-slave)
-1. [The SlaveChildProcess](the-slavechildprocess)
-1. [Full API](http://www.jasonpollman.com/distio-api/)
-1. [Controlling Slaves](#controlling-slaves)
-  - [Master#tell](#mastertell)
-  - [Slave#exec](#slaveexec)
-  - [Useful Master Methods](#useful-master-methods)
-  - [Useful Slave Methods](#useful-slave-methods)
-  - [Metadata](#metadata)
-  - [Timeouts](#timeouts)
-1. [Requests](#requests)
-1. [Responses](#responses)
-1. [Response Arrays](#response-arrays)
 1. [Patterns](#patterns)
   - [Parallel](#parallel)
   - [Pipeline](#pipeline)
   - [Workpool](#workpool)
   - [Scatter](#scatter)
+1. [Master vs. Slave?](#master-vs-slave)
+1. [The SlaveChildProcess](the-slavechildprocess)
+1. [Controlling Slaves](#controlling-slaves)
+  - [Master#tell](#mastertell)
+  - [Slave#exec](#slaveexec)
+  - [Master API](#master-api)
+  - [Slave API](#slave-api)
+  - [Slave Child Process API](#slave-child-process-api)
+  - [Metadata](#metadata)
+  - [Timeouts](#timeouts)
+1. [Requests](#requests)
+1. [Responses](#responses)
+1. [Response Arrays](#response-arrays)
+1. [Full API](http://www.jasonpollman.com/distio-api/)
 
 ## Examples
-**Examples are located in the *examples* directory of this repo.**    
+**Examples are located in the [examples](https://github.com/JasonPollman/Dist.io/tree/master/examples) directory of this repo.**    
 To browse the JSDOCs, checkout: [Dist.io API](http://www.jasonpollman.com/distio-api/)
 
 ## Master vs. Slave?
@@ -170,7 +171,7 @@ When using [Master#tell](#mastertell) and [Slave#exec](slaveexec), a [Request](#
 ### Master#tell
 **Using the Master singleton to control slaves...**
 
-**Master#tell**(*{...Slave|Number|String}* **slaves**).to(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
+**Master#tell**(*{...Slave|Number|String}* **slaves**)**.to**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
 
 ```js
 const master = require('dist-io').Master;
@@ -233,8 +234,7 @@ slave[2].exec('some task', data, metadata).then(...);
 slaves.exec('some task', data, metadata).then(...);
 ```
 
-### Useful Master Methods
-
+### Master API
 **Master#create.slave**(*{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
 Creates a new slave from the code at the given path.
 ```js
@@ -397,7 +397,13 @@ master.kill.all()             // Kills all slaves
 master.kill.group('my group') // Kills all slaves in group 'my group'
 ```
 
-### Useful Slave Methods
+*(Getter/Setter)* **Master#defaultTimeout** = *{Number}* **timeout** → *{Number}*    
+Gets/sets all slave's default request timeout. This will be overridden by any timeouts set in any request *metadata* or set by *Slave#defaultTimeout*. However, if the metadata or the slave does not specify a timeout, this will be used. If ``<= 0`` or parses to ``NaN``, no timeout will be set.
+
+*(Getter/Setter)* **Master#shouldCatchAll** = *{Boolean}* **value** → *{Boolean}*    
+Gets/sets all slave's default *catchAll* option. This will be overridden by any *catchAll* value set in the request *metadata* or by using *Slave#shouldCatchAll*. However, if the metadata or the slave does not specify a *catchAll* option, this will be used.
+
+### Slave API
 These are members/methods on the *Slave* object within the master process, not on the *SlaveChildProcess*.
 
 *(Getter)* **Slave#id** → *{Number}*    
@@ -414,6 +420,12 @@ Returns the slave's file location.
 
 *(Getter/Setter)* **Slave#group** = *{String}* **group** → *{String}*    
 Gets/sets the slaves group.
+
+*(Getter/Setter)* **Slave#defaultTimeout** = *{Number}* **timeout** → *{Number}*    
+Gets/sets the slaves default request timeout. This will be overridden by any timeouts set in the request *metadata*. However, if the metadata does not specify a timeout, this will be used. If ``<= 0`` or parses to ``NaN``, no timeout will be set.
+
+*(Getter/Setter)* **Slave#shouldCatchAll** = *{Boolean}* **value** → *{Boolean}*    
+Gets/sets the slaves default *catchAll* option. This will be overridden by any *catchAll* value set in the request *metadata*. However, if the metadata does not specify a *catchAll* key, this will be used.
 
 *(Getter)* **Slave#sent** → *{Number}*    
 Returns the number of requests sent to the slave child process associated with this slave object.
@@ -450,7 +462,7 @@ Sends a signal to the slave child process.
 
 **Slave#close**() → *{Promise}*    
 Gracefully closes the slave by removing any listeners added by Dist.io so it can exit.
-*Note, if you've added any event listeners or started any servers, etc. The slave will have to handle them during the SlaveChildProcess's "close signal" event or the slave won't exit.*
+*Note, if you've added any event listeners or started any servers, etc. The slave will have to handle them during the SlaveChildProcess's "close requested" event or the slave won't exit.*
 
 **Slave#shutdown**() → *{Promise}*    
 Like *Slave#close*, except it waits for all pending requests to resolve before sending the *close* message to the slave.
@@ -459,10 +471,171 @@ Like *Slave#close*, except it waits for all pending requests to resolve before s
 Sends a message for the slave child process to execute a task.
 See: [Slave#exec](#slaveexec)
 
+### Slave Child Process API
+
+*(Getter)* **SlaveChildProcess#id** → *{Number}*    
+Returns the slave's id.
+
+*(Getter)* **SlaveChildProcess#alias** → *{Number}*    
+Returns the slave's alias.
+
+**SlaveChildProcess#pause**() → *{SlaveChildProcess}*    
+Pauses the slave. This means the slave is refusing to execute tasks and an error will be send back to the master for every request (even closing and shutting-down).
+
+**SlaveChildProcess#resume**() → *{SlaveChildProcess}*    
+Un-pauses the slave, allowing the slave to again accept messages.
+
+*(Getter)* **SlaveChildProcess#isPaused** → *{Boolean}*    
+True if the slave is paused, false otherwise.
+
+**SlaveChildProcess#task**(*{String}* **taskName**, *{Function}* **onTaskRequest**) → *{SlaveChildProcess}*    
+Adds a task for this slave, and allows the master to execute this task. The *onTaskRequest* callback will be invoked when the master requests that *taskName* be completed.    
+
+*onTaskRequest* will be invoked with the following arguments:
+
+| Type | Name | Description |
+| :--- | :--- | :---------- |
+| *{\*}* | **data** | Data sent from the slave with the task instruction. |
+| *{Function}* | **done** | A callback that **must** be invoked when the task is complete. The first argument to done will be sent back to the master in the response as *Response#value* |
+| *{Object}* | **metadata** | The metadata from the request. |
+| *{Object}* | **message** | A copy of the original request object. |
+
+**If *onTaskRequest* throws, or *done* is invoked with an Error, the response will contain an error.**     
+That is, *Response#error* will be populated with the error and *Response#value* will not.
+
 ### Metadata
 The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accept two keys.
 
 | Key | Default | Description |
 | :-- | :-----: | :---------- |
-| *timeout* | ``0``  | Sets a timeout on the request.<br>If the timeout is exceeded, a *TimeoutResponse* object is resolved within the response.<br><br>If this value is non-numeric, parses to ``NaN``, or is ``<= 0`` then it will default to ``0`` (no timeout). |
+| *timeout* | ``0``  | Sets a timeout on the request in ms.<br>If the timeout is exceeded, a *TimeoutResponse* object is resolved within the response.<br><br>If this value is non-numeric, parses to ``NaN``, or is ``<= 0`` then it will default to ``0`` (no timeout). |
 | *catchAll* | ``false`` | If true, *ResponseErrors* will be treated like any error and will be **rejected** (passed to the *error* argument of any provided callback).<br><br>A ``false`` setting will force the response error to resolve, and the *Response.error* property will contain the error.
+
+#### Examples
+```js
+tell(slave)
+  .to('some task', 'my data', { timeout: 1000, catchAll: true })
+  .then(...);
+
+slave
+  .exec('some task', null, { timeout: 0, catchAll: false })
+  .then(...);
+```
+
+### Timeouts
+Request timeouts can be set in 3 different ways.
+
+1. On the master singleton (for all slaves)
+1. On the slave instance (for a specific slave)
+1. In the request metadata (for a specific request)
+
+Each value overrides the next.
+
+```js
+// All in ms.
+master.defaultTimeout = 3000;
+someSlave.defaultTimeout = 4000;
+someSlave.exec('task', data, { timeout: 5000 });
+```
+
+**By default, no timeouts are set.**    
+To re-set any of the setting above, set them to ``null`` to remove the timeout.
+
+#### Examples
+```js
+tell(slave)
+  .to('some task', 'my data', { timeout: 1000, catchAll: true })
+  .then(...);
+
+slave
+  .exec('some task', null, { timeout: 0, catchAll: false })
+  .then(...);
+```
+
+## Requests
+*Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.
+
+## Responses
+A *Response* is the object that's resolved by every request using *Master#tell* and *Slave#exec*.
+
+*(Getter)* **Response#from** → *{Number}*    
+Returns the id of the slave child process that sent the response.
+
+*(Getter)* **Response#slave** → *{Slave}*    
+Returns the slave object associated with the slave child process that sent the response.
+
+*(Getter)* **Response#rid** → *{Number}*    
+Returns the request id associated with this response.
+
+*(Getter)* **Response#request** → *{Object}*    
+Returns a *Request like* object, which represents the request associated with this response.
+
+*(Getter)* **Response#id** → *{Number}*    
+Returns the response (transmit) id for this response.
+
+*(Getter)* **Response#duration** → *{Number}*    
+Returns the length of time it took to resolve the response's request.
+
+*(Getter)* **Response#received** → *{Number}*    
+The timestamp of when this response was received from the slave child process.
+
+*(Getter)* **Response#sent** → *{Number}*    
+The timestamp of when the request associated with this response was sent.
+
+*(Getter)* **Response#command** → *{String}*    
+The name of the task (or command) that was completed for this response.
+
+*(Getter/Setter)* **Response#error** → *{Error|null}*    
+A *ResponseError*, if once occurred while the request was being completed.    
+This value can be modified.
+
+*(Getter/Setter)* **Response#data** → *{\*}*    
+The data sent back from the slave child process (using *done(...)*).    
+This value can be modified.
+
+*(Getter/Setter)* **Response#value** → *{\*}*    
+Alias for *Response#data*.    
+This value can be modified.
+
+*(Getter/Setter)* **Response#val** → *{\*}*    
+Alias for *Response#data*.    
+This value can be modified.
+
+**Response#pipe**(*{String}* **task**, *{Object=}* **metadata**)**.to**(*{...Slave}* **slaves**) → *{Promise}*
+Pipes a response's value as the data to another slave's task.
+
+```js
+tell(slaveA).to('foo')
+  .then(res => res.pipe('bar').to(slaveB))
+  .then(res => res.pipe('baz').to(slaveA))
+  .then(res => { ... });
+```
+
+## Response Arrays
+Response arrays are utilized when multiple slave executions are done in parallel (i.e. when using *Master#tell* or *SlaveArray#exec* on multiple slaves). They are a sub class of *Array*, so all the standard *push*, *pop*, etc. methods exist on them.
+
+However, they have some additionaly convenience methods/properties that make working with a collection of responses easier:
+
+**ResponseArray#each**(*{Function}* **onValue**) → *{undefined}*
+Iterates over each item in the response array. *onValue* is invoked with *value*, *key*, *parent*.
+
+**ResponseArray#joinValues**(*{String}* **glue**) → *String*
+Operates just like *Array#join*, but on all the *Response#value* properties.
+
+**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*
+Sorts the response array by the given *Response* object property. Any property from the *Response* class can be used here. Options for the value passed to the *order* parameter are *asc* and *desc*.
+
+*(Getter)* **Response#errors** → *{Array<Error>}*    
+Returns an array of all the errors in the response array.
+
+*(Getter)* **Response#values** → *{Array<\*>}*    
+Returns an array of all the values in the response array.
+
+*(Getter)* **Response#sum** → *{Number|NaN}*    
+Sums all the values in the response array.
+
+*(Getter)* **Response#product** → *{Number|NaN}*    
+Multiplies all the values in the response array.
+
+*(Getter)* **Response#averageResponseTime** → *{Number}*    
+Returns the average amount of time taken for each response to resolve.
