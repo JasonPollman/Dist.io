@@ -18,14 +18,14 @@ An example of the Dist.io *parallel* pattern. Examples of adding/removing tasks 
 **Pipeline**    
 An example of the Dist.io *pipeline* pattern. Examples of adding/removing tasks to/from a pipeline object. Examples of *intercepting* and mutating values throughout the pipeline; example of *Master#close.all* (closing all slaves).
 
-**Piping**
+**Piping**    
 An example of piping a response from a task to another slave's task. Examples of *Master#tell*.
 
-**Scatter**
+**Scatter**    
 An example of the Dist.io *scatter* pattern.
 
-**Speedup**
+**Speedup**    
 Some examples where distributed programming really *speeds things up*.
 
-**Workpool**
+**Workpool**    
 An example of the Dist.io *workpool* pattern.
