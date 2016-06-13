@@ -38,3 +38,11 @@ scatter
     slaves.exit();
   })
   .catch(onError);
+
+master.create.scatter('echo')
+  .data(...[1, 2, 3, 4, 5, 6, 7, 8, 9])
+  .gather(slaves[0], slaves[1])
+  .then(res => {
+    console.log(res.values.join(', '));
+  })
+  .catch(/* Handle Errors */);

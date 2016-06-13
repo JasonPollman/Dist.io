@@ -1,7 +1,7 @@
 # Dist.io
 ------
 **Distributed programming paradigms for forked node processes.**    
-An abstraction around distributed, message passing programming and their complex patterns. Makes inter-process communication easy!
+An abstraction around distributed, message passing programming and its complex patterns. Makes inter-process communication simple.
 
 > It's like async for forked node processes!
 
@@ -37,7 +37,7 @@ Create a slave process: ``slave.js``
 ```js
 const slave = require('dist-io').Slave;
 
-// Callbacks to be invoked when the master requests this task to be executed.
+// Callbacks to be invoked when the master requests a task to be executed.
 slave
   .task('say hello', (data, done) => {
     // Send back a response...
@@ -108,8 +108,8 @@ To browse the JSDOCs, checkout: [Dist.io API](http://www.jasonpollman.com/distio
 ## Patterns
 
 ### Parallel
-**Executes a set of tasks among the given slaves in parallel.**    
-If the same slave is used twice, it's tasks will be sent immediately one after the next, so if your slave child process is async, they will be executed in async by the slave.
+**Executes a set of tasks among the given slaves (in parallel).**    
+If the same slave is used twice, it's tasks will be sent immediately one after the next. So, if your slave child process is async, they will be executed in async by the slave.
 
 ```js
 const parallelTask = master.create.parallel()
@@ -139,14 +139,16 @@ someTaskList
   .then( ... );
 ```
 
-**Parallel Looping***
+**Parallel Looping**    
 You can call *Master.create.parallel#times* to create a parallel "loop".
 ```js
-const slaves = master.create.slaves(5, 'path/to/slaves');
+const slaves = master.create.slaves(5, 'path/to/slave-file.js');
 
 master.create.parallel()
-  .addTask('foo', master.slaves.leastBusy(slaves))
+  .addTask('foo', master.slaves.leastBusyInList(slaves))
+  .addTask('bar', master.slaves.leastBusyInList(slaves))
   .times(100)
+  // This will send out 200 requests. Each "times" sends 2 tasks.
   .execute()
   .then(arrayOfResponseArrays => {
     // This will resolve with an Array of ResponseArrays.
@@ -157,7 +159,7 @@ master.create.parallel()
 
 ### Pipeline
 **A pipeline is similar to async's *waterfall*.**    
-Except in Dist.io, one slave will execute a task, its results are passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
+A slave will execute a task, its results will then passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
 
 ```js
 master.create.pipeline()
@@ -171,6 +173,17 @@ master.create.pipeline()
     // result of task a (res.value) passed to slaveB's task b
     // result of task b === res.
   });
+
+const myOtherPipelineExample = master.create.pipeline()
+  .addTask('foo')
+  .for(slaveA)
+  .addTask('bar')
+  .for(slaveB);
+
+myOtherPipelineExample.execute(/* Data to start the pipeline with */).then( ... );
+// You can execute the same pipeline multiple times.
+myOtherPipelineExample.execute(/* Data to start the pipeline with */).then( ... );
+
 
 // You can intercept and mutate values during each step in the pipeline...
 master.create.pipeline()
@@ -203,24 +216,25 @@ master.create.pipeline()
 ```
 
 ### Workpool
-**A workpool is a special kind of distributed pattern where the master chooses slaves based on their availability.**    
-The workpool will choose the next *idle* slave in the slave list. If no slave is idle, it will wait for one to become idle before sending the task.    
+**A workpool is a special kind of distributed pattern where the master chooses slaves based on availability.**    
+Slaves are chosen to do tasks in an idle fist, round-robin fashion to ensure that all slaves are utilized and one slave isn't favored over another. However, if only one slave is idle and the rest are always busy, that slave will, of course, always be chosen.
 
-Slaves are chosen in an idle fist, round-robin fashion to ensure that all slaves are utilized and one slave isn't favored over another. However, if only one slave is idle and the rest are always busy, that slave will, of course, always be chosen.
+The workpool always chooses the next *idle* slave in the slave list. If no slave is idle, it will wait for one to become idle before sending a task.    
 
-Workpool tasks are queued up and sent out to as many idle slaves in the workpool at a time.
-
-This workpool is often used in scenarios like the Monte Carlo program.
+Workpool tasks are queued up and sent out to as many idle slaves in the workpool at a time. The workpool pattern is often used in scenarios like the "Monte Carlo PI Approximation" program.
 
 ```js
 const workpool = master.create.workpool(...slaves);
 
 // An idle slave will be chosen, or the task is deferred until a slave becomes idle.
 workpool.do('task', data, metadata).then(res => {
-  // res is a Response object
+  // res is a Response object, like always...
 });
 
-workpool.do('another task', data, metadata).then( ... );
+workpool.do('another task 1', data, metadata).then( ... );
+workpool.do('another task 2', data, metadata).then( ... );
+workpool.do('another task 3', data, metadata).then( ... );
+...
 
 // You can execute a task in a "loop" using workpool's "while" predicate function.
 workpool
@@ -230,10 +244,8 @@ workpool
 
 workpool
   .while((i, responsesUpToNow) => {
-    if(responsesUpToNow.values.indexOf('some value') > -1) {
-      // Return falsy to break the loop.
-      return false;
-    }
+    // Return falsy to break the loop.
+    if(responsesUpToNow.values.indexOf('some value') > -1) return false;
   })
   .do('task', data, metadata)
   .then(resArray => {
@@ -243,12 +255,27 @@ workpool
 
 ### Scatter
 **Scatters the list of data arguments to the given slaves and task in parallel.**
+The scatter pattern is useful when you have a bunch of data to process using the same task. You create the scatter bound to a specific task, then "scatter" the data set across the given slaves.
+
+The tasks are assigned in a round-robin fashion, and when all tasks have completed, the Promise will be resolved.
+
+**Note, you must use the *spread* operator if you plan to scatter an array, otherwise the Array will be considered data itself.**
 
 ```js
 master.create.scatter('task name')
   .data('hello', 'world')
   .gather(slavesA, slavesB)
   .then(res => { ... })
+  .catch(/* Handle Errors */);
+
+// Scatter an array of data...
+const myData = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+master.create.scatter('task name')
+  .data(...myData)
+  .gather(slaves[0], slaves[1])
+  .then(res => {
+    console.log(res.values.join(', '));
+  })
   .catch(/* Handle Errors */);
 
 // Tasks are assigned in a round-robin fashion, so here, slaveA
@@ -261,6 +288,7 @@ master.create.scatter('task name')
 ```
 
 #### More patterns to come...
+##### Iterator, maybe?
 
 ## Master vs. Slave vs. SlaveChildProcess?
 Dist.io is divided into two parts: the *master process* and the *slave process(es)*.    
