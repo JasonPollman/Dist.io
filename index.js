@@ -33,6 +33,14 @@ class DistIO {
   get Slave() {
     return require('./lib/SlaveChildProcess');
   }
+
+  /**
+   * Returns the MasterProxyServer class.
+   * @type {Function}
+   */
+  get MasterProxyServer() {
+    return require('./lib/MasterProxyServer');
+  }
 }
 
 /**

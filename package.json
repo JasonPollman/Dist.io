@@ -19,6 +19,9 @@
     "email": "jasonjpollman@gmail.com",
     "url": "https://github.com/JasonPollman/Dist.io/issues"
   },
+  "bin": {
+    "distio-serve": "./bin/distio-serve"
+  },
   "keywords": [
     "parallel",
     "distributed",
@@ -47,6 +50,10 @@
     "minami": "^1.1.1"
   },
   "dependencies": {
-    "proto-lib": "^0.2.10"
+    "minimist": "^1.2.0",
+    "proto-lib": "^0.2.10",
+    "socket.io": "^1.4.6",
+    "winston": "^2.2.0",
+    "socket.io-client": "^1.4.6"
   }
 }

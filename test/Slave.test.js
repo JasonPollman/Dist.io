@@ -204,6 +204,44 @@ describe('Slave Class', function () {
   });
 
   describe('Slave#exec, Slave#do', function () {
+    it('Should pass options.forkOptions to ChildProcess.fork', function (done) {
+      this.timeout(3000);
+      this.slow(1000);
+
+      const location = path.join(__dirname, 'data', 'simple-slave-j.js');
+      const slave = new Slave(location, { forkOptions: { silent: true } });
+      let gotStdout = false;
+      let gotStderr = false;
+
+      slave.on('stdout', (m) => {
+        expect(m.toString('utf8')).to.equal('testing silent slave\n');
+        gotStdout = true;
+      });
+
+      slave.on('stdout', (m) => {
+        expect(m.toString('utf8')).to.equal('testing silent slave\n');
+        gotStderr = true;
+      });
+
+      slave.do('echo', null)
+        .then((res) => {
+          expect(res).to.be.an.instanceof(Response);
+          expect(res.error).to.equal(null);
+          expect(res.value).to.equal(slave.id);
+          slave.kill();
+          if (gotStdout === false) {
+            return done(new Error('Expected stdout, but got none...'));
+          }
+          if (gotStderr === false) {
+            return done(new Error('Expected stderr, but got none...'));
+          }
+          return done();
+        })
+        .catch(e => {
+          done(e);
+        });
+    });
+
     it('Should handle request timeouts', function (done) {
       this.timeout(3000);
       this.slow(2500);

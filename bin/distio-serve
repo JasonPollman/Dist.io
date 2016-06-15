@@ -1,0 +1,13 @@
+#!/usr/local/bin/node
+'use strict';
+const args = require('minimist')(process.argv.slice(2), { number: 'port', string: 'config' });
+const distIO = require('../');
+
+process.title = 'DistIOMasterProxyServer';
+
+const conf = args.config || null;
+let config;
+
+if (conf) config = require(conf); // eslint-disable-line global-require
+const server = new distIO.MasterProxyServer(config);
+server.start();
