@@ -2,12 +2,29 @@
 'use strict';
 const args = require('minimist')(process.argv.slice(2), { number: 'port', string: 'config' });
 const distIO = require('../');
+const path = require('path');
+const os = require('os');
 
-process.title = 'DistIOMasterProxyServer';
+process.title = 'dist.io serve';
 
-const conf = args.config || null;
-let config;
+let conf = args.config || null;
+let config = {};
 
-if (conf) config = require(conf); // eslint-disable-line global-require
+try { // Read and parse configuration file...
+  if (conf) {
+    conf = path.isAbsolute(conf) ? conf : path.join(__dirname, conf);
+    config = require(conf); // eslint-disable-line global-require
+    if (typeof config !== 'object') {
+      throw new Error(`Invalid config file. Expected an object, but got ${typeof config}`);
+    }
+  }
+} catch (e) {
+  throw new Error(`Error reading config file: ${conf}${os.EOL}${e.message}`);
+}
+
+// Overwrite config file with CLI arguments...
+for (const i of Object.keys(args)) config[i] = args[i];
+
+// Start the MasterProxyServer
 const server = new distIO.MasterProxyServer(config);
 server.start();
