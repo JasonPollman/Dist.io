@@ -7,13 +7,28 @@ const path = require('path');
 const slaveJS = path.join(__dirname, 'data', 'scatter-slave.js');
 const expect = require('chai').expect;
 const ResponseArray = require('../lib/ResponseArray');
+const fork = require('child_process').fork;
 
-describe('Scatter Pattern', function () {
-  this.timeout(3000);
-  this.slow(1000);
+describe('Scatter Pattern (Remote Slaves)', function () {
+  this.timeout(4000);
+  this.slow(2500);
+
+  let mpserver = null;
+  const connectOptions = {
+    location: '127.0.0.1:1337',
+    path: slaveJS,
+  };
+
+  before(() => {
+    mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1337'], { silent: true });
+  });
+
+  after(() => {
+    mpserver.kill('SIGINT');
+  });
 
   it('Should scatter data amongst slaves (Promises)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -31,7 +46,7 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should scatter data amongst slaves (Callbacks)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -48,7 +63,7 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should simply resolve if no data is provided (Promises)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -66,7 +81,7 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should simply resolve if no data is provided (Callbacks)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -83,7 +98,7 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should throw if no slaves are given (Promises)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -101,7 +116,7 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should throw if no slaves are given (Callbacks)', function (done) {
-    const slaves = master.createSlaves(5, slaveJS);
+    const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 
     scatter

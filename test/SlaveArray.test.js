@@ -22,7 +22,7 @@ describe('SlaveArray Class', function () {
 
       let slave;
       try {
-        const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+        const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
         slave = new Slave(location); // eslint-disable-line
 
         const s = new SlaveArray(slave, slave, 1); // eslint-disable-line
@@ -59,7 +59,7 @@ describe('SlaveArray Class', function () {
 
   describe('SlaveArray#random', function () {
     it('Should return a random slave...', (done) => {
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
       const slave = new Slave(location); // eslint-disable-line
       const slave2 = new Slave(location); // eslint-disable-line
       const slave3 = new Slave(location); // eslint-disable-line
@@ -84,7 +84,7 @@ describe('SlaveArray Class', function () {
 
       const slaves = master.create.slaves(2, path.join(__dirname, 'data', 'simple-slave-c.js'));
 
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
       const slave = new Slave(location); // eslint-disable-line
 
       expect(slaves).to.be.an.instanceof(SlaveArray);
@@ -114,7 +114,7 @@ describe('SlaveArray Class', function () {
 
       const slaves = master.create.slaves(2, path.join(__dirname, 'data', 'simple-slave-c.js'));
 
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
       const slave = new Slave(location); // eslint-disable-line
 
       expect(slaves).to.be.an.instanceof(SlaveArray);
@@ -192,7 +192,7 @@ describe('SlaveArray Class', function () {
   });
 
   after((done) => {
-    Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
+    Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a-2.js')).kill();
     done();
   });
 });

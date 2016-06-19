@@ -2,7 +2,7 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 'use strict';
 
-const Slave = require('../lib/Slave');
+const RemoteSlave = require('../lib/RemoteSlave');
 const path = require('path');
 const expect = require('chai').expect;
 const exec = require('child_process').exec;
@@ -12,16 +12,32 @@ const Response = require('../lib/Response');
 const TimeoutResponse = require('../lib/TimeoutResponse');
 const ResponseError = require('../lib/ResponseError');
 const master = require('../lib/Master');
+const fork = require('child_process').fork;
 
-describe('Slave Class', function () {
-  describe('Slave#getAllSlaves', function () {
+describe.skip('Slave Class (Remote)', function () {
+  let mpserver = null;
+
+  before(() => {
+    mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1339'], { silent: true });
+  });
+
+  after(() => {
+    mpserver.kill('SIGINT');
+  });
+
+  describe('RemoteSlave#getAllSlaves', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
 
-      const slaves = Slave.getAllSlaves();
+      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+
+      const slaves = RemoteSlave.getAllSlaves();
       expect(slaves).to.be.an('array');
       expect(slaves.length).to.be.gte(3);
       slaves.forEach(s => {
@@ -33,20 +49,25 @@ describe('Slave Class', function () {
     });
   });
 
-  describe('Slave#getSlaveWithAlias', function () {
+  describe('RemoteSlave#getSlaveWithAlias', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location, { alias: 'bar' }); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
 
-      const slaves = Slave.getAllSlaves();
+      new RemoteSlave(connectOptions, { alias: 'bar' }); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+
+      const slaves = RemoteSlave.getAllSlaves();
       expect(slaves).to.be.an('array');
       expect(slaves.length).to.be.gte(3);
-      expect(Slave.getSlaveWithAlias('foo')).to.equal(null);
+      expect(RemoteSlave.getSlaveWithAlias('foo')).to.equal(null);
 
       try {
-        new Slave(location, { alias: 'bar' }); // eslint-disable-line
+        new RemoteSlave(connectOptions, { alias: 'bar' }); // eslint-disable-line
       } catch (e) {
         expect(e).to.be.an.instanceof(Error);
         expect(e.message).to.equal('Slave with alias "bar" already exists.');
@@ -62,34 +83,45 @@ describe('Slave Class', function () {
     });
   });
 
-  describe('Slave#lastId', function () {
+  describe('RemoteSlave#lastId', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
 
-      const slaves = Slave.getAllSlaves();
+      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions); // eslint-disable-line
+
+      const slaves = RemoteSlave.getAllSlaves();
       slaves.forEach(s => {
         s.kill();
       });
 
-      expect(Slave.lastId).to.be.gte(3);
+      expect(RemoteSlave.lastId).to.be.gte(3);
       done();
     });
   });
 
-  describe('Slave#constructor', function () {
+  describe('RemoteSlave#constructor', function () {
     it('Should spawn a new slave, then kill it', function (done) {
-      this.timeout(5500);
+      this.timeout(7500);
       this.slow(5000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-a-3.js');
-      const slave = new Slave(location);
-      expect(slave).to.be.an.instanceof(Slave);
+      const location = path.join(__dirname, 'data', 'simple-slave-a-4.js');
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
+
+      const slave = new RemoteSlave(connectOptions);
+      expect(slave).to.be.an.instanceof(RemoteSlave);
       expect(slave.id).to.match(/^\d+$/);
       expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-      expect(slave.location).to.equal(location);
+      expect(slave.location).to.equal(connectOptions.location);
+      expect(slave.path).to.equal(connectOptions.path);
 
       expect(slave.toString())
         .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
@@ -100,25 +132,28 @@ describe('Slave Class', function () {
 
       if (os.platform() !== 'win32') {
         setTimeout(() => {
-          exec(`${pgrep} SimpleSlaveA3`, function (err, stdout) {
+          exec(`${pgrep} QWERTYSimpleSlaveA4`, function (err, stdout) {
             expect(err).to.equal(null);
             expect(stdout.trim()).to.match(/^\d+\s*$/m);
             expect(slave.kill()).to.equal(slave);
-            exec(`${pgrep} SimpleSlaveA3`, function (e, sout) {
-              expect(err).to.equal(null);
-              expect(sout.trim()).to.match(/^$/);
-              expect(slave.id).to.match(/^\d+$/);
-              expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-              expect(slave.location).to.equal(location);
+            setTimeout(() => {
+              exec(`${pgrep} QWERTYSimpleSlaveA4`, function (e, sout) {
+                expect(err).to.equal(null);
+                expect(sout.trim()).to.match(/^$/);
+                expect(slave.id).to.match(/^\d+$/);
+                expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
+                expect(slave.location).to.equal(connectOptions.location);
+                expect(slave.path).to.equal(connectOptions.path);
 
-              expect(slave.toString())
-                .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
+                expect(slave.toString()).to
+                  .equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
 
-              expect(slave.hasExited).to.equal(true);
-              expect(slave.isConnected).to.equal(false);
-              expect(slave.spawnError).to.equal(null);
-              done();
-            });
+                expect(slave.hasExited).to.equal(true);
+                expect(slave.isConnected).to.equal(false);
+                expect(slave.spawnError).to.equal(null);
+                done();
+              });
+            }, 1000);
           });
         }, 2000);
       } else {
@@ -131,63 +166,84 @@ describe('Slave Class', function () {
       this.slow(2500);
 
       let location = path.join(__dirname, 'data', 'doesnt-exist.js');
-      try {
-        const slave = new Slave(location); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a regular file, ' +
-          'but received error: ENOENT: no such file or directory, ' +
-          'stat \'/Users/Jason/Source/Dist.io/test/data/doesnt-exist.js\''
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
+
+      const slave = new RemoteSlave(connectOptions); // eslint-disable-line
+      slave.onSpawnError(er => {
+        expect(er).to.be.an.instanceof(Error);
+        expect(er.message).to.match(
+          /^Failed to connect to remote slave @127.0.0.1:1339:\sSlave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
         );
-      }
 
-      try {
-        const slave = new Slave(); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "undefined"');
-      }
 
-      try {
-        const slave = new Slave(''); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: ""');
-      }
+        try {
+          const slave = new RemoteSlave(); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got undefined'
+          );
+        }
 
-      try {
-        const slave = new Slave([]); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "object"');
-      }
+        try {
+          const slave = new RemoteSlave(''); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got string'
+          );
+        }
 
-      try {
-        const slave = new Slave(() => {}); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "function"');
-      }
+        try {
+          const slave = new RemoteSlave([]); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 ' +
+            '(connectOptions) property "location" to be a string, but got undefined'
+          );
+        }
 
-      try {
-        const slave = new Slave(null); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "object"');
-      }
+        try {
+          const slave = new RemoteSlave(() => {}); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got function'
+          );
+        }
 
-      location = path.join(__dirname, 'data');
-      try {
-        const slave = new Slave(location); // eslint-disable-line
-      } catch (e) {
-        expect(e.message).to.equal(
-          'Slave constructor argument #0 requires a regular file, ' +
-          'but /Users/Jason/Source/Dist.io/test/data isn\'t a file.'
-        );
-      }
-      done();
+        try {
+          const slave = new RemoteSlave(null); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 (connectOptions) property ' +
+            '"location" to be a string, but got undefined'
+          );
+        }
+
+        location = path.join(__dirname, 'data');
+        connectOptions.path = location;
+        try {
+          const slave = new RemoteSlave(location); // eslint-disable-line
+        } catch (e) {
+          expect(e.message).to.equal(
+            'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got string'
+          );
+        }
+        done();
+      });
     });
 
     it('Should set the slave title option', function (done) {
       this.timeout(3000);
       this.slow(2500);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location, { title: 'slave-title-test' });
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+
+      const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test' });
       slave.kill();
       done();
     });
@@ -196,20 +252,28 @@ describe('Slave Class', function () {
       this.timeout(3000);
       this.slow(2500);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location, { title: 'slave-title-test', args: ['a', '--foo=bar', '-x'] });
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+
+      const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test', args: ['a', '--foo=bar', '-x'] });
       slave.kill();
       done();
     });
   });
 
-  describe('Slave#exec, Slave#do', function () {
+  describe('RemoteSlave#exec, RemoteSlave#do', function () {
     it('Should pass options.forkOptions to ChildProcess.fork', function (done) {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-j.js');
-      const slave = new Slave(location, { forkOptions: { silent: true } });
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-j.js'),
+      };
+
+      const slave = new RemoteSlave(connectOptions, { forkOptions: { silent: true } });
       let gotStdout = false;
       let gotStderr = false;
 
@@ -247,8 +311,12 @@ describe('Slave Class', function () {
       this.slow(2500);
       let completed = 0;
 
-      let location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      let slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+
+      let slave = new RemoteSlave(connectOptions);
       slave.do('echo', null, { timeout: 1000 })
         .then((res) => {
           expect(res).to.be.an.instanceof(TimeoutResponse);
@@ -263,8 +331,8 @@ describe('Slave Class', function () {
           done(e);
         });
 
-      location = path.join(__dirname, 'data', 'simple-slave-c.js');
-      slave = new Slave(location);
+      connectOptions.path = path.join(__dirname, 'data', 'simple-slave-c.js');
+      slave = new RemoteSlave(connectOptions);
       slave.exec(1234, null)
         .then((res) => {
           expect(res).to.be.an.instanceof(Response);
@@ -284,10 +352,13 @@ describe('Slave Class', function () {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
-      Slave.defaultTimeout = 100;
+      RemoteSlave.defaultTimeout = 100;
       slave.do('echo', null)
         .then((res) => {
           expect(res).to.be.an.instanceof(TimeoutResponse);
@@ -299,18 +370,21 @@ describe('Slave Class', function () {
         .catch(e => {
           done(e);
         });
-      Slave.defaultTimeout = 0;
-      Slave.defaultTimeout = null;
+      RemoteSlave.defaultTimeout = 0;
+      RemoteSlave.defaultTimeout = null;
     });
 
     it('Should handle request timeouts (with Slave.defaultTimeout set), part II', function (done) {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
-      Slave.defaultTimeout = 10;
+      RemoteSlave.defaultTimeout = 10;
       slave.do('echo', null, { catchAll: true })
         .then(() => done(new Error('Expected to throw')))
         .catch(e => {
@@ -320,19 +394,22 @@ describe('Slave Class', function () {
           slave.kill();
           done();
         });
-      Slave.defaultTimeout = undefined;
-      expect(Slave.defaultTimeout).to.equal(null);
+      RemoteSlave.defaultTimeout = undefined;
+      expect(RemoteSlave.defaultTimeout).to.equal(null);
     });
 
     it('Should handle request timeouts (with Master#defaultTimeout set), part I', function (done) {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
       master.defaultTimeout = 100;
-      expect(master.defaultTimeout).to.equal(Slave.defaultTimeout);
+      expect(master.defaultTimeout).to.equal(RemoteSlave.defaultTimeout);
       slave.do('echo', null)
         .then((res) => {
           expect(res).to.be.an.instanceof(TimeoutResponse);
@@ -347,12 +424,15 @@ describe('Slave Class', function () {
       master.defaultTimeout = null;
     });
 
-    it('Should handle request timeouts (with Slave#defaultTimeout set), part I', function (done) {
+    it('Should handle request timeouts (with RemoteSlave#defaultTimeout set), part I', function (done) {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
       slave.defaultTimeout = 50;
       slave.defaultTimeout = undefined;
@@ -382,13 +462,16 @@ describe('Slave Class', function () {
       expect(slave.defaultTimeout).to.equal(null);
     });
 
-    it('Should handle request timeouts (with Slave#defaultTimeout set), part II', function (done) {
+    it('Should handle request timeouts (with RemoteSlave#defaultTimeout set), part II', function (done) {
       this.timeout(3000);
       this.slow(1000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
-      const slave2 = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
+      const slave2 = new RemoteSlave(connectOptions);
 
       slave2.defaultTimeout = 2;
       slave2.defaultTimeout = 'foo';
@@ -409,8 +492,11 @@ describe('Slave Class', function () {
     });
 
     it('Should reject on invalid command types', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
       let completed = 0;
 
       slave.exec({}, null, { timeout: 1000 })
@@ -453,22 +539,29 @@ describe('Slave Class', function () {
 
   it('Should expect a non-empty string filepath for the "file" argument', function (done) {
     try {
-      const slave = new Slave(); // eslint-disable-line
+      const slave = new RemoteSlave(); // eslint-disable-line
     } catch (e) {
-      expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: "undefined"');
+      expect(e.message).to.equal(
+        'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got undefined'
+      );
     }
 
     try {
-      const slave = new Slave(''); // eslint-disable-line
+      const slave = new RemoteSlave(''); // eslint-disable-line
     } catch (e) {
-      expect(e.message).to.equal('Slave constructor argument #0 requires a non-empty string, but got: ""');
+      expect(e.message).to.equal(
+        'RemoteSlave#constructor expected argument #0 (connectOptions) to be an object, but got string'
+      );
     }
     done();
   });
 
   it('Should have a #then property', function (done) {
-    const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-    const slave = new Slave(location);
+    const connectOptions = {
+      location: '127.0.0.1:1339',
+      path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+    };
+    const slave = new RemoteSlave(connectOptions);
     slave.then();
     slave.then('string');
     slave.then(123);
@@ -483,8 +576,11 @@ describe('Slave Class', function () {
   });
 
   it('Should handle very short request timeouts', function (done) {
-    const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-    const slave = new Slave(location);
+    const connectOptions = {
+      location: '127.0.0.1:1339',
+      path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+    };
+    const slave = new RemoteSlave(connectOptions);
     slave.exec('echo', null, { timeout: 1 })
       .then((res) => {
         expect(res).to.be.an.instanceof(TimeoutResponse);
@@ -497,11 +593,14 @@ describe('Slave Class', function () {
       });
   });
 
-  describe('Slave#ack', function () {
+  describe('RemoteSlave#ack', function () {
     this.slow(2000);
     it('Should send an acknowledgement message', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
       slave.ack({ foo: 'bar' })
         .then(res => {
@@ -523,11 +622,14 @@ describe('Slave Class', function () {
     });
   });
 
-  describe('Slave#noop', function () {
+  describe('RemoteSlave#noop', function () {
     this.slow(2000);
     it('Should send a noop message', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
-      const slave = new Slave(location);
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      };
+      const slave = new RemoteSlave(connectOptions);
 
       slave.noop()
         .then(res => {
@@ -542,7 +644,7 @@ describe('Slave Class', function () {
   });
 
   after((done) => {
-    Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
+    RemoteSlave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
     done();
   });
 });
