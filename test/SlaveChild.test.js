@@ -25,6 +25,8 @@ describe('SlaveChildProcess Class', function () {
   describe('SlaveChildProcess#id', function () {
     it('Should return the slave\'s id', () => {
       expect(slave.id).to.equal(10009);
+      expect(slave.localId).to.equal(10009);
+      expect(slave.remoteId).to.equal(null);
     });
   });
 

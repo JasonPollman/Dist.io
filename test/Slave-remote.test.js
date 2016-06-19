@@ -13,8 +13,9 @@ const TimeoutResponse = require('../lib/TimeoutResponse');
 const ResponseError = require('../lib/ResponseError');
 const master = require('../lib/Master');
 const fork = require('child_process').fork;
+const SlaveArray = require('../lib/SlaveArray');
 
-describe.skip('Slave Class (Remote)', function () {
+describe('Slave Class (Remote)', function () {
   let mpserver = null;
 
   before(() => {
@@ -33,9 +34,9 @@ describe.skip('Slave Class (Remote)', function () {
         path: location,
       };
 
-      new RemoteSlave(connectOptions); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
 
       const slaves = RemoteSlave.getAllSlaves();
       expect(slaves).to.be.an('array');
@@ -43,8 +44,8 @@ describe.skip('Slave Class (Remote)', function () {
       slaves.forEach(s => {
         expect(s.pid).to.be.a('number');
         expect(s.pid).to.be.gte(0);
-        s.kill();
       });
+      master.kill('sremote');
       done();
     });
   });
@@ -57,9 +58,9 @@ describe.skip('Slave Class (Remote)', function () {
         path: location,
       };
 
-      new RemoteSlave(connectOptions, { alias: 'bar' }); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions, { alias: 'bar', group: 'sr-t' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
 
       const slaves = RemoteSlave.getAllSlaves();
       expect(slaves).to.be.an('array');
@@ -73,12 +74,12 @@ describe.skip('Slave Class (Remote)', function () {
         expect(e.message).to.equal('Slave with alias "bar" already exists.');
       }
       slaves.forEach(s => {
-        s.kill();
         s.group = 'new group';
         s.group = {};
         expect(s.rank).to.be.a('number');
         expect(s.group).to.equal('new group');
       });
+      master.kill('sr-t');
       done();
     });
   });
@@ -87,18 +88,17 @@ describe.skip('Slave Class (Remote)', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
       const connectOptions = {
-        location: '127.0.0.1:1339',
+        host: '127.0.0.1:1339',
         path: location,
       };
 
-      new RemoteSlave(connectOptions); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
-      new RemoteSlave(connectOptions); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote2' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote2' }); // eslint-disable-line
+      new RemoteSlave(connectOptions, { group: 'sremote2' }); // eslint-disable-line
 
       const slaves = RemoteSlave.getAllSlaves();
-      slaves.forEach(s => {
-        s.kill();
-      });
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      master.kill('sremote2');
 
       expect(RemoteSlave.lastId).to.be.gte(3);
       done();
@@ -108,7 +108,7 @@ describe.skip('Slave Class (Remote)', function () {
   describe('RemoteSlave#constructor', function () {
     it('Should spawn a new slave, then kill it', function (done) {
       this.timeout(7500);
-      this.slow(5000);
+      this.slow(6000);
 
       const location = path.join(__dirname, 'data', 'simple-slave-a-4.js');
       const connectOptions = {
@@ -120,7 +120,7 @@ describe.skip('Slave Class (Remote)', function () {
       expect(slave).to.be.an.instanceof(RemoteSlave);
       expect(slave.id).to.match(/^\d+$/);
       expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-      expect(slave.location).to.equal(connectOptions.location);
+      expect(slave.location).to.equal(`http://${connectOptions.location}`);
       expect(slave.path).to.equal(connectOptions.path);
 
       expect(slave.toString())
@@ -142,7 +142,7 @@ describe.skip('Slave Class (Remote)', function () {
                 expect(sout.trim()).to.match(/^$/);
                 expect(slave.id).to.match(/^\d+$/);
                 expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
-                expect(slave.location).to.equal(connectOptions.location);
+                expect(slave.location).to.equal(`http://${connectOptions.location}`);
                 expect(slave.path).to.equal(connectOptions.path);
 
                 expect(slave.toString()).to
@@ -153,7 +153,7 @@ describe.skip('Slave Class (Remote)', function () {
                 expect(slave.spawnError).to.equal(null);
                 done();
               });
-            }, 1000);
+            }, 2000);
           });
         }, 2000);
       } else {
@@ -165,6 +165,11 @@ describe.skip('Slave Class (Remote)', function () {
       this.timeout(3000);
       this.slow(2500);
 
+      RemoteSlave.reconnectionAttempts = 4;
+      RemoteSlave.reconnectionDelay = 4000;
+      RemoteSlave.reconnectionAttempts = 'a';
+      RemoteSlave.reconnectionDelay = 'b';
+
       let location = path.join(__dirname, 'data', 'doesnt-exist.js');
       const connectOptions = {
         location: '127.0.0.1:1339',
@@ -175,7 +180,7 @@ describe.skip('Slave Class (Remote)', function () {
       slave.onSpawnError(er => {
         expect(er).to.be.an.instanceof(Error);
         expect(er.message).to.match(
-          /^Failed to connect to remote slave @127.0.0.1:1339:\sSlave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
+          /^Failed to connect to remote slave @http:\/\/127.0.0.1:1339:\sSlave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
         );
 
 
@@ -239,12 +244,12 @@ describe.skip('Slave Class (Remote)', function () {
       this.slow(2500);
 
       const connectOptions = {
-        location: '127.0.0.1:1339',
+        host: '127.0.0.1:1339',
         path: path.join(__dirname, 'data', 'simple-slave-d.js'),
       };
 
       const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test' });
-      slave.kill();
+      slave.kill('SIGINT');
       done();
     });
 
@@ -258,7 +263,7 @@ describe.skip('Slave Class (Remote)', function () {
       };
 
       const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test', args: ['a', '--foo=bar', '-x'] });
-      slave.kill();
+      slave.kill('SIGBREAK');
       done();
     });
   });
@@ -292,7 +297,7 @@ describe.skip('Slave Class (Remote)', function () {
           expect(res).to.be.an.instanceof(Response);
           expect(res.error).to.equal(null);
           expect(res.value).to.equal(slave.id);
-          slave.kill();
+          slave.kill('SIGSTOP');
           if (gotStdout === false) {
             return done(new Error('Expected stdout, but got none...'));
           }
@@ -339,7 +344,7 @@ describe.skip('Slave Class (Remote)', function () {
           expect(res.error.message).to.match(/Slave #\d+ does not listen to task "1234"/);
           expect(res.error.name).to.equal('ResponseError: ReferenceError');
           if (++completed === 2) {
-            slave.kill();
+            slave.kill('SIGHUP');
             done();
           }
         })
@@ -364,7 +369,7 @@ describe.skip('Slave Class (Remote)', function () {
           expect(res).to.be.an.instanceof(TimeoutResponse);
           expect(res.error.message).to.match(/Request #\d+ with command "\w+" timed out after 100ms./);
           expect(res.error.name).to.equal('ResponseError: Error');
-          slave.kill();
+          slave.kill('SIGTERM');
           done();
         })
         .catch(e => {
@@ -391,7 +396,7 @@ describe.skip('Slave Class (Remote)', function () {
           expect(e).to.be.an.instanceof(ResponseError);
           expect(e.message).to.match(/Request #\d+ with command "\w+" timed out after 10ms./);
           expect(e.name).to.equal('ResponseError: Error');
-          slave.kill();
+          slave.kill('SIGHUP');
           done();
         });
       RemoteSlave.defaultTimeout = undefined;

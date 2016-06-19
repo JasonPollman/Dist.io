@@ -24,6 +24,10 @@ describe('Master Class', function () {
       expect(slaves).to.be.an.instanceof(SlaveArray);
       expect(slaves.length).to.equal(10);
 
+      slaves.each(s => {
+        expect(s.isRemote).to.equal(false);
+      });
+
       Master.close(slaves[0])
         .then(status => {
           expect(status).to.equal(true);

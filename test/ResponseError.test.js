@@ -57,6 +57,11 @@ describe('ResponseError Class', function () {
     expect(x.message).to.equal('test message');
     expect(x.name).to.equal('ResponseError: test error');
     expect(x.stack).to.equal('stack');
+    expect(x.raw).to.eql({
+      message: 'test message',
+      name: 'test error',
+      stack: 'stack',
+    });
     done();
   });
 });

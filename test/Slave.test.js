@@ -17,9 +17,9 @@ describe('Slave Class', function () {
   describe('Slave#getAllSlaves', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      new Slave(location, { group: 'slave-test-get-all' }); // eslint-disable-line
+      new Slave(location, { group: 'slave-test-get-all' }); // eslint-disable-line
+      new Slave(location, { group: 'slave-test-get-all' }); // eslint-disable-line
 
       const slaves = Slave.getAllSlaves();
       expect(slaves).to.be.an('array');
@@ -27,8 +27,8 @@ describe('Slave Class', function () {
       slaves.forEach(s => {
         expect(s.pid).to.be.a('number');
         expect(s.pid).to.be.gte(0);
-        s.kill();
       });
+      master.kill('slave-test-get-all');
       done();
     });
   });
@@ -36,28 +36,29 @@ describe('Slave Class', function () {
   describe('Slave#getSlaveWithAlias', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location, { alias: 'bar' }); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      const a = new Slave(location, { alias: 'bar' }); // eslint-disable-line
+      const b = new Slave(location); // eslint-disable-line
+      const c = new Slave(location); // eslint-disable-line
 
       const slaves = Slave.getAllSlaves();
       expect(slaves).to.be.an('array');
       expect(slaves.length).to.be.gte(3);
       expect(Slave.getSlaveWithAlias('foo')).to.equal(null);
 
+      let ss = null;
       try {
-        new Slave(location, { alias: 'bar' }); // eslint-disable-line
+        ss = new Slave(location, { alias: 'bar' }); // eslint-disable-line
       } catch (e) {
         expect(e).to.be.an.instanceof(Error);
         expect(e.message).to.equal('Slave with alias "bar" already exists.');
       }
       slaves.forEach(s => {
-        s.kill();
         s.group = 'new group';
         s.group = {};
         expect(s.rank).to.be.a('number');
         expect(s.group).to.equal('new group');
       });
+      master.kill(ss, a, b, c);
       done();
     });
   });
@@ -65,15 +66,12 @@ describe('Slave Class', function () {
   describe('Slave#lastId', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
-      new Slave(location); // eslint-disable-line
+      const x = new Slave(location); // eslint-disable-line
+      const y = new Slave(location); // eslint-disable-line
+      const z = new Slave(location); // eslint-disable-line
 
-      const slaves = Slave.getAllSlaves();
-      slaves.forEach(s => {
-        s.kill();
-      });
-
+      Slave.getAllSlaves();
+      master.kill(x, y, z);
       expect(Slave.lastId).to.be.gte(3);
       done();
     });
@@ -90,6 +88,8 @@ describe('Slave Class', function () {
       expect(slave.id).to.match(/^\d+$/);
       expect(slave.alias).to.match(/^0x[a-z0-9]+$/);
       expect(slave.location).to.equal(location);
+      expect(slave.path).to.equal(location);
+      expect(Slave.isSlaveMessage).to.be.a('function');
 
       expect(slave.toString())
         .to.equal(`Slave id=${slave.id}, alias=${slave.alias}, sent=${slave.sent}, received=${slave.received}`);
@@ -100,11 +100,11 @@ describe('Slave Class', function () {
 
       if (os.platform() !== 'win32') {
         setTimeout(() => {
-          exec(`${pgrep} SimpleSlaveA3`, function (err, stdout) {
+          exec(`${pgrep} TestingSimpleSlaveA3`, function (err, stdout) {
             expect(err).to.equal(null);
             expect(stdout.trim()).to.match(/^\d+\s*$/m);
             expect(slave.kill()).to.equal(slave);
-            exec(`${pgrep} SimpleSlaveA3`, function (e, sout) {
+            exec(`${pgrep} TestingSimpleSlaveA3`, function (e, sout) {
               expect(err).to.equal(null);
               expect(sout.trim()).to.match(/^$/);
               expect(slave.id).to.match(/^\d+$/);
@@ -117,6 +117,12 @@ describe('Slave Class', function () {
               expect(slave.hasExited).to.equal(true);
               expect(slave.isConnected).to.equal(false);
               expect(slave.spawnError).to.equal(null);
+
+              expect(Slave.protected.bind(Slave, null)).to.throw(Error);
+              expect(Slave.protected.bind(Slave, slave)).to.not.throw(Error);
+
+              expect(Slave.cleanupSlaveReferences.bind(Slave, null)).to.throw(Error);
+              expect(Slave.cleanupSlaveReferences.bind(Slave, slave)).to.not.throw(Error);
               done();
             });
           });

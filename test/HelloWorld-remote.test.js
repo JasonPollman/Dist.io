@@ -38,7 +38,7 @@ function checkSimpleResponseGoodbyeSingle(res) {
   expect(res.error).to.eql(null);
 }
 
-describe.skip('Hello World (Remote Slaves)', function () {
+describe('Hello World (Remote Slaves)', function () {
   this.timeout(4000);
   this.slow(2000);
 
@@ -59,7 +59,12 @@ describe.skip('Hello World (Remote Slaves)', function () {
   describe('Basic Usage', function () {
     it('Should send messages to the slave and return the data (Promises)', (done) => {
       this.timeout(8000);
-      const slaves = master.createRemoteSlaves(3, connectOptions, { group: 'hw-a' });
+      const slaves = master.createRemoteSlaves(3, connectOptions, { group: 'hwr-a' });
+
+      slaves.each(s => {
+        expect(s.isRemote).to.equal(true);
+        expect(s.socket).to.be.an('object');
+      });
 
       tell(slaves).to('say hello')
         .then(res => checkSimpleResponseHello(res))
@@ -69,7 +74,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
         .then(res => checkSimpleResponseHello(res))
         .then(() => tell(slaves[0].id, slaves[1].id, slaves[2].id).to('say hello'))
         .then(res => checkSimpleResponseHello(res))
-        .then(() => tell('hw-a').to('say hello'))
+        .then(() => tell('hwr-a').to('say hello'))
         .then(res => checkSimpleResponseHello(res))
         .then(() => tell(slaves).to('say goodbye'))
         .then(res => checkSimpleResponseGoodbye(res))
@@ -79,7 +84,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
         .then(res => checkSimpleResponseGoodbye(res))
         .then(() => tell(slaves[0].id, slaves[1].id, slaves[2].id).to('say goodbye'))
         .then(res => checkSimpleResponseGoodbye(res))
-        .then(() => tell('hw-a').to('say goodbye'))
+        .then(() => tell('hwr-a').to('say goodbye'))
         .then(res => checkSimpleResponseGoodbye(res))
         .then(() => slaves.exec('say hello'))
         .then(res => checkSimpleResponseHello(res))
@@ -95,7 +100,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should send messages to the slave and return the data (Callbacks)', function (done) {
       this.timeout(8000);
-      const slaves = master.createRemoteSlaves(3, connectOptions, { group: 'hw-b' });
+      const slaves = master.createRemoteSlaves(3, connectOptions, { group: 'hwr-b' });
 
       tell(slaves).to('say hello', function (err, res) {
         expect(err).to.equal(null);
@@ -106,7 +111,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
           tell(slaves[0].id, slaves[1].id, slaves[2].id).to('say hello', function (err, res) {
             expect(err).to.equal(null);
             checkSimpleResponseHello(res);
-            tell('hw-b').to('say hello', function (err, res) {
+            tell('hwr-b').to('say hello', function (err, res) {
               expect(err).to.equal(null);
               checkSimpleResponseHello(res);
               tell(slaves).to('say goodbye', function (err, res) {
@@ -121,7 +126,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
                     tell(slaves[0].id, slaves[1].id, slaves[2].id).to('say goodbye', function (err, res) {
                       expect(err).to.equal(null);
                       checkSimpleResponseGoodbye(res);
-                      tell('hw-b').to('say goodbye', function (err, res) {
+                      tell('hwr-b').to('say goodbye', function (err, res) {
                         expect(err).to.equal(null);
                         checkSimpleResponseGoodbye(res);
                         slaves.exec('say hello', function (err, res) {
@@ -158,7 +163,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
       let slave2;
       let slave3;
 
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-c' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-c' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.workpool(slaves))
         .then(wp => { workpool = wp; })
@@ -207,7 +212,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Should only send messages to one slave at a time and round-robin requests (Callbacks)', (done) => {
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-d' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-d' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         let slave1;
@@ -268,7 +273,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Master#workpool.while (Callbacks)', (done) => {
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-e' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -283,7 +288,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Master#workpool.while #2 (Callbacks)', (done) => {
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-e' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -298,7 +303,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Master#workpool.while #3 (Callbacks)', (done) => {
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-e' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -312,7 +317,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Master#workpool.while #4 (Callbacks, Single Slave)', (done) => {
-      master.create.remote.slaves(1, connectOptions, { group: 'hw-e' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(1, connectOptions, { group: 'hwr-e' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -327,7 +332,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     });
 
     it('Master#workpool.while (Promises)', (done) => {
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-y' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-y' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
 
         workpool
@@ -345,7 +350,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     it('Master#workpool.while (Promises, Single Slave, Async)', (done) => {
       this.timeout(5000);
 
-      master.create.remote.slaves(1, connectOptions, { group: 'hw-z' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(1, connectOptions, { group: 'hwr-z' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
         let completed = 0;
 
@@ -378,7 +383,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
     it('Master#workpool.do (Promises, Single Slave, Async)', (done) => {
       this.timeout(5000);
 
-      master.create.remote.slaves(1, connectOptions, { group: 'hw-z' }, function (slaves) { // eslint-disable-line max-len
+      master.create.remote.slaves(1, connectOptions, { group: 'hwr-z' }, function (slaves) { // eslint-disable-line max-len
         const workpool = master.create.workpool(slaves);
         let completed = 0;
 
@@ -448,7 +453,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should execute a bunch of tasks "simultaneously" (Promises)', (done) => {
       let slaves;
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-h' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-h' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.parallel())
         .then(parallel => parallel
@@ -468,7 +473,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should execute a bunch of tasks "simultaneously" (Callbacks)', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-i' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-i' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.addTask('say hello').for(slaves[0]);
@@ -485,7 +490,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should execute a bunch of tasks "simultaneously" (With numeric task)', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-i' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-i' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.addTask(1).for(slaves[0]);
@@ -506,7 +511,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should should throw if ".for" wasn\'t called on a task', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-j' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-j' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.addTask('say hello').for(slaves[0]);
@@ -524,7 +529,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should should resolve an empty ReponseArray if no tasks have been added (Promises)', (done) => {
       let slaves;
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-k' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-k' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.parallel())
         .then(parallel => parallel.execute())
@@ -539,7 +544,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should should resolve an empty ReponseArray if no tasks have been added (Callbacks)', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-l' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-l' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.execute(function (err, res) {
@@ -554,7 +559,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should iterate multiple times when using ".times" (Promises)', (done) => {
       let slaves;
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-h' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-h' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.parallel())
         .then(parallel => parallel
@@ -581,7 +586,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should iterate multiple times when using ".times" (Callbacks)', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-i' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-i' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.addTask('say hello').for(slaves[0]).times(7);
@@ -602,7 +607,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should do nothing if a non-number is passed to ".times"', (done) => {
       master.create.remote
-        .slaves(3, connectOptions, { group: 'hw-i' }, function (slaves) {
+        .slaves(3, connectOptions, { group: 'hwr-i' }, function (slaves) {
           const parallel = master.create.parallel();
 
           parallel.addTask('say hello').for(slaves[0]).times('string');
@@ -619,7 +624,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should throw if a non-Slave argument is passed to ".for"', (done) => {
       let slaves;
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-h' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-h' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.parallel())
         .then(parallel => {
@@ -674,7 +679,7 @@ describe.skip('Hello World (Remote Slaves)', function () {
 
     it('Should throw if the given task is invalid', (done) => {
       let slaves;
-      master.create.remote.slaves(3, connectOptions, { group: 'hw-h' })
+      master.create.remote.slaves(3, connectOptions, { group: 'hwr-h' })
         .then(instances => { slaves = instances; })
         .then(() => master.create.parallel())
         .then(parallel => {

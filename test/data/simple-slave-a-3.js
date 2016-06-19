@@ -1,5 +1,5 @@
 'use strict';
-process.title = 'SimpleSlaveA3';
+process.title = 'TestingSimpleSlaveA3';
 
 setInterval(() => {
   /* No Op */
