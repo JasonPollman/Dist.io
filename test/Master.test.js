@@ -119,6 +119,22 @@ describe('Master Class', function () {
     });
   });
 
+  describe('Master#slaves.local', function () {
+    it('Should return all local slaves', function (done) {
+      const s = Master.slaves.local;
+      expect(s).to.be.an.instanceof(SlaveArray);
+      done();
+    });
+  });
+
+  describe('Master#slaves.remote', function () {
+    it('Should return all local slaves', function (done) {
+      const s = Master.slaves.remote;
+      expect(s).to.be.an.instanceof(SlaveArray);
+      done();
+    });
+  });
+
   describe('Master#shutdown', function () {
     it('Should shutdown the given slave arguments after all messages have been sent (Promises)', function (done) {
       this.timeout(3000);

@@ -35,9 +35,13 @@ describe('Slave Class (Remote)', function () {
         path: location,
       };
 
-      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
-      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
-      new RemoteSlave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+      master.create.remote.slave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+      master.create.remote.slave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+      master.create.remote.slave(connectOptions, { group: 'sremote' }); // eslint-disable-line
+
+      const sls = master.slaves.remote;
+      expect(sls).to.be.an.instanceof(SlaveArray);
+      expect(sls.length).to.be.gte(3);
 
       const slaves = RemoteSlave.getAllSlaves();
       expect(slaves).to.be.an('array');

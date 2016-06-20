@@ -6,7 +6,8 @@
   "author": "Jason James Pollman <jasonjpollman@gmail.com>",
   "license": "ISC",
   "scripts": {
-    "test": "istanbul cover _mocha"
+    "test": "istanbul cover _mocha",
+    "docs": "jsdoc ./ -c ./.jsdoc.json"
   },
   "engines": {
     "node": ">=5.10.1"
