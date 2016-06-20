@@ -16,8 +16,7 @@
 
 'use strict';
 const master = require('../../').Master;
-
-const s = master.create.remote.slaves(2, { location: 'localhost:1337', path: './examples/remote/slave.js' });
+const s = master.create.remote.slaves(2, { host: 'localhost:1337', script: './examples/remote/slave.js' });
 
 master.tell(s[0])
   .to('say hello')

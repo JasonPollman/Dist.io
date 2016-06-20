@@ -18,9 +18,9 @@
 const master = require('../../').Master;
 const path = require('path');
 
-// Create two remote slaves, and one local.
-let s = master.create.remote.slaves(2, { host: 'localhost:1337', path: './examples/local-remote/slave.js' });
-const local = master.create.slaves(2, path.join(__dirname, '/slave.js'));
+// Create two remote slaves, and two local.
+let s = master.create.remote.slaves(2, { host: 'localhost:1337', script: './examples/local-remote/slave.js' });
+const local = master.create.slaves(2, path.join(__dirname, 'slave.js'));
 
 // Push the local into the slave array created using master.create.remote.slaves...
 s = s.concat(local);
