@@ -924,15 +924,15 @@ tell(slaveA).to('foo')
 ## Response Arrays
 Response arrays are utilized when multiple slave executions are done in parallel (i.e. when using *Master#tell* or *SlaveArray#exec* on multiple slaves). They are a sub class of *Array*, so all the standard *push*, *pop*, etc. methods exist on them.
 
-However, they have some additionaly convenience methods/properties that make working with a collection of responses easier:
+However, they have some additional convenience methods/properties that make working with a collection of responses easier:
 
-**ResponseArray#each**(*{Function}* **onValue**) → *{undefined}*
+**ResponseArray#each**(*{Function}* **onValue**) → *{undefined}*    
 Iterates over each item in the response array. *onValue* is invoked with *value*, *key*, *parent*.
 
-**ResponseArray#joinValues**(*{String}* **glue**) → *String*
+**ResponseArray#joinValues**(*{String}* **glue**) → *String*    
 Operates just like *Array#join*, but on all the *Response#value* properties.
 
-**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*
+**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*   
 Sorts the response array by the given *Response* object property. Any property from the *Response* class can be used here. Options for the value passed to the *order* parameter are *asc* and *desc*.
 
 *(Getter)* **Response#errors** → *{Array<Error>}*    
