@@ -452,6 +452,9 @@ slaves.exec('some task', data, metadata).then(...);
 ### Master API
 **Master#create.slave**(*{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
 Creates a new local slave from the code at the given path.
+
+*This is an alias for Master#createSlave*    
+
 ```js
 const slave = master.create.slave('/path/to/slave.js', {
   // An alias for this slave, must be unique for each slave.
@@ -469,6 +472,9 @@ const slave = master.create.slave('/path/to/slave.js', {
 
 **Master#create.slaves**(*{Number}* count, *{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
 Creates multiple local slaves from the code at the given path.
+
+*This is an alias for Master#createSlaves*    
+
 ```js
 const slave = master.create.slaves(7, '/path/to/slave.js', {
   // An alias for the slaves, must be unique for each slave (see note below)
@@ -491,6 +497,8 @@ const slave = master.create.slaves(7, '/path/to/slave.js', {
 **Master#create.remote.slave**(*{String}* **remoteSlaveOptions**, *{Object=}* **options**) → *{SlaveArray}*    
 Creates a remote slave. Options are the same a creating a local slaves.
 
+*This is an alias for Master#createRemoteSlave*    
+
 The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
 | Key      | Description |
 | :------- | :---------- |
@@ -509,6 +517,8 @@ const slave = master.create.remote.slave(
 
 **Master#create.remote.slaves**(*{Number}* count, *{String}* **remoteSlaveOptions**, *{Object=}* **options**) → *{SlaveArray}*    
 Creates multiple remote slaves. Options are the same a creating a local slaves.
+
+*This is an alias for Master#createRemoteSlaves*    
 
 The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
 | Key      | Description |
