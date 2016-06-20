@@ -839,26 +839,28 @@ slave
 ## The Master Proxy Server
 **Is just a fancy name for a socket.io server, that passes messages back and forth between a client and a host machine.**    
 
-The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine.
+It's what enables Dist.io to start processes on remote machines. The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine. Simple as that.    
+
+**The power of distributed computing!**    
+You can run the master proxy server from an infinite number of machines and distribute computationally expensive tasks among them!
 
 ### Starting the Master Proxy Server
-**All CLI arguments are optional**   
-The default port is ``1337``.   
+**All CLI arguments are optional** The default port is ``1337``.   
 
 ```bash
 $ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json]
 ```
 #### Master Proxy Server Config
-**See ``./serve-default-config.js`` for an example of a config file**
+**See [serve-default-config.js](https://github.com/JasonPollman/Dist.io/blob/master/serve-default-config.json) for an example of a config file with the defaults listed.**
 
 
 ## Remote Slaves
-**Remote slaves use the same API as local slaves**
+**Remote slaves use the same API as local slaves...**    
+There are a few caveats about using them, however:    
 
-There are a few caveats about using them, however:
-- A Master Proxy Server
+- A [Master Proxy Server](#the-master-proxy-server) must be running on the host machine.
 - The script must exist on the host machine and be *npm installed* there.
-
+- You must use [Master#create.remote.slave(s)](#master-api) to start them.
 
 ## Requests
 *Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.
