@@ -499,7 +499,8 @@ Creates a remote slave. Options are the same a creating a local slaves.
 
 *This is an alias for Master#createRemoteSlave*    
 
-The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
+The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:    
+
 | Key      | Description |
 | :------- | :---------- |
 | *host*   | The URL path to the host machine (Master Proxy Server) |
@@ -520,7 +521,8 @@ Creates multiple remote slaves. Options are the same a creating a local slaves.
 
 *This is an alias for Master#createRemoteSlaves*    
 
-The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
+The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:    
+
 | Key      | Description |
 | :------- | :---------- |
 | *host*   | The URL path to the host machine (Master Proxy Server) |
