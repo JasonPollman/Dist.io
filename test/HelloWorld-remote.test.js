@@ -4,6 +4,7 @@
 
 const master = require('../').Master;
 const Slave = require('../lib/Slave');
+const RemoteSlave = require('../lib/RemoteSlave');
 const path = require('path');
 const expect = require('chai').expect;
 const tell = master.tell;
@@ -49,6 +50,7 @@ describe('Hello World (Remote Slaves)', function () {
   };
 
   before(() => {
+    RemoteSlave.onSpawnError(() => {});
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1338'], { silent: true });
   });
 
@@ -259,7 +261,7 @@ describe('Hello World (Remote Slaves)', function () {
     it('Master#workpool should throw if the while predicate is not a function', (done) => {
       let slave;
       try {
-        slave = master.create.slave(path.join(__dirname, 'data', 'slave-hello-world.js'));
+        slave = master.create.remote.slave(connectOptions);
         master.create.workpool(slave).while('string');
         done(new Error('Expected to throw'));
       } catch (e) {

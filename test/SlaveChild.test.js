@@ -1,32 +1,38 @@
 /* eslint-env node, mocha */
-/* eslint-disable prefer-arrow-callback, func-names, require-jsdoc */
+/* eslint-disable prefer-arrow-callback, func-names, require-jsdoc, global-require */
 'use strict';
 
-process.argv.push(
-  '--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias', '--dist-io-slave-title=slave-child-test'
-);
-
-function throwError() {
-  throw new Error('foo');
-}
-
-const slave = require('./data/simple-slave-b');
-const expect = require('chai').expect;
-
-slave.task('throw', () => {
-  throw new Error('oops');
-});
-
-slave.task('throw2', (data, done) => {
-  done(new Error('oops'));
-});
-
 describe('SlaveChildProcess Class', function () {
+  process.argv = process.argv.slice(0, 2);
+  process.argv.push(
+    '--dist-io-slave-id=10009', '--dist-io-slave-alias=test-alias', '--dist-io-slave-title=slave-child-test'
+  );
+
+  function throwError() {
+    throw new Error('foo');
+  }
+
+  const slave = require('./data/simple-slave-b');
+  const expect = require('chai').expect;
+
+  slave.task('throw', () => {
+    throw new Error('oops');
+  });
+
+  slave.task('throw2', (data, done) => {
+    done(new Error('oops'));
+  });
+
+  slave.task(123, (data, done) => {
+    done(new Error('oops'));
+  });
+
   describe('SlaveChildProcess#id', function () {
     it('Should return the slave\'s id', () => {
       expect(slave.id).to.equal(10009);
       expect(slave.localId).to.equal(10009);
       expect(slave.remoteId).to.equal(null);
+      expect(slave.wasProxied).to.equal(false);
     });
   });
 
@@ -228,6 +234,7 @@ describe('SlaveChildProcess Class', function () {
 
   describe('SlaveChildProcess#isPaused, SlaveChildProcess#pause, SlaveChildProcess#resume', function () {
     it('Shouldn\'t be paused, by default', () => {
+      expect(slave.resume()).to.equal(slave);
       expect(slave.isPaused).to.equal(false);
     });
 

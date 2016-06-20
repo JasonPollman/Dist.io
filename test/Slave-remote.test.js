@@ -19,6 +19,7 @@ describe('Slave Class (Remote)', function () {
   let mpserver = null;
 
   before(() => {
+    RemoteSlave.onSpawnError(() => {});
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1339'], { silent: true });
   });
 
@@ -58,6 +59,7 @@ describe('Slave Class (Remote)', function () {
         path: location,
       };
 
+      RemoteSlave.onSpawnError('foo'); // Should do nothing...
       new RemoteSlave(connectOptions, { alias: 'bar', group: 'sr-t' }); // eslint-disable-line
       new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
       new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
@@ -180,7 +182,7 @@ describe('Slave Class (Remote)', function () {
       slave.onSpawnError(er => {
         expect(er).to.be.an.instanceof(Error);
         expect(er.message).to.match(
-          /^Failed to connect to remote slave @http:\/\/127.0.0.1:1339:\sSlave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
+          /Slave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
         );
 
 

@@ -235,7 +235,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
     server.start((err) => {
       expect(err).to.equal(null);
       const slave = master.create.remote
-        .slave({ host: 'localhost:5554', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+        .slave({ host: 'localhost:5554', path: path.join(__dirname, 'data', 'simple-slave-k.js') });
 
       slave.exec('random')
         .then(res => {

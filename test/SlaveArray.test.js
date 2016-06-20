@@ -108,6 +108,45 @@ describe('SlaveArray Class', function () {
     });
   });
 
+  describe('SlaveArray#concat', function () {
+    it('Should concat slave arrays', function (done) {
+      this.slow(1000);
+
+      const slaves = master.create.slaves(2, path.join(__dirname, 'data', 'simple-slave-c.js'));
+      const otherSlaves = master.create.slaves(2, path.join(__dirname, 'data', 'simple-slave-c.js'));
+
+      const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
+      const slave = new Slave(location); // eslint-disable-line
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(2);
+      expect(slaves.concat).to.be.a('function');
+
+      const newSlaveArray = slaves.concat(otherSlaves);
+      expect(newSlaveArray.length).to.equal(4);
+      expect(newSlaveArray).to.be.an.instanceof(SlaveArray);
+      slaves.exit();
+      done();
+    });
+
+    it('Should throw if any argument isn\'t a slave array', function (done) {
+      this.slow(1000);
+
+      const slaves = master.create.slaves(2, path.join(__dirname, 'data', 'simple-slave-c.js'));
+
+      const location = path.join(__dirname, 'data', 'simple-slave-a-2.js');
+      const slave = new Slave(location); // eslint-disable-line
+
+      expect(slaves).to.be.an.instanceof(SlaveArray);
+      expect(slaves.length).to.equal(2);
+      expect(slaves.concat).to.be.a('function');
+
+      expect(slaves.concat.bind(slaves, 1, 'string')).to.throw(TypeError);
+      slaves.exit();
+      done();
+    });
+  });
+
   describe('SlaveArray#unshift', function () {
     it('Should unshift in new slaves', function (done) {
       this.slow(1000);

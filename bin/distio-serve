@@ -7,7 +7,7 @@ const os = require('os');
 
 process.title = 'dist.io server';
 
-let conf = args.config || null;
+let conf = args.config || path.join(__dirname, '..', 'serve-default-config.json');
 let config = {};
 
 try { // Read and parse configuration file...
