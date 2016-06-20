@@ -9,6 +9,9 @@ An abstraction around distributed, message passing programming and its complex p
 ---
 ```bash
 $ npm install dist.io --save
+
+# To serve as a remote slave server, install globally...
+$ npm install dist.io -g
 ```
 
 ## Basic Usage
@@ -29,7 +32,7 @@ master.tell(slave).to('say hello')
   .then(response => {
     console.log(response.value); // 'Goodbye World!'
     console.log(response.error); // null
-    return slave.close();       // All done, gracefully exit the slave process.
+    return slave.close();        // All done, gracefully exit the slave process.
   })
   .catch(e => console.error(e));
 ```
@@ -37,11 +40,9 @@ Create a slave process: ``slave.js``
 ```js
 const slave = require('dist-io').Slave;
 
-// Callbacks to be invoked when the master requests a task to be executed.
-slave
+slave // Add some slave tasks...
   .task('say hello', (data, done) => {
-    // Send back a response...
-    // Note: done *must* be called.
+    // Sends back a response. Note: done *must* be called.
     done('Hello World!');
   })
   .task('say goodbye', (data, done) => {
@@ -73,6 +74,36 @@ tell(slaves).to('say hello')
 const slave = require('dist-io').Slave;
 
 slave.task('say hello', (data, done) => {
+  done(`Hello from ${slave.id}`);
+});
+```
+
+### Hello World, Remote Slaves
+**First start the Dist.io Master Proxy Server (``bin/distio-serve``)**
+```bash
+$ distio-serve --port=3000
+```
+
+Now we can use Dist.io to start and interact with slaves using our Master Proxy Server.    
+
+``master.js``
+```js
+const master = require('dist-io').Master;
+const tell = master.tell;
+
+// Forks 5 slave.js processes
+const slaves = master.createRemoteSlaves(5, { script: './path/to/slave.js', host: 'localhost:3000' });
+
+// Interact with remote slaves...
+tell(slaves).to('say hello').then(responses => { ... })
+```
+**Slaves must exist on the remote machine and be installed there as well (i.e. *npm install*).**    
+
+``slave.js``
+```js
+const slave = require('dist-io').Slave;
+
+slave.task('say hello', (data, done) => {
   done(`Hello from ${self.id}`);
 });
 ```
@@ -96,6 +127,8 @@ slave.task('say hello', (data, done) => {
   - [Slave Child Process API](#slave-child-process-api)
   - [Metadata](#metadata)
   - [Timeouts](#timeouts)
+1. [The Master Proxy Server](#the-master-proxy-server)
+1. [Remote Slaves](#remote-slaves)
 1. [Requests](#requests)
 1. [Responses](#responses)
 1. [Response Arrays](#response-arrays)
@@ -418,7 +451,7 @@ slaves.exec('some task', data, metadata).then(...);
 
 ### Master API
 **Master#create.slave**(*{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
-Creates a new slave from the code at the given path.
+Creates a new local slave from the code at the given path.
 ```js
 const slave = master.create.slave('/path/to/slave.js', {
   // An alias for this slave, must be unique for each slave.
@@ -435,7 +468,7 @@ const slave = master.create.slave('/path/to/slave.js', {
 ```
 
 **Master#create.slaves**(*{Number}* count, *{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
-Creates multiple slave from the code at the given path.
+Creates multiple local slaves from the code at the given path.
 ```js
 const slave = master.create.slaves(7, '/path/to/slave.js', {
   // An alias for the slaves, must be unique for each slave (see note below)
@@ -455,6 +488,45 @@ const slave = master.create.slaves(7, '/path/to/slave.js', {
 // Ex: foo, foo-1, foo-2, ...etc.
 ```
 
+**Master#create.remote.slave**(*{String}* **remoteSlaveOptions**, *{Object=}* **options**) → *{SlaveArray}*    
+Creates a remote slave. Options are the same a creating a local slaves.
+
+The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
+| Key      | Description |
+| :------- | :---------- |
+| *host*   | The URL path to the host machine (Master Proxy Server) |
+| *script* | The path to the script file **on the host machine** |
+
+```js
+const slave = master.create.remote.slave(
+  {
+    host: 'http://my.master.server:3000',
+    script: '/path/to/host/script.js'
+  },
+  { /* Options */ }
+);
+```
+
+**Master#create.remote.slaves**(*{Number}* count, *{String}* **remoteSlaveOptions**, *{Object=}* **options**) → *{SlaveArray}*    
+Creates multiple remote slaves. Options are the same a creating a local slaves.
+
+The argument passed for parameter *remoteSlaveOptions* should be an object with the following keys:
+| Key      | Description |
+| :------- | :---------- |
+| *host*   | The URL path to the host machine (Master Proxy Server) |
+| *script* | The path to the script file **on the host machine** |
+
+```js
+const slave = master.create.remote.slaves(
+  7,
+  {
+    host: 'http://my.master.server:3000',
+    script: '/path/to/host/script.js'
+  },
+  { /* Options */ }
+);
+```
+
 **Master#slaves.all** → *{SlaveArray}*    
 Returns all *active* slaves (those which haven't been closed or killed).
 ```js
@@ -471,6 +543,18 @@ const busySlaves = master.slaves.busy;
 Returns all slaves that have no requests pending ("idle"). Note idle is from the master's perspective and not the slave's. This *does not* mean the slave process is idle, only that there are no pending requests send from the master.
 ```js
 const idleSlaves = master.slaves.idle;
+```
+
+**Master#slaves.remote** → *{SlaveArray}*    
+Returns all *remote* slaves (those not started on the current machine).
+```js
+const remoteSlaves = master.slaves.remote;
+```
+
+**Master#slaves.local** → *{SlaveArray}*    
+Returns all *local* slaves (those which have been started on the current machine).
+```js
+const localSlaves = master.slaves.local;
 ```
 
 **Master#slaves.idleInList**(*...{Slave|Number|String}* **slavesOrIdsOrAliases**) → *{SlaveArray}*    
@@ -594,11 +678,17 @@ Returns the slave's id.
 *(Getter)* **Slave#pid** → *{Number}*    
 Returns the slave's process id.
 
-*(Getter)* **Slave#alias** → *{Number}*    
+*(Getter)* **Slave#isRemote** → *{Boolean}*    
+True if the slave is a remotely spawned slave (i.e. non-local).
+
+*(Getter)* **Slave#alias** → *{String}*    
 Returns the slave's alias.
 
-*(Getter)* **Slave#location** → *{Number}*    
-Returns the slave's file location.
+*(Getter)* **Slave#location** → *{String}*    
+Returns the slave's file location for local slaves, and the host for remote slaves.
+
+*(Getter)* **Slave#path** → *{String}*    
+Returns the slave's file location for both local and remote slaves.
 
 *(Getter/Setter)* **Slave#group** = *{String}* **group** → *{String}*    
 Gets/sets the slaves group.
@@ -633,8 +723,11 @@ True is the slave hasn't been shutdown, killed, or closed. Indicates that the IP
 *(Getter)* **Slave#hasExited** → *{Boolean}*    
 True is the slave has been closed or shutdown.
 
-*(Setter)* **Slave#onUncaughtException** = *{Function}*    
+**Slave#onUncaughtException**(*{Function}* callback) → *{undefined}*    
 Sets a function to handle any uncaught exceptions the slave might throw.
+
+**Slave#onSpawnError**(*{Function}* callback) → *{undefined}*   
+Sets the callback to be executed if an error occurs during the slave spawn.
 
 **Slave#ack**(*{Object}* **metdata**) → *{Promise}*    
 Sends an acknowledgement to the slave child processes associated with this slave object.
@@ -656,13 +749,22 @@ See: [Slave#exec](#slaveexec)
 ### Slave Child Process API
 
 *(Getter)* **SlaveChildProcess#id** → *{Number}*    
-Returns the slave's id.
+Returns the slave's id. This will always return the *remote* id. So if using a remote slave, this will return the id as determined from the *client*, not the master proxy server. If the slave is running locally, the local and remote ids will be the same.
+
+*(Getter)* **SlaveChildProcess#localId** → *{Number}*    
+Returns the slave's local id. That is, the id as it was assigned from the master proxy server.
+
+*(Getter)* **SlaveChildProcess#remoteId** → *{Number}*    
+Returns the slave's remote id. That is, the id as it was assigned from client machine (not the master proxy server).
 
 *(Getter)* **SlaveChildProcess#alias** → *{Number}*    
 Returns the slave's alias.
 
+*(Getter)* **SlaveChildProcess#wasProxied** → *{Boolean}*    
+True if the slave was spawned by a non-local process, false otherwise.
+
 **SlaveChildProcess#pause**() → *{SlaveChildProcess}*    
-Pauses the slave. This means the slave is refusing to execute tasks and an error will be send back to the master for every request (even closing and shutting-down).
+Pauses the slave. This means the slave will refuse to execute tasks and an error will be send back to the master for every request once paused (even closing and shutting-down).
 
 **SlaveChildProcess#resume**() → *{SlaveChildProcess}*    
 Un-pauses the slave, allowing the slave to again accept messages.
@@ -733,6 +835,30 @@ slave
   .exec('some task', null, { timeout: 0, catchAll: false })
   .then(...);
 ```
+
+## The Master Proxy Server
+**Is just a fancy name for a socket.io server, that passes messages back and forth between a client and a host machine.**    
+
+The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine.
+
+### Starting the Master Proxy Server
+**All CLI arguments are optional**   
+The default port is ``1337``.   
+
+```bash
+$ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json]
+```
+#### Master Proxy Server Config
+**See ``./serve-default-config.js`` for an example of a config file**
+
+
+## Remote Slaves
+**Remote slaves use the same API as local slaves**
+
+There are a few caveats about using them, however:
+- A Master Proxy Server
+- The script must exist on the host machine and be *npm installed* there.
+
 
 ## Requests
 *Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.

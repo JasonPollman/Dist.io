@@ -6,6 +6,9 @@ An example of sending messages to multiple processes and collecting the results.
 **Hello World**   
 Some simple hello world examples. Examples of creating single and multiple slave processes, then exiting them.
 
+**Local-Remote**    
+An example of starting both local and remote slaves and executing tasks with them.
+
 **Matrix-Mult**   
 Matrix multiplication using multiple processes; shows *speedup* when dealing with large matrices.
 
@@ -20,6 +23,9 @@ An example of the Dist.io *pipeline* pattern. Examples of adding/removing tasks 
 
 **Piping**    
 An example of piping a response from a task to another slave's task. Examples of *Master#tell*.
+
+**Remote**    
+An example of starting a remote slave and executing tasks with it.
 
 **Scatter**    
 An example of the Dist.io *scatter* pattern.
