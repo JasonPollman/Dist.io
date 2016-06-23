@@ -15,14 +15,17 @@ describe('RemoteSlave Class', function () {
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1395'], { silent: true });
     s = new RemoteSlave({
       host: 'localhost:1395',
-      script: path.join(__dirname, 'data', 'simple-slave-i.js'),
+      script: path.join('test', 'data', 'simple-slave-i.js'),
     }, { forkOptions: { silent: false } });
     done();
   });
 
-  after(() => {
+  after(done => {
     s.kill();
-    mpserver.kill('SIGINT');
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
   });
 
   describe('RemoteSlave#constructor', () => {
@@ -34,8 +37,11 @@ describe('RemoteSlave Class', function () {
       done();
     });
 
-    after(() => {
-      mpserver2.kill('SIGINT');
+    after(done => {
+      setTimeout(() => {
+        mpserver2.kill('SIGINT');
+        done();
+      }, 1000);
     });
 
     it('Should throw if not given a script path', (done) => {
@@ -58,12 +64,15 @@ describe('RemoteSlave Class', function () {
       done();
     });
 
-    after(() => {
-      mpserver3.kill('SIGINT');
+    after(done => {
+      setTimeout(() => {
+        mpserver3.kill('SIGINT');
+        done();
+      }, 1000);
     });
 
     it('Should kill with SIGKILL by default', (done) => {
-      s3 = new RemoteSlave({ host: 'localhost:1440', script: path.join(__dirname, 'data', 'simple-slave-i.js') });
+      s3 = new RemoteSlave({ host: 'localhost:1440', script: path.join('test', 'data', 'simple-slave-i.js') });
       s3.kill();
       done();
     });
@@ -90,6 +99,29 @@ describe('RemoteSlave Class', function () {
     });
   });
 
+  describe('RemoteSlave#socket.error', () => {
+    it('Should emit the Slave~uncaughtException event', (done) => {
+      try {
+        s.socket.emit('error', new Error('foo'));
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(s.isConnected).to.equal(false);
+        expect(s.hasExited).to.equal(true);
+        expect(e.message).to.equal('foo');
+      }
+
+      s.on('uncaughtException', function oue(e) {
+        s.removeListener('uncaughtException', oue);
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('foo');
+        expect(s.isConnected).to.equal(false);
+        expect(s.hasExited).to.equal(true);
+        done();
+      });
+      s.socket.emit('error', new Error('foo'));
+    });
+  });
+
   describe('RemoteSlave#slaveResponseListener, II', () => {
     it('Should handle various message types', (done) => {
       expect(s.slaveResponseListener({})).to.equal(undefined);
@@ -105,8 +137,8 @@ describe('RemoteSlave Class', function () {
 
   describe('RemoteSlave#slaveResponseListener, III', () => {
     it('Should handle various message types', (done) => {
-      s.onUncaughtException(e => {
-        s.onUncaughtException(() => {});
+      s.on('uncaughtException', e => {
+        s.on('uncaughtException', () => {});
         expect(e).to.be.an.instanceof(Error);
         expect(e.message).to.equal('test');
         expect(e.name).to.equal('test');

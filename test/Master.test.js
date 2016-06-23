@@ -946,30 +946,24 @@ describe('Master Class', function () {
       this.timeout(6000);
       this.slow(5000);
 
-      Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'), {
-        onUncaughtException: (e) => {
-          expect(e).to.be.an.instanceof(Error);
-          expect(e.message).to.equal('uncaught exception');
-        },
+      Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'))
+      .on('uncaughtException', e => {
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('uncaught exception');
       });
 
       const c = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'));
-      c.onUncaughtException = (e) => {
+      c.on('uncaughtException', e => {
         expect(e).to.be.an.instanceof(Error);
         expect(e.message).to.equal('uncaught exception');
-      };
+      });
 
-      // Does nothing, but shouldn't cause any side effects.
-      const d = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-g.js'));
-      d.onUncaughtException = {};
-
-      const b = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-h.js'), {
-        onUncaughtException: (er) => {
-          expect(er).to.be.an.instanceof(Error);
-          expect(er.message).to.equal('Unknown error');
-          Master.kill(b);
-          done();
-        },
+      const b = Master.createSlave(path.join(__dirname, 'data', 'simple-slave-h.js'));
+      b.on('uncaughtException', er => {
+        expect(er).to.be.an.instanceof(Error);
+        expect(er.message).to.equal('Unknown error');
+        Master.kill(b);
+        done();
       });
     });
 

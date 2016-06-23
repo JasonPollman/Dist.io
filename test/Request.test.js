@@ -107,7 +107,7 @@ describe('Request Class', function () {
         const y = new Response({ error: { message: 'hello world' } });
         expect(x.hasTimedout(y)).to.equal(true);
         done();
-      }, 501);
+      }, 550);
     });
   });
 });

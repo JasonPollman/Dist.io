@@ -4,7 +4,7 @@
 
 const master = require('../').Master;
 const path = require('path');
-const slaveJS = path.join(__dirname, 'data', 'scatter-slave.js');
+const slaveJS = path.join('test', 'data', 'scatter-slave.js');
 const expect = require('chai').expect;
 const ResponseArray = require('../lib/ResponseArray');
 const fork = require('child_process').fork;
@@ -23,8 +23,11 @@ describe('Scatter Pattern (Remote Slaves)', function () {
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1337'], { silent: true });
   });
 
-  after(() => {
-    mpserver.kill('SIGINT');
+  after(done => {
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
   });
 
   it('Should scatter data amongst slaves (Promises)', function (done) {

@@ -4,7 +4,6 @@
 
 const master = require('../').Master;
 const Slave = require('../lib/Slave');
-const RemoteSlave = require('../lib/RemoteSlave');
 const path = require('path');
 const expect = require('chai').expect;
 const tell = master.tell;
@@ -46,16 +45,18 @@ describe('Hello World (Remote Slaves)', function () {
   let mpserver = null;
   const connectOptions = {
     location: '127.0.0.1:1338',
-    path: path.join(__dirname, 'data', 'slave-hello-world.js'),
+    path: path.join('test', 'data', 'slave-hello-world.js'),
   };
 
   before(() => {
-    RemoteSlave.onSpawnError(() => {});
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1338'], { silent: true });
   });
 
-  after(() => {
-    mpserver.kill('SIGINT');
+  after(done => {
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
   });
 
   describe('Basic Usage', function () {
@@ -450,6 +451,7 @@ describe('Hello World (Remote Slaves)', function () {
       expect(parallel.taskCount()).to.equal(1);
       expect(parallel.removeTask(addedTask3).removed).to.equal(true);
       expect(parallel.taskCount()).to.equal(0);
+      master.kill(slaveA, slaveB);
       done();
     });
 

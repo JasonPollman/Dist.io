@@ -465,8 +465,10 @@ const slave = master.create.slave('/path/to/slave.js', {
   args: [ ... ],
   // Options passed to ChildProcess.fork
   forkOptions: { ... },
-  // If the slave throw, we can handle it here if we want.
+  // If the slave throws, we can handle it here if we want.
   onUncaughtException: () => { ... }
+  // If the slave fails to spawn, this listener will handle it.
+  onSpawnError: () => { ... }
 });
 ```
 
@@ -486,7 +488,9 @@ const slave = master.create.slaves(7, '/path/to/slave.js', {
   // Options passed to ChildProcess.fork
   forkOptions: { ... },
   // If any of the slaves throw, we can handle it here if we want.
-  onUncaughtException: () => { ... }
+  onUncaughtException: () => { ... },
+  // If any the slave fails to spawn, this listener will handle it.
+  onSpawnError: () => { ... }
 });
 // Note when adding an alias using master.create.slaves,
 // since all aliases must be unique, an iterator is appended to the alias
@@ -734,12 +738,6 @@ True is the slave hasn't been shutdown, killed, or closed. Indicates that the IP
 
 *(Getter)* **Slave#hasExited** → *{Boolean}*    
 True is the slave has been closed or shutdown.
-
-**Slave#onUncaughtException**(*{Function}* callback) → *{undefined}*    
-Sets a function to handle any uncaught exceptions the slave might throw.
-
-**Slave#onSpawnError**(*{Function}* callback) → *{undefined}*   
-Sets the callback to be executed if an error occurs during the slave spawn.
 
 **Slave#ack**(*{Object}* **metdata**) → *{Promise}*    
 Sends an acknowledgement to the slave child processes associated with this slave object.

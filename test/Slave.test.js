@@ -12,6 +12,7 @@ const Response = require('../lib/Response');
 const TimeoutResponse = require('../lib/TimeoutResponse');
 const ResponseError = require('../lib/ResponseError');
 const master = require('../lib/Master');
+const ChildProcess = require('child_process').ChildProcess;
 
 describe('Slave Class', function () {
   describe('Slave#getAllSlaves', function () {
@@ -33,10 +34,39 @@ describe('Slave Class', function () {
     });
   });
 
+  describe('Slave#childProcess', function () {
+    it('Should return the slave\'s child process instance', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const a = new Slave(location); // eslint-disable-line
+
+      expect(a.childProcess).to.be.an.instanceof(ChildProcess);
+      a.on('spawn error', e => {
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('test');
+        done();
+      });
+
+      a.childProcess.emit('error', new Error('test'));
+    });
+
+    it('Should throw on spawn error if no "spawn error" event is registered', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const a = new Slave(location);
+      expect(a.childProcess).to.be.an.instanceof(ChildProcess);
+      try {
+        a.childProcess.emit('error', new Error('test'));
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e.message).to.equal('test');
+        done();
+      }
+    });
+  });
+
   describe('Slave#getSlaveWithAlias', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join(__dirname, 'data', 'simple-slave-a.js');
-      const a = new Slave(location, { alias: 'bar' }); // eslint-disable-line
+      const a = new Slave(location, { alias: 'bar2' }); // eslint-disable-line
       const b = new Slave(location); // eslint-disable-line
       const c = new Slave(location); // eslint-disable-line
 
@@ -47,10 +77,10 @@ describe('Slave Class', function () {
 
       let ss = null;
       try {
-        ss = new Slave(location, { alias: 'bar' }); // eslint-disable-line
+        ss = new Slave(location, { alias: 'bar2' }); // eslint-disable-line
       } catch (e) {
         expect(e).to.be.an.instanceof(Error);
-        expect(e.message).to.equal('Slave with alias "bar" already exists.');
+        expect(e.message).to.equal('Slave with alias "bar2" already exists.');
       }
       slaves.forEach(s => {
         s.group = 'new group';

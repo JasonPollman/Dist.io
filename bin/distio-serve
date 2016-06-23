@@ -25,6 +25,6 @@ try { // Read and parse configuration file...
 // Overwrite config file with CLI arguments...
 for (const i of Object.keys(args)) config[i] = args[i];
 
-// Start the MasterProxyServer
 const server = new distIO.MasterProxyServer(config);
-server.start();
+// Start the MasterProxyServer
+server.bindSIGINT().start();

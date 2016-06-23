@@ -19,17 +19,19 @@ describe('Slave Class (Remote)', function () {
   let mpserver = null;
 
   before(() => {
-    RemoteSlave.onSpawnError(() => {});
     mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1339'], { silent: true });
   });
 
-  after(() => {
-    mpserver.kill('SIGINT');
+  after(done => {
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
   });
 
   describe('RemoteSlave#getAllSlaves', function () {
     it('Should return an array of all slaves', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join('test', 'data', 'simple-slave-a.js');
       const connectOptions = {
         location: '127.0.0.1:1339',
         path: location,
@@ -57,13 +59,12 @@ describe('Slave Class (Remote)', function () {
 
   describe('RemoteSlave#getSlaveWithAlias', function () {
     it('Should return an array of all slaves', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join('test', 'data', 'simple-slave-a.js');
       const connectOptions = {
         location: '127.0.0.1:1339',
         path: location,
       };
 
-      RemoteSlave.onSpawnError('foo'); // Should do nothing...
       new RemoteSlave(connectOptions, { alias: 'bar', group: 'sr-t' }); // eslint-disable-line
       new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
       new RemoteSlave(connectOptions, { group: 'sr-t' }); // eslint-disable-line
@@ -92,7 +93,7 @@ describe('Slave Class (Remote)', function () {
 
   describe('RemoteSlave#lastId', function () {
     it('Should return an array of all slaves', function (done) {
-      const location = path.join(__dirname, 'data', 'simple-slave-a.js');
+      const location = path.join('test', 'data', 'simple-slave-a.js');
       const connectOptions = {
         host: '127.0.0.1:1339',
         path: location,
@@ -116,7 +117,7 @@ describe('Slave Class (Remote)', function () {
       this.timeout(7500);
       this.slow(6000);
 
-      const location = path.join(__dirname, 'data', 'simple-slave-a-4.js');
+      const location = path.join('test', 'data', 'simple-slave-a-4.js');
       const connectOptions = {
         location: '127.0.0.1:1339',
         path: location,
@@ -176,14 +177,14 @@ describe('Slave Class (Remote)', function () {
       RemoteSlave.reconnectionAttempts = 'a';
       RemoteSlave.reconnectionDelay = 'b';
 
-      let location = path.join(__dirname, 'data', 'doesnt-exist.js');
+      let location = path.join('test', 'data', 'doesnt-exist.js');
       const connectOptions = {
         location: '127.0.0.1:1339',
         path: location,
       };
 
       const slave = new RemoteSlave(connectOptions); // eslint-disable-line
-      slave.onSpawnError(er => {
+      slave.on('spawn error', er => {
         expect(er).to.be.an.instanceof(Error);
         expect(er.message).to.match(
           /Slave constructor argument #0 requires a regular file,.*/ // eslint-disable-line max-len
@@ -232,7 +233,7 @@ describe('Slave Class (Remote)', function () {
           );
         }
 
-        location = path.join(__dirname, 'data');
+        location = path.join('test', 'data');
         connectOptions.path = location;
         try {
           const slave = new RemoteSlave(location); // eslint-disable-line
@@ -251,7 +252,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         host: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
 
       const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test' });
@@ -265,7 +266,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
 
       const slave = new RemoteSlave(connectOptions, { title: 'slave-title-test', args: ['a', '--foo=bar', '-x'] });
@@ -281,7 +282,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-j.js'),
+        path: path.join('test', 'data', 'simple-slave-j.js'),
       };
 
       const slave = new RemoteSlave(connectOptions, { forkOptions: { silent: true } });
@@ -324,7 +325,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
 
       let slave = new RemoteSlave(connectOptions);
@@ -342,7 +343,7 @@ describe('Slave Class (Remote)', function () {
           done(e);
         });
 
-      connectOptions.path = path.join(__dirname, 'data', 'simple-slave-c.js');
+      connectOptions.path = path.join('test', 'data', 'simple-slave-c.js');
       slave = new RemoteSlave(connectOptions);
       slave.exec(1234, null)
         .then((res) => {
@@ -365,7 +366,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -391,7 +392,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -415,7 +416,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -441,7 +442,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -479,7 +480,7 @@ describe('Slave Class (Remote)', function () {
 
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
       const slave2 = new RemoteSlave(connectOptions);
@@ -505,7 +506,7 @@ describe('Slave Class (Remote)', function () {
     it('Should reject on invalid command types', function (done) {
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
       let completed = 0;
@@ -570,7 +571,7 @@ describe('Slave Class (Remote)', function () {
   it('Should have a #then property', function (done) {
     const connectOptions = {
       location: '127.0.0.1:1339',
-      path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      path: path.join('test', 'data', 'simple-slave-d.js'),
     };
     const slave = new RemoteSlave(connectOptions);
     slave.then();
@@ -589,7 +590,7 @@ describe('Slave Class (Remote)', function () {
   it('Should handle very short request timeouts', function (done) {
     const connectOptions = {
       location: '127.0.0.1:1339',
-      path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+      path: path.join('test', 'data', 'simple-slave-d.js'),
     };
     const slave = new RemoteSlave(connectOptions);
     slave.exec('echo', null, { timeout: 1 })
@@ -609,7 +610,7 @@ describe('Slave Class (Remote)', function () {
     it('Should send an acknowledgement message', function (done) {
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -638,7 +639,7 @@ describe('Slave Class (Remote)', function () {
     it('Should send a noop message', function (done) {
       const connectOptions = {
         location: '127.0.0.1:1339',
-        path: path.join(__dirname, 'data', 'simple-slave-d.js'),
+        path: path.join('test', 'data', 'simple-slave-d.js'),
       };
       const slave = new RemoteSlave(connectOptions);
 
@@ -655,7 +656,7 @@ describe('Slave Class (Remote)', function () {
   });
 
   after((done) => {
-    RemoteSlave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
+    RemoteSlave.getSlavesWithPath(path.join('test', 'data', 'simple-slave-a.js')).kill();
     done();
   });
 });
