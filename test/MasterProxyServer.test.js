@@ -49,6 +49,116 @@ describe('Master Proxy Server', function masterProxyServerTest() {
   });
 
   describe('Security', () => {
+    it('Should throw if the config.authorizedIps value isn\'t an array', (done) => {
+      /* eslint-disable no-new */
+      try {
+        new MPS({ authorizedIps: 'string', port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+
+      try {
+        new MPS({ authorizedIps: 123, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+
+      try {
+        new MPS({ authorizedIps: 0, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+      /* eslint-enable no-new */
+      done();
+    });
+
+    it('Should throw if the config.basicAuth value isn\'t an object', (done) => {
+      /* eslint-disable no-new */
+      try {
+        new MPS({ basicAuth: 'string', port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+
+      try {
+        new MPS({ basicAuth: 123, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+
+      try {
+        new MPS({ basicAuth: 0, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+      }
+      /* eslint-enable no-new */
+      done();
+    });
+
+    it('Should throw if the config.basicAuth.username value isn\'t a string', (done) => {
+      /* eslint-disable no-new */
+      try {
+        new MPS({ basicAuth: {}, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.username" is invalid/);
+      }
+
+      try {
+        new MPS({ basicAuth: { password: '123' }, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.username" is invalid/);
+      }
+
+      try {
+        new MPS({ basicAuth: { username: 123, password: 'qwe' }, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.username" is invalid/);
+      }
+      /* eslint-enable no-new */
+      done();
+    });
+
+    it('Should throw if the config.basicAuth.password value isn\'t a string', (done) => {
+      /* eslint-disable no-new */
+      try {
+        new MPS({ basicAuth: { username: 'foo' }, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.password" is invalid/);
+      }
+
+      try {
+        new MPS({ basicAuth: { username: '123', password: 123 }, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.password" is invalid/);
+      }
+
+      try {
+        new MPS({ basicAuth: { username: 'foo', password: [] }, port: 3245, logLevel: 0 });
+        done(new Error('Expected to throw'));
+      } catch (e) {
+        expect(e).to.be.an.instanceof(TypeError);
+        expect(e.message).to.match(/Config parameter "basicAuth.password" is invalid/);
+      }
+      /* eslint-enable no-new */
+      done();
+    });
+
     it('Should allow authorized IP addresses if the user\'s ip is in config.authorizedIps', (done) => {
       const server = new MPS({ authorizedIps: ['196\\.168\\.0\\..*', '.*'], port: 3247, logLevel: 0 });
       server.start()
@@ -61,6 +171,179 @@ describe('Master Proxy Server', function masterProxyServerTest() {
           });
 
           slave.noop().then(() => done()).then(() => server.stop());
+        })
+        .catch(done);
+    });
+
+    it('Should allow a connection if basicAuth string is correct (no passphrase)', (done) => {
+      const server = new MPS({ basicAuth: { username: 'foo', password: 'bar' }, port: 3111, logLevel: 0 });
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({ host: 'foo:bar@localhost:3111', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+          slave.on('spawn error', e => done(e));
+          slave.noop().then(() => done()).then(() => server.stop());
+        })
+        .catch(done);
+    });
+
+    it('Should allow a connection if basicAuth string is correct (with passphrase)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar', passphrase: 'baz' },
+        port: 3112,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo:bar@localhost:3112',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'baz',
+            });
+
+          slave.on('spawn error', e => done(e));
+          slave.noop().then(() => done()).then(() => server.stop());
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (no auth provided)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar', passphrase: 'baz' },
+        port: 3123,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'localhost:3123',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (with bad passphrase)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar', passphrase: 'baz' },
+        port: 3113,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo:bar@localhost:3113',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'baz1',
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (with bad password)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar', passphrase: 'baz' },
+        port: 3114,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo:basr@localhost:3114',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'baz',
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (with bad username)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar' },
+        port: 3115,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'faoo:bar@localhost:3115',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (with unnecessary passphrase)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar' },
+        port: 3116,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo:bar@localhost:3116',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'abcdefghi',
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (missing passphrase)', (done) => {
+      const server = new MPS(
+        { basicAuth: { username: 'foo', password: 'bar', passphrase: 'qwerty' },
+        port: 3117,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo:bar@localhost:3117',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+            });
+
+          slave.on('spawn error', () => done());
         })
         .catch(done);
     });
@@ -105,6 +388,54 @@ describe('Master Proxy Server', function masterProxyServerTest() {
               },
             }
           );
+        })
+        .catch(done);
+    });
+
+    it('Should reject a connection if basicAuth string is incorrect (with authorized ip)', (done) => {
+      const server = new MPS(
+        { basicAuth: { authorizedIps: ['.*'], username: 'foo', password: 'bar', passphrase: 'qwerty' },
+        port: 3118,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'faoo:bar@localhost:3118',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'qwerty',
+            });
+
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
+        })
+        .catch(done);
+    });
+
+    it('Should block unauthorized IP addresses if the user\'s ip isn\'t in config.authorizedIps (but with successful auth string)', (done) => { // eslint-disable-line max-len
+      const server = new MPS(
+        { authorizedIps: ['no matches'], basicAuth: { username: 'foo22', password: 'bar', passphrase: 'qwerty' },
+        port: 3119,
+        logLevel: 0,
+      });
+
+      server.start()
+        .then(() => {
+          const slave = master.create.remote
+            .slave({
+              host: 'foo22:bar@localhost:3119',
+              path: path.join(__dirname, 'data', 'simple-slave-i.js'),
+              passphrase: 'qwerty',
+            });
+
+            slave.on('spawn error', e => {
+              expect(e.message).to.equal('Unauthorized');
+              done();
+            });
         })
         .catch(done);
     });
