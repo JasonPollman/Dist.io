@@ -1,7 +1,7 @@
 # Dist.io
 ------
-**Distributed programming paradigms for forked node processes.**    
-An abstraction around distributed, message passing programming and its complex patterns. Makes inter-process communication simple.
+**Distributed programming paradigms for forked node.js processes.**    
+Dist.io is an abstraction around distributed, message passing programming and its complex patterns. It makes inter-process communication simple.
 
 > It's like async for forked node processes!
 
@@ -10,14 +10,18 @@ An abstraction around distributed, message passing programming and its complex p
 ```bash
 $ npm install dist.io --save
 
-# To serve as a remote slave server, install globally...
+# If you wist to serve as a Master Proxy Server
+# and host slave processes, install globally...
 $ npm install dist.io -g
 ```
 
 ## Basic Usage
 ---
 ### Hello World    
-Create a master process: ``master.js``
+Start a simple slave process from the master process and log some hello world messages.    
+
+**Create a master process:** ``master.js``    
+*The master process controls IO flow, manages slave tasks, and each slave's life cycle.*
 
 ```js
 const master = require('dist-io').Master;
@@ -36,7 +40,9 @@ master.tell(slave).to('say hello')
   })
   .catch(e => console.error(e));
 ```
-Create a slave process: ``slave.js``
+**Create a slave process:** ``slave.js``    
+*Slaves simply execute tasks*    
+
 ```js
 const slave = require('dist-io').Slave;
 
@@ -61,9 +67,14 @@ const slaves = master.createSlaves(5, './path/to/slave.js');
 
 // Broadcast a message to all the slaves...
 tell(slaves).to('say hello')
-  .then(responses => console.log(responses.joinValues(', '))); // -> 'Hello from 0, Hello from 1,...'
-  // Send the message to only the slave with the id 0.
-  .then(() => tell(master.slave(0)).to('say hello'))
+  .then(responses => {
+    console.log(responses.joinValues(', '))
+    // -> 'Hello from 0, Hello from 1, Hello from 2...'
+  });
+  .then(() => {
+    // Send a message to only the slave with the id 0.
+    return tell(master.slave(0)).to('say hello')
+  })
   .then(response => console.log(response.value)) // -> 'Hello from 0'
   .then(() => slaves.close())
   .catch(e => console.error(e));
@@ -92,10 +103,18 @@ const master = require('dist-io').Master;
 const tell = master.tell;
 
 // Forks 5 slave.js processes
-const slaves = master.createRemoteSlaves(5, { script: './path/to/slave.js', host: 'localhost:3000' });
+const slaves = master.createRemoteSlaves(5, {
+  // Path to the script on the remote machine.
+  // This is relative to the server's root.
+  script: './path/to/slave.js',
+  // The host and port to the Master Proxy Server.
+  host: 'localhost:3000'
+});
 
-// Interact with remote slaves...
-tell(slaves).to('say hello').then(responses => { ... })
+tell(slaves).to('say hello').then(responses => {
+  /* Do something with the responses... */
+  slaves.close();
+});
 ```
 **Slaves must exist on the remote machine and be installed there as well (i.e. *npm install*).**    
 
@@ -104,7 +123,7 @@ tell(slaves).to('say hello').then(responses => { ... })
 const slave = require('dist-io').Slave;
 
 slave.task('say hello', (data, done) => {
-  done(`Hello from ${self.id}`);
+  done(`Hello from ${slave.id}`);
 });
 ```
 
@@ -113,12 +132,12 @@ slave.task('say hello', (data, done) => {
 1. [Install](#install)
 1. [Basic Usage](#basic-usage)
 1. [Examples](#examples)
+1. [Master vs. Slave vs. SlaveChildProcess?](#master-vs-slave-vs-slavechildprocess)
 1. [Patterns](#patterns)
   - [Parallel](#parallel)
   - [Pipeline](#pipeline)
   - [Workpool](#workpool)
   - [Scatter](#scatter)
-1. [Master vs. Slave vs. SlaveChildProcess?](#master-vs-slave-vs-slavechildprocess)
 1. [Controlling Slaves](#controlling-slaves)
   - [Master#tell](#mastertell)
   - [Slave#exec](#slaveexec)
@@ -128,6 +147,8 @@ slave.task('say hello', (data, done) => {
   - [Metadata](#metadata)
   - [Timeouts](#timeouts)
 1. [The Master Proxy Server](#the-master-proxy-server)
+  - [Starting the Master Proxy Server](#starting-the-master-proxy-server)
+  - [Configuration](#master-proxy-server-config)
 1. [Remote Slaves](#remote-slaves)
 1. [Requests](#requests)
 1. [Responses](#responses)
@@ -138,7 +159,54 @@ slave.task('say hello', (data, done) => {
 **Examples are located in the [examples](https://github.com/JasonPollman/Dist.io/tree/master/examples) directory of this repo.**    
 To browse the JSDOCs, checkout: [Dist.io API](http://www.jasonpollman.com/distio-api/)
 
+## Master vs. Slave vs. SlaveChildProcess?
+Dist.io is divided into two logical parts: the *master process* and the *slave child process(es)*.    
+
+**A master controls zero or more slave processes...**
+
+- The master process is created when ```require('dist.io').Master``` is called and is an instance of the *Master* class.
+- A slave child process is created when ```require('dist.io').Slave``` is called and is an instance of the *SlaveChildProcess* class.
+- The *Slave* class referenced below is the "handle" between the master and the slave child process and represents a slave child process within the master process.
+
+*Note, a process can be both a master and a slave child process, however this isn't advised (and be careful not to create a circular spawn dependency!)*
+
+#### Example
+``master.js``
+```js
+// This is now a master process...
+const master = require('dist-io').Master;
+// We can create new slaves using the master process...
+const slave = master.createSlave('./path/to/slave.js');
+
+// Tell the slave to do some stuff...
+master.tell(slave).to('foo')
+  .then(res => {
+    // A Response object is returned, see Responses below...
+    console.log(res.value);
+    console.log(res.error);
+  })
+```
+
+``slave.js``
+```js
+// This is now a slave process...
+const slave = require('dist-io').Slave;
+// Setup some tasks that this slave accepts...
+// Note, you must call done to send resolve the request with a response.
+// Any arguments passed to done are optional, and only the first is sent back.
+slave
+  .task('foo', (data, done) {
+    /* Do some work */
+    done('return some value for task foo...');
+  });
+  .task('bar', (data, done) {
+    /* Do some work */
+    done('return some value for task bar...');
+  });
+```
+
 ## Patterns
+#### These are abstractions around common distributed programming patterns to make working with multiple slaves and controlling IO flow simpler.
 
 ### Parallel
 **Executes a set of tasks among the given slaves (in parallel).**    
@@ -194,12 +262,12 @@ master.create.parallel()
 **A pipeline is similar to async's *waterfall*.**    
 A slave will execute a task, its results will then passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
 
+The pipeline is started with some *initial* data (albeit ``undefined``), which is passed to the first task. The second task get the value returned from the first task, and so on, and so forth.
+
 ```js
 master.create.pipeline()
-  .addTask('task a')
-  .for(slaveA)
-  .addTask('task b') // Results of a's response.value piped to 'task b'.
-  .for(slaveB)
+  .addTask('task a').for(slaveA)
+  .addTask('task b').for(slaveB)
   .execute(initialData)
   .then (res => {
     // initialData passed to slaveA's task a,
@@ -208,26 +276,23 @@ master.create.pipeline()
   });
 
 const myOtherPipelineExample = master.create.pipeline()
-  .addTask('foo')
-  .for(slaveA)
-  .addTask('bar')
-  .for(slaveB);
+  .addTask('foo').for(slaveA)
+  .addTask('bar').for(slaveB);
 
 myOtherPipelineExample.execute(/* Data to start the pipeline with */).then( ... );
+
 // You can execute the same pipeline multiple times.
 myOtherPipelineExample.execute(/* Data to start the pipeline with */).then( ... );
 
-
 // You can intercept and mutate values during each step in the pipeline...
 master.create.pipeline()
-  .addTask('task a')
-  .for(slaveA)
+  .addTask('task a').for(slaveA)
   // Intercept and mutate the value before passing to b...
   .intercept((res, end) => {
     return res.value += ' intercepted just before b!'
   });
-  .addTask('task b')
-  .for(slaveB)
+  .addTask('task b').for(slaveB)
+  // Intercept and mutate the value before passing to c...
   .intercept((res, end) => {
     res.value += ' intercepted just before c!';
     if (/intercepted just before b!/.test(res.value)) {
@@ -237,8 +302,7 @@ master.create.pipeline()
       end('breaking pipeline before c.');
     }
   });
-  .addTask('task c')
-  .for(slaveC)
+  .addTask('task c').for(slaveC)
   .intercept((res, end) => {
     return res.value += ' intercept before final resolution!'
   });
@@ -256,6 +320,10 @@ The workpool always chooses the next *idle* slave in the slave list. If no slave
 
 Workpool tasks are queued up and sent out to as many idle slaves in the workpool at a time. The workpool pattern is often used in scenarios like the "Monte Carlo PI Approximation" program.
 
+The workpool is created by passing in a list (or array) of slaves. Anytime a task needs execution, you call the "do" command, and the workpool will choose the best slave for the job.
+
+**Note:** If you add a slave that doesn't subscribe to *some* task into the workpool and it's called upon to do that task, you'll get a response error (*res.error*) stating that the slave doesn't subscribe to the task.
+
 ```js
 const workpool = master.create.workpool(...slaves);
 
@@ -266,7 +334,7 @@ workpool.do('task', data, metadata).then(res => {
 
 workpool.do('another task 1', data, metadata).then( ... );
 workpool.do('another task 2', data, metadata).then( ... );
-workpool.do('another task 3', data, metadata).then( ... );
+workpool.do('another task 3', data, { timeout: 3000 }).then( ... );
 ...
 
 // You can execute a task in a "loop" using workpool's "while" predicate function.
@@ -281,23 +349,23 @@ workpool
     if(responsesUpToNow.values.indexOf('some value') > -1) return false;
   })
   .do('task', data, metadata)
-  .then(resArray => {
-    // res is a ResponseArray object
-  });
+  .then(resArray => { ... });
 ```
 
 ### Scatter
-**Scatters the list of data arguments to the given slaves and task in parallel.**
-The scatter pattern is useful when you have a bunch of data to process using the same task. You create the scatter bound to a specific task, then "scatter" the data set across the given slaves.
+**Scatters the list of data arguments provided to the given slaves and task in parallel.**
+The scatter pattern is useful when you have a bunch of data to process using the same task. You create the scatter bound to a specific task, and then "scatter" the data set across the given slaves.
 
 The tasks are assigned in a round-robin fashion, and when all tasks have completed, the Promise will be resolved.
 
 **Note, you must use the *spread* operator if you plan to scatter an array, otherwise the Array will be considered data itself.**
 
+If you specify ``{ chunk: true }`` into the task metadata, the scatter behavior will change. Rather than round-robin sending the tasks out, it will simply split the array into ``slaveCount`` parts and send these sub-arrays to the slaves as the data.
+
 ```js
 master.create.scatter('task name')
   .data('hello', 'world')
-  .gather(slavesA, slavesB)
+  .gather(slaveA, slaveB)
   .then(res => { ... })
   .catch(/* Handle Errors */);
 
@@ -305,7 +373,7 @@ master.create.scatter('task name')
 const myData = [1, 2, 3, 4, 5, 6, 7, 8, 9];
 master.create.scatter('task name')
   .data(...myData)
-  .gather(slaves[0], slaves[1])
+  .gather(slaveA, slavesB)
   .then(res => {
     console.log(res.values.join(', '));
   })
@@ -313,61 +381,27 @@ master.create.scatter('task name')
 
 // Tasks are assigned in a round-robin fashion, so here, slaveA
 // will get both the 'a' and null data objects.
-master.create.scatter('task name')
+master.create.scatter('task name', { timeout: 5000, chunk: false })
   .data('a', 'b', { foo: 'bar' }, null)
-  .gather(slavesA, slavesB, slavesC)
+  .gather(slaveA, slaveB, slaveC)
   .then(res => { ... })
+  .catch(/* Handle Errors */);
+
+// Using { chunk: true }, the data will be split up
+// and sent to the slaves as arrays in equal portions.
+master.create.scatter('task name', { chunk: true })
+  .data(...[1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+  .gather(slaveA, slaveB)
+  .then(res => {
+    // res.length === 2
+    // slaveA will get [1, 2, 3, 4, 5] as it's data
+    // slaveB will get [6, 7, 8, 9, 10] as it's data
+  })
   .catch(/* Handle Errors */);
 ```
 
 #### More patterns to come...
 ##### Iterator, maybe?
-
-## Master vs. Slave vs. SlaveChildProcess?
-Dist.io is divided into two parts: the *master process* and the *slave process(es)*.    
-
-**A master controls zero or more slave processes...**
-
-- The master process is created when ```require('dist.io').Master``` is called and is an instance of the *Master* class.
-- A slave process is created when ```require('dist.io').Slave``` is called and is an instance of the *SlaveChildProcess* class.
-- The *Slave* class referenced below is the "handle" between the master and the slave child process and represents a slave child process within the master process.
-
-*Note, a process can be both a master and a slave child process, however this isn't advised (and be careful not to create a circular spawn dependency!)*
-
-#### Example
-``master.js``
-```js
-// This is now a master process...
-const master = require('dist-io').Master;
-// We can create new slaves using the master process...
-const slave = master.createSlave('./path/to/slave.js');
-
-// Tell the slave to do some stuff...
-master.tell(slave).to('foo')
-  .then(res => {
-    // A Response object is returned, see Responses below...
-    console.log(res.value);
-    console.log(res.error);
-  })
-```
-
-``slave.js``
-```js
-// This is now a slave process...
-const slave = require('dist-io').Slave;
-// Setup some tasks that this slave accepts...
-// Note, you must call done to send resolve the request with a response.
-// Any arguments passed to done are optional, and only the first is sent back.
-slave
-  .task('foo', (data, done) {
-    /* Do some work */
-    done('return some value for task foo...');
-  });
-  .task('bar', (data, done) {
-    /* Do some work */
-    done('return some value for task bar...');
-  });
-```
 
 ## Controlling Slaves
 **Dist.io allows you to control slaves using a few different syntactic dialects.**    
@@ -405,8 +439,8 @@ tell(slaves).to('some task', 'my data', { /* meta data */ }).then(...)
 tell(slave[0], slave[1], slave[3]).to('some task', 'my data', { /* meta data */ }).then(...)
 
 // If a slave doesn't "do" a task, or doesn't "define" it,
-// and error will be sent back in the response.
-// By default these are *not* errors, but ResponseErrors and will not be caught.
+// an error will be sent back in the response.
+// By default these are *not* considered "errors", but ResponseErrors and will not be caught.
 // For example...
 tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
   .then(res => {
@@ -427,7 +461,7 @@ tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000, cat
 ```
 
 ### Slave#exec
-**Using the actual Slave object to perform tasks...**
+**Using the Slave object to perform tasks...**
 
 **Slave#exec**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
 
@@ -443,7 +477,8 @@ slave[1].exec('some task', data, metadata).then(...);
 slave[2].exec('some task', data, metadata).then(...);
 
 // The SlaveArray object also has the base Slave
-// methods which will operate on all its slaves.
+// methods that operate on all the slaves in the array.
+
 // All 3 slaves will execute 'some task', and when
 // all have completed, the Promise will be resolved.
 slaves.exec('some task', data, metadata).then(...);
@@ -507,8 +542,9 @@ The argument passed for parameter *remoteSlaveOptions* should be an object with 
 
 | Key      | Description |
 | :------- | :---------- |
-| *host*   | The URL path to the host machine (Master Proxy Server) |
-| *script* | The path to the script file **on the host machine** |
+| *host*   | The host and port of the host machine (Master Proxy Server) |
+| *script* | The path to the script file **on the host machine**, relative to the server's root |
+| *passphrase* | An *optional* passphrase, if the server has enabled [Basic Auth](#master-proxy-server-config) |
 
 ```js
 const slave = master.create.remote.slave(
@@ -531,6 +567,7 @@ The argument passed for parameter *remoteSlaveOptions* should be an object with 
 | :------- | :---------- |
 | *host*   | The URL path to the host machine (Master Proxy Server) |
 | *script* | The path to the script file **on the host machine** |
+| *passphrase* | An *optional* passphrase, if using [Basic Auth](#basic-authorization) |
 
 ```js
 const slave = master.create.remote.slaves(
@@ -634,16 +671,16 @@ const slaveFromExample = master.getSlavesWithPath('/path/to/example.js');
 ```
 
 **Master#slave**(*...{Slave|Number|String}* **slavesOrIdsOrAliases**) → *{Slave|null}*    
-Attempts to resolve the given argument to a slave by:     
+Attempts to resolve the given argument to an active slave:     
 
 - If *slavesOrIdsOrAliases* is a slave, return *slavesOrIdsOrAliases*,
 - else if *slavesOrIdsOrAliases* is a number, find the slave with the given id.
 - else if *slavesOrIdsOrAliases* is a string, find the slave with the given alias.
 
 ```js
-let slave = master.slave(slaveX);
-let slave = master.slave(0);
-let slave = master.slave('slave alias');
+slave = master.slave(slaveX);
+slave = master.slave(0);
+slave = master.slave('slave alias');
 ```
 
 **Master#shutdown**(*...{Slave|Number|String}* **slavesOrIdsOrAliases**) → *{Promise}*    
@@ -686,6 +723,7 @@ Gets/sets all slave's default request timeout. This will be overridden by any ti
 Gets/sets all slave's default *catchAll* option. This will be overridden by any *catchAll* value set in the request *metadata* or by using *Slave#shouldCatchAll*. However, if the metadata or the slave does not specify a *catchAll* option, this will be used.
 
 ### Slave API
+**API for both local and remote slaves**
 These are members/methods on the *Slave* object within the master process, not on the *SlaveChildProcess*.
 
 *(Getter)* **Slave#id** → *{Number}*    
@@ -798,7 +836,7 @@ Adds a task for this slave, and allows the master to execute this task. The *onT
 That is, *Response#error* will be populated with the error and *Response#value* will not.
 
 ### Metadata
-The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accept two keys.
+The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accepts two keys.
 
 | Key | Default | Description |
 | :-- | :-----: | :---------- |
@@ -819,11 +857,11 @@ slave
 ### Timeouts
 Request timeouts can be set in 3 different ways.
 
-1. On the master singleton (for all slaves)
+1. On the master singleton (for all slaves and all requests)
 1. On the slave instance (for a specific slave)
 1. In the request metadata (for a specific request)
 
-Each value overrides the next.
+Each subsequent value overrides the next.
 
 ```js
 // All in ms.
@@ -833,7 +871,7 @@ someSlave.exec('task', data, { timeout: 5000 });
 ```
 
 **By default, no timeouts are set.**    
-To re-set any of the setting above, set them to ``null`` to remove the timeout.
+To re-set any of the settings above, set them to ``null`` or ``0`` to remove the timeout.
 
 #### Examples
 ```js
@@ -852,16 +890,43 @@ slave
 It's what enables Dist.io to start processes on remote machines. The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine. Simple as that.    
 
 **The power of distributed computing!**    
-You can run the master proxy server from an infinite number of machines and distribute computationally expensive tasks among them!
+You can run the master proxy server from a multitude of machines and distribute computationally expensive tasks among them!
 
 ### Starting the Master Proxy Server
-**All CLI arguments are optional** The default port is ``1337``.   
+**All CLI arguments are optional.**    
+The default port is ``1337``.   
 
 ```bash
 $ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json]
 ```
-#### Master Proxy Server Config
-**See [serve-default-config.js](https://github.com/JasonPollman/Dist.io/blob/master/serve-default-config.json) for an example of a config file with the defaults listed.**
+### Master Proxy Server Config
+```js
+{
+  // The logging verbosity level.
+  "logLevel": 5,
+  // The port to start the server on.
+  "port": 1337,
+  // The root path to the scripts directory to fork from.
+  // All remote forks will be relative to this path.
+  "root": ".",
+  // A set of optional credentials for basic authorization.
+  // If passphrase is unspecified, basic base64 encoding
+  // will be used. Otherwise AES256 encryption.
+  "basicAuth": {            
+    "username": "username",
+    "password": "password",
+    "passphrase": "secret"
+  },
+  // An array of string IPs or regular expression
+  // strings for IP matching. If unspecified,
+  // all IPs will be allowed to connect.
+  "authorizedIps": [
+    "192\\.168\\.0\\.\\d{1,3}",
+  ]
+}
+```
+
+**See [serve-default-config.js](https://github.com/JasonPollman/Dist.io/blob/master/serve-default-config.json) for the default config file.**
 
 
 ## Remote Slaves
@@ -871,6 +936,7 @@ There are a few caveats about using them, however:
 - A [Master Proxy Server](#the-master-proxy-server) must be running on the host machine.
 - The script must exist on the host machine and be *npm installed* there.
 - You must use [Master#create.remote.slave(s)](#master-api) to start them.
+- The cannot pass file descriptors to remote slaves.
 
 ## Requests
 *Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.
