@@ -14,3 +14,7 @@ slave.task('get', (tokenId, done) => {
     default : return done(new Error(`No token with ${tokenId} exists!`));
   }
 });
+
+slave.task('die', (data, done) => {
+  done(new Error('whoops'));
+});

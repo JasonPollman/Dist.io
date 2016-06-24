@@ -46,7 +46,7 @@ describe('RemoteSlave Class', function () {
 
     it('Should throw if not given a script path', (done) => {
       try {
-        s2 = new RemoteSlave({ host: 'localhost:1395' });
+        s2 = new RemoteSlave({ host: 'localhost:1395' }, { alias: 'remote alias test' });
         done(new Error('Expected to throw'));
       } catch (e) {
         expect(e).to.be.an.instanceof(TypeError);

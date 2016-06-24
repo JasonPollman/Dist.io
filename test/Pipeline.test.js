@@ -164,6 +164,40 @@ describe('Pipeline Pattern', function () {
       });
   });
 
+  it('Should reject break the pipeline on an error (catchAll)', function (done) {
+    const slaveA = master.createSlave(a);
+    const slaveB = master.createSlave(b);
+    const pipeline = master.create.pipeline();
+
+    pipeline.addTask('auth').for(slaveA);
+
+    pipeline.addTask('die').for(slaveB)
+      .execute('token-1', { catchAll: true })
+      .then(() => done(new Error('Expected to fail')))
+      .catch(e => {
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('whoops');
+        done();
+      });
+  });
+
+  it('Should reject break the pipeline on an error (non-catchAll)', function (done) {
+    const slaveA = master.createSlave(a);
+    const slaveB = master.createSlave(b);
+    const pipeline = master.create.pipeline();
+
+    pipeline.addTask('auth').for(slaveA);
+
+    pipeline.addTask('die').for(slaveB)
+      .execute('token-1')
+      .then(() => done(new Error('Expected to fail')))
+      .catch(e => {
+        expect(e).to.be.an.instanceof(Error);
+        expect(e.message).to.equal('whoops');
+        done();
+      });
+  });
+
   it('Should reject if a task was added without a slave (Callbacks)', function (done) {
     const slaveB = master.createSlave(b);
     const pipeline = master.create.pipeline();

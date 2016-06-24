@@ -31,7 +31,7 @@ describe('Scatter Pattern (Remote Slaves)', function () {
   });
 
   it('Should scatter data amongst slaves (Promises)', function (done) {
-    const slaves = master.createRemoteSlaves(5, connectOptions);
+    const slaves = master.createRemoteSlaves(5, connectOptions, { alias: 'scatter-remote' });
     const scatter = master.create.scatter('echo');
 
     scatter
@@ -49,6 +49,13 @@ describe('Scatter Pattern (Remote Slaves)', function () {
   });
 
   it('Should scatter data amongst slaves (Callbacks)', function (done) {
+    try {
+      master.createRemoteSlaves('asd', connectOptions);
+      done(new Error('Expected to throw'));
+    } catch (e) {
+      expect(e).to.be.an.instanceof(TypeError);
+    }
+
     const slaves = master.createRemoteSlaves(5, connectOptions);
     const scatter = master.create.scatter('echo');
 

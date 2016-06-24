@@ -86,12 +86,12 @@ describe('Scatter Pattern', function () {
   });
 
   it('Should scatter data amongst slaves (Errors returned, catchAll)', function (done) {
-    const slaves = master.createSlaves(5, path.join(__dirname, 'data', 'scatter-slave-error.js'));
+    const slaves = master.createSlaves(5, path.join(__dirname, 'data', 'scatter-slave-error-2.js'));
     const scatter = master.create.scatter('echo', { chunk: true, catchAll: true });
 
     scatter
       .data('hello', 'world', 'goodbye', 'world')
-      .gather(slaves[0], slaves[1], function (err, res) {
+      .gather(slaves[0], function (err, res) {
         expect(err.message).to.equal('oops');
         expect(res).to.equal(null);
         slaves.kill();

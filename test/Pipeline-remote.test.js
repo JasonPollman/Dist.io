@@ -14,20 +14,26 @@ describe('Pipeline Pattern (Remote)', function () {
   let mpserver;
 
   const a = {
-    host: 'localhost:1395',
+    host: 'localhost:1245',
     path: path.join(__dirname, 'data', 'slave-pipeline-a.js'),
   };
   const b = {
-    host: 'localhost:1395',
+    host: 'localhost:1245',
     path: path.join(__dirname, 'data', 'slave-pipeline-b.js'),
   };
 
-  before(() => {
-    mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1395'], { silent: true });
+  before((done) => {
+    mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1245'], { silent: true });
+    setTimeout(() => {
+      done();
+    }, 1000);
   });
 
-  after(() => {
-    mpserver.kill('SIGINT');
+  after(done => {
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
   });
 
   it('Master#createPipeline.addTask should return an object with a id symbol', function (done) {
