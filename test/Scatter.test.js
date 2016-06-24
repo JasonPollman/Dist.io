@@ -47,6 +47,58 @@ describe('Scatter Pattern', function () {
       });
   });
 
+  it('Should scatter data amongst slaves (Chunked data)', function (done) {
+    const slaves = master.createSlaves(5, path.join(__dirname, 'data', 'scatter-slave-chunk.js'));
+    const scatter = master.create.scatter('echo', { chunk: true });
+
+    scatter
+      .data('hello', 'world', 'goodbye', 'world')
+      .gather(slaves[0], slaves[1], function (err, res) {
+        expect(err).to.equal(null);
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.equal(2);
+        res.sortBy('rid');
+        expect(res.values[0]).to.equal('hello+world');
+        expect(res.values[1]).to.equal('goodbye+world');
+        slaves.kill();
+        done();
+      });
+  });
+
+  it('Should scatter data amongst slaves (Errors returned)', function (done) {
+    const slaves = master.createSlaves(5, path.join(__dirname, 'data', 'scatter-slave-error.js'));
+    const scatter = master.create.scatter('echo', { chunk: true });
+
+    scatter
+      .data('hello', 'world', 'goodbye', 'world')
+      .gather(slaves[0], slaves[1], function (err, res) {
+        expect(err).to.equal(null);
+        expect(res).to.be.an.instanceof(ResponseArray);
+        expect(res.length).to.equal(2);
+        res.sortBy('rid');
+        expect(res.errors[0].message).to.equal('oops');
+        expect(res.errors[1].message).to.equal('oops');
+        expect(res.values[0]).to.equal(undefined);
+        expect(res.values[1]).to.equal(undefined);
+        slaves.kill();
+        done();
+      });
+  });
+
+  it('Should scatter data amongst slaves (Errors returned, catchAll)', function (done) {
+    const slaves = master.createSlaves(5, path.join(__dirname, 'data', 'scatter-slave-error.js'));
+    const scatter = master.create.scatter('echo', { chunk: true, catchAll: true });
+
+    scatter
+      .data('hello', 'world', 'goodbye', 'world')
+      .gather(slaves[0], slaves[1], function (err, res) {
+        expect(err.message).to.equal('oops');
+        expect(res).to.equal(null);
+        slaves.kill();
+        done();
+      });
+  });
+
   it('Should simply resolve if no data is provided (Promises)', function (done) {
     const slaves = master.createSlaves(5, slaveJS);
     const scatter = master.create.scatter('echo');
