@@ -144,6 +144,11 @@ slave.task('say hello', (data, done) => {
   - [Pipeline](#pipeline)
   - [Workpool](#workpool)
   - [Scatter](#scatter)
+1. [The Master Proxy Server](#the-master-proxy-server)
+  - [Starting the Master Proxy Server](#starting-the-master-proxy-server)
+  - [Configuration](#master-proxy-server-config)
+1. [Remote Slaves](#remote-slaves)
+  - [Connecting to Remote Slaves](#connecting-to-remote-slaves)
 1. [API](#api)
   - [Master API](#master-api)
   - [Slave API](#slave-api)
@@ -152,11 +157,6 @@ slave.task('say hello', (data, done) => {
   - [Request API](#request-api)
   - [Response API](#response-api)
   - [ResponseArray API](#response-array-api)
-1. [The Master Proxy Server](#the-master-proxy-server)
-  - [Starting the Master Proxy Server](#starting-the-master-proxy-server)
-  - [Configuration](#master-proxy-server-config)
-1. [Remote Slaves](#remote-slaves)
-  - [Connecting to Remote Slaves](#connecting-to-remote-slaves)
 1. [Full API](http://www.jasonpollman.com/distio-api/)
 
 ## Examples
@@ -608,6 +608,100 @@ master.create.scatter('task name', { chunk: true })
 
 #### More patterns to come...
 ##### Iterator, maybe?
+
+## The Master Proxy Server
+**Is just a fancy name for a socket.io server, that passes messages back and forth between a client and a host machine.**    
+
+It's what enables Dist.io to start processes on remote machines. The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine. Simple as that.    
+
+**The power of distributed computing!**    
+You can run the master proxy server from a multitude of machines and distribute computationally expensive tasks among them!
+
+### Starting the Master Proxy Server
+**All CLI arguments are optional.**    
+The default port is ``1337``.   
+
+```bash
+$ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json]
+```
+### Master Proxy Server Config
+```js
+{
+  // The logging verbosity level.
+  "logLevel": 5,
+  // The port to start the server on.
+  "port": 1337,
+  // The root path to the scripts directory to fork from.
+  // All remote forks will be relative to this path.
+  "root": ".",
+  // A set of optional credentials for basic authorization.
+  // If passphrase is unspecified, basic base64 encoding
+  // will be used. Otherwise AES256 encryption.
+  "basicAuth": {            
+    "username": "username",
+    "password": "password",
+    "passphrase": "secret"
+  },
+  // An array of string IPs or regular expression
+  // strings for IP matching. If unspecified,
+  // all IPs will be allowed to connect.
+  "authorizedIps": [
+    "192\\.168\\.0\\.\\d{1,3}",
+  ],
+  // The maximum number of slaves to execute concurrently
+  // If unspecified, Number.MAX_VALUE will be used.
+  // If this value is <= 0, then the default will be used.
+  "maxConcurrentSlaves": 8,
+  // The maximum amount of time a slave is allowed
+  // to run (in ms) before killing it with SIGKILL
+  // Default is 900000 (15 minutes).
+  "killSlavesAfter": 900000
+}
+```
+
+**See [serve-default-config.js](https://github.com/JasonPollman/Dist.io/blob/master/serve-default-config.json) for the default config file.**
+
+## Remote Slaves
+**Remote slaves use the same API as local slaves...**    
+There are a few caveats about using them, however:    
+
+- A [Master Proxy Server](#the-master-proxy-server) must be running on the host machine.
+- The script must exist on the host machine and be *npm installed* there.
+- You must use [Master#create.remote.slave(s)](#master-api) to start them.
+- The cannot pass file descriptors to remote slaves.
+
+### Remote Slave API
+*RemoteSlave* class extends the *Slave* class, therefore the API between regular slaves and remote slaves is the same, with the following additions.
+
+*(Getter)* **RemoteSlave#socket** → *{Socket}*    
+Returns the slave's *socket.io* reference.
+
+### Connecting To Remote Slaves
+
+#### No Authentication
+```js
+  const slave = master.create.remote.slave({
+    host: 'http://my-master-server:3000',
+    script: 'slave.js'
+  });
+```
+
+#### Basic Auth, No Passphrase
+```js
+  const slave = master.create.remote.slave({
+    host: 'http://username:password@my-master-server',
+    script: 'slave.js'
+  });
+```
+
+#### Basic Auth and Passphrase
+```js
+  const slave = master.create.remote.slave({
+    host: 'http://username:password@my-master-server:3000',
+    script: 'slave.js',
+    passphrase: 'secret passphrase'
+  });
+```
 
 ## API
 
@@ -1075,98 +1169,3 @@ Multiplies all the values in the response array.
 
 *(Getter)* **Response#averageResponseTime** → *{Number}*    
 Returns the average amount of time taken for each response to resolve.
-
-## The Master Proxy Server
-**Is just a fancy name for a socket.io server, that passes messages back and forth between a client and a host machine.**    
-
-It's what enables Dist.io to start processes on remote machines. The master proxy server works by accepting messages to start/interact with/stop slaves. The server executes these actions and proxies the results back to your local machine. Simple as that.    
-
-**The power of distributed computing!**    
-You can run the master proxy server from a multitude of machines and distribute computationally expensive tasks among them!
-
-### Starting the Master Proxy Server
-**All CLI arguments are optional.**    
-The default port is ``1337``.   
-
-```bash
-$ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json]
-```
-### Master Proxy Server Config
-```js
-{
-  // The logging verbosity level.
-  "logLevel": 5,
-  // The port to start the server on.
-  "port": 1337,
-  // The root path to the scripts directory to fork from.
-  // All remote forks will be relative to this path.
-  "root": ".",
-  // A set of optional credentials for basic authorization.
-  // If passphrase is unspecified, basic base64 encoding
-  // will be used. Otherwise AES256 encryption.
-  "basicAuth": {            
-    "username": "username",
-    "password": "password",
-    "passphrase": "secret"
-  },
-  // An array of string IPs or regular expression
-  // strings for IP matching. If unspecified,
-  // all IPs will be allowed to connect.
-  "authorizedIps": [
-    "192\\.168\\.0\\.\\d{1,3}",
-  ],
-  // The maximum number of slaves to execute concurrently
-  // If unspecified, Number.MAX_VALUE will be used.
-  // If this value is <= 0, then the default will be used.
-  "maxConcurrentSlaves": 8,
-  // The maximum amount of time a slave is allowed
-  // to run (in ms) before killing it with SIGKILL
-  // Default is 900000 (15 minutes).
-  "killSlavesAfter": 900000
-}
-```
-
-**See [serve-default-config.js](https://github.com/JasonPollman/Dist.io/blob/master/serve-default-config.json) for the default config file.**
-
-
-## Remote Slaves
-**Remote slaves use the same API as local slaves...**    
-There are a few caveats about using them, however:    
-
-- A [Master Proxy Server](#the-master-proxy-server) must be running on the host machine.
-- The script must exist on the host machine and be *npm installed* there.
-- You must use [Master#create.remote.slave(s)](#master-api) to start them.
-- The cannot pass file descriptors to remote slaves.
-
-### Remote Slave API
-*RemoteSlave* class extends the *Slave* class, therefore the API between regular slaves and remote slaves is the same, with the following additions.
-
-*(Getter)* **RemoteSlave#socket** → *{Socket}*    
-Returns the slave's *socket.io* reference.
-
-### Connecting To Remote Slaves
-
-#### No Authentication
-```js
-  const slave = master.create.remote.slave({
-    host: 'http://my-master-server:3000',
-    script: 'slave.js'
-  });
-```
-
-#### Basic Auth, No Passphrase
-```js
-  const slave = master.create.remote.slave({
-    host: 'http://username:password@my-master-server',
-    script: 'slave.js'
-  });
-```
-
-#### Basic Auth and Passphrase
-```js
-  const slave = master.create.remote.slave({
-    host: 'http://username:password@my-master-server:3000',
-    script: 'slave.js',
-    passphrase: 'secret passphrase'
-  });
-```
