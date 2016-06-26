@@ -8,6 +8,8 @@ const expect = require('chai').expect;
 const path = require('path');
 const os = require('os');
 const ResponseError = require('../lib/ResponseError');
+const commands = require('../lib/Commands');
+const fork = require('child_process').fork;
 
 describe('Master Proxy Server', function masterProxyServerTest() {
   this.timeout(10000);
@@ -16,6 +18,79 @@ describe('Master Proxy Server', function masterProxyServerTest() {
   let MPS;
   before(() => {
     MPS = distio.MasterProxyServer;
+  });
+
+  describe('MasterProxyServer#maxConcurrentSlaves', function () {
+    let mpserver;
+
+    before(() => {
+      mpserver = fork(
+        path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=5731', '--maxConcurrentSlaves=2'], { silent: true }
+      );
+    });
+
+    after(done => {
+      setTimeout(() => {
+        mpserver.kill('SIGINT');
+        done();
+      }, 1000);
+    });
+
+    it('Should queue slaves according to "config.maxConcurrentSlaves" < max', function (done) {
+      const slaves = master.create.remote
+        .slaves(2, { host: 'localhost:5731', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+      master.tell(slaves).to(commands.ACK)
+        .then(res => {
+          expect(res.length).to.equal(2);
+          res.forEach(r => {
+            expect(r.error).to.equal(null);
+            expect(r.value).to.be.an('object');
+          });
+          slaves.kill();
+          done();
+        })
+        .catch(done);
+    });
+
+    it('Should queue slaves according to "config.maxConcurrentSlaves" > max (client side)', function (done) {
+      const slaves = master.create.remote
+        .slaves(5, { host: 'localhost:5731', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+      let completed = 0;
+      for (let i = 0; i < slaves.length; i++) {
+        master.tell(slaves[i]).to('random')
+          .then(r => { // eslint-disable-line
+            expect(r.error).to.equal(null);
+            expect(r.value).to.be.a('number');
+            slaves[i].kill();
+            if (++completed === 5) done();
+          })
+          .catch(done);
+      }
+    });
+
+    it('Should queue slaves according to "config.maxConcurrentSlaves" > max (server side)', function (done) {
+      this.timeout(45000);
+      this.slow(5000);
+
+      const server = new MPS({ authorizedIps: ['.*'], port: 9176, logLevel: 0, maxConcurrentSlaves: 80 });
+
+      const readySlave = master.create.remote
+        .slave({ host: 'localhost:9176', path: path.join(__dirname, 'data', 'simple-slave-m.js') });
+
+      server.start()
+        .then(() => {
+          readySlave.exec('init')
+            .then(res => {
+              expect(res.error).to.equal(null);
+              expect(res.value).to.equal('okay');
+              done();
+            })
+            .catch(done);
+        })
+        .catch(done);
+    });
   });
 
   describe('MasterProxyServer#bindSIGINT', function () {
@@ -28,8 +103,6 @@ describe('Master Proxy Server', function masterProxyServerTest() {
       server.start()
         .then(() => {
           expect(server.started).to.equal(true);
-          master.create.remote
-            .slave({ host: 'localhost:3112', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
 
           const listeners = process.listeners('SIGINT');
           process.removeAllListeners('SIGINT');
@@ -352,7 +425,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
       const server = new MPS({ authorizedIps: [], port: 3245, logLevel: 0 });
       server.start()
         .then(() => {
-          master.create.remote
+          const slave = master.create.remote
             .slave({
               host: 'localhost:3245',
               path: path.join(__dirname, 'data', 'simple-slave-i.js'),
@@ -361,6 +434,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
               onSpawnError: function spawnError(e) {
                 expect(e).to.be.an.instanceof(Error);
                 expect(e.message).to.equal('Unauthorized');
+                slave.kill();
                 server.stop();
                 done();
               },
@@ -374,7 +448,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
       const server = new MPS({ authorizedIps: ['196\\.168\\.0\\..*'], port: 3246, logLevel: 0 });
       server.start()
         .then(() => {
-          master.create.remote
+          const slave = master.create.remote
             .slave({
               host: 'localhost:3246',
               path: path.join(__dirname, 'data', 'simple-slave-i.js'),
@@ -383,6 +457,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
               onSpawnError: function spawnError(e) {
                 expect(e).to.be.an.instanceof(Error);
                 expect(e.message).to.equal('Unauthorized');
+                slave.kill();
                 server.stop();
                 done();
               },
@@ -439,6 +514,71 @@ describe('Master Proxy Server', function masterProxyServerTest() {
         })
         .catch(done);
     });
+  });
+
+  it('Should reject bad messages', function (done) {
+    const server = new MPS({ logLevel: 0, port: 12356 });
+    server.start()
+      .then(() => {
+        const slave = master.create.remote
+          .slave({ host: 'localhost:12356', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+        slave.on('uncaughtException', () => {
+          /* Noop */
+        });
+
+        const thirdListener = m => {
+          slave.socket.removeListener('message', thirdListener);
+          expect(m.error.message).to.equal('Invalid request');
+          expect(m.error.name).to.equal('RemoteSlaveError: ReferenceError');
+          done();
+        };
+
+        const secondListener = m => {
+          slave.socket.removeListener('message', secondListener);
+          expect(m.error.message).to.equal('No slave with id 19191919191 exists!');
+          expect(m.error.name).to.equal('RemoteSlaveError: ReferenceError');
+          slave.socket.on('message', thirdListener);
+          slave.socket.emit('message', {
+            sent: Date.now(),
+            rid: 1245,
+            for: slave.id,
+            meta: {},
+            data: null,
+            command: 'echo',
+            created: Date.now() - 100,
+          });
+        };
+
+        const firstListener = m => {
+          slave.socket.removeListener('message', firstListener);
+          expect(m.error.message).to.equal('Invalid request');
+          expect(m.error.name).to.equal('RemoteSlaveError: ReferenceError');
+          slave.socket.on('message', secondListener);
+          slave.socket.emit('message', {
+            sent: Date.now(),
+            rid: 1245,
+            for: 19191919191,
+            meta: {},
+            data: null,
+            command: 'echo',
+            created: Date.now() - 100,
+            secretId: 'abc',
+            secretNumber: 123,
+            title: 'MasterIOMessage',
+          });
+        };
+
+        slave.on('remote handshake', () => {
+          server.connections.forEach(c => {
+            if (c.id.replace(/^\/#/, '') === slave.socket.id) {
+              slave.socket.on('message', firstListener);
+              slave.socket.emit('message', 'foo');
+            }
+          });
+        });
+      })
+      .catch(done);
   });
 
   it('Should be returned by the Dist.io Index file', () => {
@@ -614,43 +754,6 @@ describe('Master Proxy Server', function masterProxyServerTest() {
         expect(slave.hasExited).to.equal(true);
         done();
       });
-    });
-  });
-
-  it('Should kills slaves after "config.killSlavesAfter" ms (verify "exited" event)', (done) => {
-    const server = new MPS({ logLevel: 0, port: 5130, killSlavesAfter: 1 });
-    expect(server.start).to.be.a('function');
-    expect(server.stop).to.be.a('function');
-    expect(server).to.be.an.instanceof(MPS);
-
-    server.start((err) => {
-      expect(err).to.equal(null);
-      const slave = master.create.remote
-        .slave({ host: 'localhost:5130', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
-
-      let gotExited = false;
-      let gotAckError = false;
-      slave.on('exited', () => {
-        expect(slave.isConnected).to.equal(false);
-        expect(slave.hasExited).to.equal(true);
-        gotExited = true;
-      });
-
-      slave.ack()
-        .then(res => {
-          expect(res.error.message).to.match(
-            /^Slave id=\d+, alias=\d+x\d+, sent=\d+, received=\d+ was killed or closed during request\.$/
-          );
-          gotAckError = true;
-        })
-        .catch(done);
-
-      const checkArgs = setInterval(() => {
-        if (gotExited && gotAckError) {
-          clearInterval(checkArgs);
-          done();
-        }
-      }, 1000);
     });
   });
 

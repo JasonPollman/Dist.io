@@ -421,6 +421,8 @@ describe('Slave Class (Remote)', function () {
       const slave = new RemoteSlave(connectOptions);
 
       RemoteSlave.defaultTimeout = 100;
+      RemoteSlave.defaultTimeout = [];
+      RemoteSlave.defaultTimeout = () => {};
       slave.do('echo', null)
         .then((res) => {
           expect(res).to.be.an.instanceof(TimeoutResponse);
