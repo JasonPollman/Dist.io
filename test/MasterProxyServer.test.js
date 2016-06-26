@@ -453,7 +453,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
   });
 
   it('Should handle invalid script root paths', (done) => {
-    const server = new MPS({ root: 'a/b/c' });
+    const server = new MPS({ logLevel: 0, root: 'a/b/c' });
     server.start()
       .then(() => done(new Error('Expected to throw')))
       .catch(e => {
@@ -464,7 +464,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
   });
 
   it('Should resolve if start is called and the server is running', (done) => {
-    const server = new MPS();
+    const server = new MPS({ logLevel: 0 });
     server.start()
       .then(() => {
         expect(server.started).to.equal(true);
@@ -576,6 +576,81 @@ describe('Master Proxy Server', function masterProxyServerTest() {
             .then(() => done());
         })
         .catch(done);
+    });
+  });
+
+  it('Should kills slaves after "config.killSlavesAfter" ms', (done) => {
+    const server = new MPS({ logLevel: 0, port: 5586, killSlavesAfter: 1 });
+    expect(server.start).to.be.a('function');
+    expect(server.stop).to.be.a('function');
+    expect(server).to.be.an.instanceof(MPS);
+
+    server.start((err) => {
+      expect(err).to.equal(null);
+      const slave = master.create.remote
+        .slave({ host: 'localhost:5586', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+      setTimeout(() => {
+        expect(slave.isConnected).to.equal(false);
+        expect(slave.hasExited).to.equal(true);
+        done();
+      }, 100);
+    });
+  });
+
+  it('Should kills slaves after "config.killSlavesAfter" ms (verify "exited" event)', (done) => {
+    const server = new MPS({ logLevel: 0, port: 5587, killSlavesAfter: 200 });
+    expect(server.start).to.be.a('function');
+    expect(server.stop).to.be.a('function');
+    expect(server).to.be.an.instanceof(MPS);
+
+    server.start((err) => {
+      expect(err).to.equal(null);
+      const slave = master.create.remote
+        .slave({ host: 'localhost:5587', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+      slave.on('exited', () => {
+        expect(slave.isConnected).to.equal(false);
+        expect(slave.hasExited).to.equal(true);
+        done();
+      });
+    });
+  });
+
+  it('Should kills slaves after "config.killSlavesAfter" ms (verify "exited" event)', (done) => {
+    const server = new MPS({ logLevel: 0, port: 5130, killSlavesAfter: 1 });
+    expect(server.start).to.be.a('function');
+    expect(server.stop).to.be.a('function');
+    expect(server).to.be.an.instanceof(MPS);
+
+    server.start((err) => {
+      expect(err).to.equal(null);
+      const slave = master.create.remote
+        .slave({ host: 'localhost:5130', path: path.join(__dirname, 'data', 'simple-slave-i.js') });
+
+      let gotExited = false;
+      let gotAckError = false;
+      slave.on('exited', () => {
+        expect(slave.isConnected).to.equal(false);
+        expect(slave.hasExited).to.equal(true);
+        gotExited = true;
+      });
+
+      slave.ack()
+        .then(res => {
+          expect(res.error.message).to.match(
+            /^Slave id=\d+, alias=\d+x\d+, sent=\d+, received=\d+ was killed or closed during request\.$/
+          );
+          gotAckError = true;
+        })
+        .catch(done);
+
+      const checkArgs = setInterval(() => {
+        if (gotExited && gotAckError) {
+          clearInterval(checkArgs);
+          done();
+        }
+      }, 1000);
     });
   });
 
