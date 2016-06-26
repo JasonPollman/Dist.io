@@ -797,13 +797,13 @@ See: [Slave#exec](#slaveexec)
 ### Slave Child Process API
 
 *(Getter)* **SlaveChildProcess#id** → *{Number}*    
-Returns the slave's id. This will always return the *remote* id. So if using a remote slave, this will return the id as determined from the *client*, not the master proxy server. If the slave is running locally, the local and remote ids will be the same.
+Returns the slave's id. This will always return the *remote* id. So if using a remote slave, this will return the id as determined from the *client*, not the master proxy server.
 
-*(Getter)* **SlaveChildProcess#localId** → *{Number}*    
-Returns the slave's local id. That is, the id as it was assigned from the master proxy server.
+*(Getter)* **SlaveChildProcess#serverId** → *{Number}*    
+Returns the slave's server id. That is, the slave id as it was assigned from the master proxy server.
 
-*(Getter)* **SlaveChildProcess#remoteId** → *{Number}*    
-Returns the slave's remote id. That is, the id as it was assigned from client machine (not the master proxy server).
+*(Getter)* **SlaveChildProcess#remoteId** → *{Number|null}*    
+Returns the slave's remote id. That is, the slave id as it was assigned from client machine (not the master proxy server). If the slave is running locally, this will be ``null``.
 
 *(Getter)* **SlaveChildProcess#alias** → *{Number}*    
 Returns the slave's alias.

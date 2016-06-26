@@ -9,9 +9,6 @@ Some simple hello world examples. Examples of creating single and multiple slave
 **Local-Remote**    
 An example of starting both local and remote slaves and executing tasks with them.
 
-**Matrix-Mult**   
-Matrix multiplication using multiple processes; shows *speedup* when dealing with large matrices.
-
 **Monte-Carlo**    
 The *Monte-Carlo PI Approximation* program. Examples of Dist.io's *workpool* pattern using *while*, *parallel* pattern using *times* and the *scatter* pattern. Shows timing of each vs. single process time.
 

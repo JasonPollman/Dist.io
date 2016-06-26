@@ -246,6 +246,56 @@ describe('Slave Class (Remote)', function () {
       });
     });
 
+    it('Should handle connection timeouts (No "spawn error" listeners)', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+
+      RemoteSlave.reconnectionAttempts = 1;
+      RemoteSlave.reconnectionDelay = 500;
+
+      const location = path.join('test', 'data', 'doesnt-exist.js');
+      const connectOptions = {
+        location: 'test:test@127.0.0.1:80',
+        path: location,
+      };
+
+      const slave = new RemoteSlave(connectOptions);
+      slave.on('spawn error', e => {
+        expect(e.message).to.equal('Unable to connect to host http://127.0.0.1:80');
+        done();
+      });
+    });
+
+    it('Should handle connection timeouts (With "spawn error" listeners)', function (done) {
+      this.timeout(3000);
+      this.slow(2500);
+
+      const listeners = process.listeners('uncaughtException');
+
+      const catchErr = e => {
+        expect(e.message).to.equal('Unable to connect to host http://127.0.0.1:80');
+        process.removeListener('uncaughtException', catchErr);
+        listeners.forEach(fn => {
+          process.on('uncaughtException', fn);
+        });
+        done();
+      };
+
+
+      process.removeAllListeners('uncaughtException');
+      process.on('uncaughtException', catchErr);
+      RemoteSlave.reconnectionAttempts = 1;
+      RemoteSlave.reconnectionDelay = 500;
+
+      const location = path.join('test', 'data', 'doesnt-exist.js');
+      const connectOptions = {
+        location: 'test:test@127.0.0.1:80',
+        path: location,
+      };
+
+      new RemoteSlave(connectOptions); // eslint-disable-line
+    });
+
     it('Should set the slave title option', function (done) {
       this.timeout(3000);
       this.slow(2500);

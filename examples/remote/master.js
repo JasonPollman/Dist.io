@@ -16,16 +16,27 @@
 
 'use strict';
 const master = require('../../').Master;
-const s = master.create.remote.slaves(2, { host: 'localhost:1337', script: './examples/remote/slave.js' });
+const slaves = master.create.remote.slaves(2, { host: 'localhost:1337', script: './examples/remote/slave.js' });
 
-master.tell(s[0])
+/*
+  If the server requires basic auth...
+  const slaves = master.create.remote.slaves(2,
+    {
+      host: 'username:password@localhost:1337',
+      script: './examples/remote/slave.js',
+      passphrase: 'secret'
+    }
+  );
+ */
+
+master.tell(slaves[0])
   .to('say hello')
-  .then(() => master.tell(s[0]).to('say goodbye'))
-  .then(() => s[0].close())
+  .then(() => master.tell(slaves[0]).to('say goodbye'))
+  .then(() => slaves[0].close())
   .catch(e => console.error(e));
 
-master.tell(s[1])
+master.tell(slaves[1])
   .to('say hello')
-  .then(() => master.tell(s[1]).to('say goodbye'))
-  .then(() => s[1].close())
+  .then(() => master.tell(slaves[1]).to('say goodbye'))
+  .then(() => slaves[1].close())
   .catch(e => console.error(e));

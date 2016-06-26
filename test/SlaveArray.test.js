@@ -8,8 +8,22 @@ const Slave = require('../lib/Slave');
 const expect = require('chai').expect;
 const master = require('../').Master;
 const ResponseArray = require('../lib/ResponseArray');
+const fork = require('child_process').fork;
 
 describe('SlaveArray Class', function () {
+  let mpserver;
+
+  before(() => {
+    mpserver = fork(path.join(__dirname, '..', 'bin', 'distio-serve'), ['--port=1200'], { silent: true });
+  });
+
+  after(done => {
+    setTimeout(() => {
+      mpserver.kill('SIGINT');
+      done();
+    }, 1000);
+  });
+
   describe('SlaveArray#constructor', function () {
     it('Should throw when given non-Slave objects', (done) => {
       try {
@@ -54,6 +68,52 @@ describe('SlaveArray Class', function () {
       .catch(e => {
         done(e);
       });
+    });
+  });
+
+  describe('SlaveArray#sockets', function () {
+    this.slow(1000);
+
+    it('Should return an empty array (local slaves)', (done) => {
+      const location = path.join(__dirname, 'data', 'simple-slave-b.js');
+      const slave = new Slave(location); // eslint-disable-line
+      const s = new SlaveArray(slave);
+      expect(s.sockets).to.eql([]);
+      s.kill();
+      done();
+    });
+
+    it('Should return an array of socket objects (remote slaves)', (done) => {
+      const location = path.join('test', 'data', 'simple-slave-a.js');
+      const connectOptions = {
+        location: '127.0.0.1:1200',
+        path: location,
+      };
+
+      const s = master.create.remote.slaves(3, connectOptions, { group: 'testing sockets prop' });
+      expect(s.sockets).to.be.an.instanceof(Array);
+      expect(s.sockets.length).to.equal(3);
+      s.sockets.forEach(i => expect(i).to.be.an('object'));
+
+      s.sockets.on('___test', () => {});
+      s.sockets[0].emit('___test');
+      done();
+    });
+  });
+
+  describe('SlaveArray#on', function () {
+    this.slow(1000);
+
+    it('Should attach listeners to all slaves in the array', (done) => {
+      const location = path.join(__dirname, 'data', 'simple-slave-b.js');
+      const slave = new Slave(location); // eslint-disable-line
+      const s = new SlaveArray(slave);
+      expect(s.on).to.be.a('function');
+      expect(s.on('foo', d => {
+        expect(d).to.equal('test');
+        done();
+      })).to.equal(s);
+      s[0].emit('foo', 'test');
     });
   });
 
