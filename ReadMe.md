@@ -136,6 +136,9 @@ slave.task('say hello', (data, done) => {
 1. [Controlling Slaves](#controlling-slaves)
   - [Master#tell](#mastertell)
   - [Slave#exec](#slaveexec)
+  - [Metadata](#metadata)
+  - [Timeouts](#timeouts)
+  - [Error Handling](#error-handling)
 1. [Patterns](#patterns)
   - [Parallel](#parallel)
   - [Pipeline](#pipeline)
@@ -149,8 +152,6 @@ slave.task('say hello', (data, done) => {
   - [Request API](#request-api)
   - [Response API](#response-api)
   - [ResponseArray API](#response-array-api)
-1. [Metadata](#metadata)
-1. [Timeouts](#timeouts)
 1. [The Master Proxy Server](#the-master-proxy-server)
   - [Starting the Master Proxy Server](#starting-the-master-proxy-server)
   - [Configuration](#master-proxy-server-config)
@@ -288,6 +289,127 @@ slave[2].exec('some task', data, metadata).then(...);
 // all have completed, the Promise will be resolved.
 slaves.exec('some task', data, metadata).then(...);
 ```
+
+### Metadata
+The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accepts two keys.
+
+| Key | Default | Description |
+| :-- | :-----: | :---------- |
+| *timeout* | ``0``  | Sets a timeout on the request in ms.<br>If the timeout is exceeded, a *TimeoutResponse* object is resolved within the response.<br><br>If this value is non-numeric, parses to ``NaN``, or is ``<= 0`` then it will default to ``0`` (no timeout). |
+| *catchAll* | ``false`` | If true, *ResponseErrors* will be treated like any error and will be **rejected** (passed to the *error* argument of any provided callback).<br><br>A ``false`` setting will force the response error to resolve, and the *Response.error* property will contain the error.
+
+#### Examples
+```js
+tell(slave)
+  .to('some task', 'my data', { timeout: 1000, catchAll: true })
+  .then(...);
+
+slave
+  .exec('some task', null, { timeout: 0, catchAll: false })
+  .then(...);
+```
+
+### Timeouts
+Request timeouts can be set in 3 different ways.
+
+1. On the master singleton (for all slaves and all requests)
+1. On the slave instance (for a specific slave)
+1. In the request metadata (for a specific request)
+
+Each subsequent value overrides the next.
+
+```js
+// All in ms.
+master.defaultTimeout = 3000;
+someSlave.defaultTimeout = 4000;
+someSlave.exec('task', data, { timeout: 5000 });
+```
+
+**By default, no timeouts are set.**    
+To re-set any of the settings above, set them to ``null`` or ``0`` to remove the timeout.
+
+### Error Handling
+
+#### Spawn Errors
+To catch errors due to spawning, each slave *should* have a ``spawn error`` event handler. *Most* spawn errors (bad data) are user errors and will throw locally (i.e. can be caught with try/catch). However, should a process fail to fork, the ``spawn error`` event will be emitted. Especially when using *remote* slaves, you should subscribe to this event.
+
+```js
+const slave = master.create.slave('path/to/script.js');
+slave.on('spawn error', () => { ... });
+
+// Or, send in as options...
+const slave = master.create.slave('path/to/script.js', {
+  onSpawnError: () => { ... }
+});
+```
+
+#### Exceptions
+To catch any *uncaughtExceptions* the slave child process might throw at any point in its lifecycle, each slave *should* have a ``uncaughtException`` event handler.
+
+While you can handle the error in the master process here, once an exception occurs within the slave process, the **slave can no longer perform tasks** (since the exception killed the process).
+
+```js
+const slave = master.create.slave('path/to/script.js');
+slave.on('uncaughtException', () => { ... });
+
+// Or, send in as options...
+const slave = master.create.slave('path/to/script.js', {
+  uncaughtException: () => { ... }
+});
+```
+
+**Tip: you can attach the same listener to every slave in a SlaveArray using SlaveArray#on**
+```js
+const slaves = master.create.slaves(8, 'path/to/script.js');
+slaves.on('uncaughtException', () => { ... });
+```
+
+#### Response Errors
+Response Errors are errors that are sent back to the master process by passing an error to *done* in the slave process or if a task callback throws a catchable error.
+
+Examples
+``slave.js``
+```js
+slave
+  .task('get error', (data, done) => {
+    done(new Error('foo')); // Error sent back
+  })
+  .task('throw error', (data, done) => {
+    throw new Error('bar'); // Error caught by Dist.io SlaveChildProcess
+  });
+```
+
+**By default response errors are not considered "errors".** They are passed back and resolved as valid responses and should be handled using ``response.error``. This is by design, and thus, promises will not "catch" any response errors.
+
+You can, however, change this behavior by sending ``{ catchAll: true }`` in your request metadata.
+
+**Default Behavior**
+```js
+slave.exec('task', 'my data')
+  .then(res => {
+    // If error thrown by slave res.error will be an Error.
+    console.log(res.error);
+  })
+  .catch(e => {
+    // If error was sent back by the slave, this will not be invoked.
+    // This catch is for non-response errors.
+  });
+```
+
+**catchAll Behavior**
+```js
+slave.exec('task', 'my data', { catchAll: true })
+  .then(res => {
+    // If error this block will not be invoked...
+  })
+  .catch(e => {
+    // If error was sent back by the slave, e will be
+    // equivalent to res.error above.
+  });
+```
+
+The *catchAll* behavior is useful when you have a long chain of promises and expect that all requests complete without any issues.
+
 
 ## Patterns
 #### These are abstractions around common distributed programming patterns to make working with multiple slaves and controlling IO flow simpler.
@@ -832,7 +954,7 @@ Adds a task for this slave, and allows the master to execute this task. The *onT
 
 | Type | Name | Description |
 | :--- | :--- | :---------- |
-| *{\*}* | **data** | Data sent from the slave with the task instruction. |
+| *{*\**}* | **data** | Data sent from the slave with the task instruction. |
 | *{Function}* | **done** | A callback that **must** be invoked when the task is complete. The first argument to done will be sent back to the master in the response as *Response#value* |
 | *{Object}* | **metadata** | The metadata from the request. |
 | *{Object}* | **message** | A copy of the original request object. |
@@ -953,55 +1075,6 @@ Multiplies all the values in the response array.
 
 *(Getter)* **Response#averageResponseTime** → *{Number}*    
 Returns the average amount of time taken for each response to resolve.
-
-## Metadata
-The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accepts two keys.
-
-| Key | Default | Description |
-| :-- | :-----: | :---------- |
-| *timeout* | ``0``  | Sets a timeout on the request in ms.<br>If the timeout is exceeded, a *TimeoutResponse* object is resolved within the response.<br><br>If this value is non-numeric, parses to ``NaN``, or is ``<= 0`` then it will default to ``0`` (no timeout). |
-| *catchAll* | ``false`` | If true, *ResponseErrors* will be treated like any error and will be **rejected** (passed to the *error* argument of any provided callback).<br><br>A ``false`` setting will force the response error to resolve, and the *Response.error* property will contain the error.
-
-### Examples
-```js
-tell(slave)
-  .to('some task', 'my data', { timeout: 1000, catchAll: true })
-  .then(...);
-
-slave
-  .exec('some task', null, { timeout: 0, catchAll: false })
-  .then(...);
-```
-
-## Timeouts
-Request timeouts can be set in 3 different ways.
-
-1. On the master singleton (for all slaves and all requests)
-1. On the slave instance (for a specific slave)
-1. In the request metadata (for a specific request)
-
-Each subsequent value overrides the next.
-
-```js
-// All in ms.
-master.defaultTimeout = 3000;
-someSlave.defaultTimeout = 4000;
-someSlave.exec('task', data, { timeout: 5000 });
-```
-
-**By default, no timeouts are set.**    
-To re-set any of the settings above, set them to ``null`` or ``0`` to remove the timeout.
-
-#### Examples
-```js
-tell(slave)
-  .to('some task', 'my data', { timeout: 1000, catchAll: true })
-  .then(...);
-
-slave
-  .exec('some task', null, { timeout: 0, catchAll: false })
-  .then(...);
-```
 
 ## The Master Proxy Server
 **Is just a fancy name for a socket.io server, that passes messages back and forth between a client and a host machine.**    
