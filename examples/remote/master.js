@@ -29,6 +29,8 @@ const slaves = master.create.remote.slaves(2, { host: 'localhost:1337', script: 
   );
  */
 
+master.shouldCatchAll = true;
+
 master.tell(slaves[0])
   .to('say hello')
   .then(() => master.tell(slaves[0]).to('say goodbye'))

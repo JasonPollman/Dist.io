@@ -10,8 +10,8 @@ const os = require('os');
 const ResponseError = require('../lib/ResponseError');
 
 describe('Master Proxy Server', function masterProxyServerTest() {
-  this.timeout(3000);
-  this.slow(1500);
+  this.timeout(10000);
+  this.slow(5000);
 
   let MPS;
   before(() => {
@@ -432,10 +432,10 @@ describe('Master Proxy Server', function masterProxyServerTest() {
               passphrase: 'qwerty',
             });
 
-            slave.on('spawn error', e => {
-              expect(e.message).to.equal('Unauthorized');
-              done();
-            });
+          slave.on('spawn error', e => {
+            expect(e.message).to.equal('Unauthorized');
+            done();
+          });
         })
         .catch(done);
     });
@@ -549,7 +549,7 @@ describe('Master Proxy Server', function masterProxyServerTest() {
   });
 
   it('Should start a new server and allow a master client to connect', (done) => {
-    const server = new MPS({ logLevel: 0, port: 5556 });
+    const server = new MPS({ logLevel: 0, port: 5556, killSlavesAfter: 9999 });
     expect(server.start).to.be.a('function');
     expect(server.stop).to.be.a('function');
     expect(server).to.be.an.instanceof(MPS);

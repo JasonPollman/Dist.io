@@ -1,5 +1,6 @@
 {
   "logLevel": 5,
   "port": 1337,
-  "root": "."
+  "root": ".",
+  "killSlavesAfter": 900000
 }

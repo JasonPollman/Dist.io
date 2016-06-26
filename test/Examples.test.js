@@ -31,7 +31,7 @@ describe('Validate Examples', function () {
   ];
 
   it('Should execute the examples from the "./examples" directory without any errors', function (done) {
-    this.timeout(15000);
+    this.timeout(30000);
     this.slow(5000);
 
     const total = examples.length;

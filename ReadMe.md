@@ -1,9 +1,9 @@
 # Dist.io
 ------
 **Distributed programming paradigms for forked node.js processes.**    
-Dist.io is an abstraction around distributed, message passing programming and its complex patterns. It makes inter-process communication simple.
+Dist.io is an abstraction around distributed, message passing programming and its complex patterns. It makes inter-process communication simple and allows you to fork remote processes.
 
-> It's like async for forked node processes!
+> It's like async for multiple node processes!
 
 ## Install
 ---
@@ -133,26 +133,29 @@ slave.task('say hello', (data, done) => {
 1. [Basic Usage](#basic-usage)
 1. [Examples](#examples)
 1. [Master vs. Slave vs. SlaveChildProcess?](#master-vs-slave-vs-slavechildprocess)
+1. [Controlling Slaves](#controlling-slaves)
+  - [Master#tell](#mastertell)
+  - [Slave#exec](#slaveexec)
 1. [Patterns](#patterns)
   - [Parallel](#parallel)
   - [Pipeline](#pipeline)
   - [Workpool](#workpool)
   - [Scatter](#scatter)
-1. [Controlling Slaves](#controlling-slaves)
-  - [Master#tell](#mastertell)
-  - [Slave#exec](#slaveexec)
+1. [API](#api)
   - [Master API](#master-api)
   - [Slave API](#slave-api)
   - [Slave Child Process API](#slave-child-process-api)
-  - [Metadata](#metadata)
-  - [Timeouts](#timeouts)
+  - [SlaveArray API](#slave-array-api)
+  - [Request API](#request-api)
+  - [Response API](#response-api)
+  - [ResponseArray API](#response-array-api)
+1. [Metadata](#metadata)
+1. [Timeouts](#timeouts)
 1. [The Master Proxy Server](#the-master-proxy-server)
   - [Starting the Master Proxy Server](#starting-the-master-proxy-server)
   - [Configuration](#master-proxy-server-config)
 1. [Remote Slaves](#remote-slaves)
-1. [Requests](#requests)
-1. [Responses](#responses)
-1. [Response Arrays](#response-arrays)
+  - [Connecting to Remote Slaves](#connecting-to-remote-slaves)
 1. [Full API](http://www.jasonpollman.com/distio-api/)
 
 ## Examples
@@ -203,6 +206,87 @@ slave
     /* Do some work */
     done('return some value for task bar...');
   });
+```
+
+## Controlling Slaves
+**Dist.io allows you to control slaves using a few different syntactic dialects.**    
+Note that all return a *Promise* and accept an optional *callback* parameter (I would choose a single style, but not both). For the purposes of simplicity, the examples in this document use *Promises*.
+
+When using [Master#tell](#mastertell) and [Slave#exec](slaveexec), a [Request](#request) will be sent to the slave.    
+
+**Each requests contains:**
+
+| Item | Description |
+| :--- | :---------- |
+| *task name* | The name of the task for the slave to perform |
+| *data* | Data for the slave to use while processing the task |
+| *metadata* | Options used in this request, which will also be sent to the slave process.<br>Options like the request timeout and error handling settings. |
+
+### Master#tell
+**Using the Master singleton to control slaves...**
+
+**Master#tell**(*{...Slave|Number|String}* **slaves**)**.to**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
+
+```js
+const master = require('dist-io').Master;
+const tell = master.tell;
+
+// Forks 5 slave.js processes
+const slaves = master.createSlaves(5, './path/to/slave.js');
+
+// Tell a single slave to perform a task...
+tell(slave[0]).to('some task', 'my data', { /* meta data */ }).then(...)
+
+// Tell all 5 slaves to perform the task 'some task'...
+tell(slaves).to('some task', 'my data', { /* meta data */ }).then(...)
+
+// Or specific slaves...
+tell(slave[0], slave[1], slave[3]).to('some task', 'my data', { /* meta data */ }).then(...)
+
+// If a slave doesn't "do" a task, or doesn't "define" it,
+// an error will be sent back in the response.
+// By default these are *not* considered "errors", but ResponseErrors and will not be caught.
+// For example...
+tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
+  .then(res => {
+    console.log(res.error); // Error: Slave #0 does not listen to task 'do some undefined task'.
+  })
+  .catch(e => {
+    // This will not be invoked...
+  })
+
+// However, you can change this behavior by setting catchAll to true in the metadata.
+tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000, catchAll: true })
+  .then(res => {
+    // This will not be invoked...
+  })
+  .catch(e => {
+    console.log(e); // Error: Slave #0 does not listen to task 'do some undefined task'.
+  })
+```
+
+### Slave#exec
+**Using the Slave object to perform tasks...**
+
+**Slave#exec**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
+
+The semantics of *Slave#exec* are the same as *Master#tell*, but the syntax is slightly different.
+
+```js
+// Create some slaves...
+// This will return a SlaveArray
+const slaves = master.create.slaves(3, './path/to/slave.js');
+
+slave[0].exec('some task', data, metadata).then(...);
+slave[1].exec('some task', data, metadata).then(...);
+slave[2].exec('some task', data, metadata).then(...);
+
+// The SlaveArray object also has the base Slave
+// methods that operate on all the slaves in the array.
+
+// All 3 slaves will execute 'some task', and when
+// all have completed, the Promise will be resolved.
+slaves.exec('some task', data, metadata).then(...);
 ```
 
 ## Patterns
@@ -403,86 +487,7 @@ master.create.scatter('task name', { chunk: true })
 #### More patterns to come...
 ##### Iterator, maybe?
 
-## Controlling Slaves
-**Dist.io allows you to control slaves using a few different syntactic dialects.**    
-Note that all return a *Promise* and accept an optional *callback* parameter (I would choose a single style, but not both). For the purposes of simplicity, the examples in this document use *Promises*.
-
-When using [Master#tell](#mastertell) and [Slave#exec](slaveexec), a [Request](#request) will be sent to the slave.    
-
-**Each requests contains:**
-
-| Item | Description |
-| :--- | :---------- |
-| *task name* | The name of the task for the slave to perform |
-| *data* | Data for the slave to use while processing the task |
-| *metadata* | Options used in this request, which will also be sent to the slave process.<br>Options like the request timeout and error handling settings. |
-
-### Master#tell
-**Using the Master singleton to control slaves...**
-
-**Master#tell**(*{...Slave|Number|String}* **slaves**)**.to**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
-
-```js
-const master = require('dist-io').Master;
-const tell = master.tell;
-
-// Forks 5 slave.js processes
-const slaves = master.createSlaves(5, './path/to/slave.js');
-
-// Tell a single slave to perform a task...
-tell(slave[0]).to('some task', 'my data', { /* meta data */ }).then(...)
-
-// Tell all 5 slaves to perform the task 'some task'...
-tell(slaves).to('some task', 'my data', { /* meta data */ }).then(...)
-
-// Or specific slaves...
-tell(slave[0], slave[1], slave[3]).to('some task', 'my data', { /* meta data */ }).then(...)
-
-// If a slave doesn't "do" a task, or doesn't "define" it,
-// an error will be sent back in the response.
-// By default these are *not* considered "errors", but ResponseErrors and will not be caught.
-// For example...
-tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
-  .then(res => {
-    console.log(res.error); // Error: Slave #0 does not listen to task 'do some undefined task'.
-  })
-  .catch(e => {
-    // This will not be invoked...
-  })
-
-// However, you can change this behavior by setting catchAll to true in the metadata.
-tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000, catchAll: true })
-  .then(res => {
-    // This will not be invoked...
-  })
-  .catch(e => {
-    console.log(e); // Error: Slave #0 does not listen to task 'do some undefined task'.
-  })
-```
-
-### Slave#exec
-**Using the Slave object to perform tasks...**
-
-**Slave#exec**(*{String}* **taskName**, *{\*=}* **data**, *{Object=}* **metadata**, *{Function=}* **callback**) → *{Promise}*    
-
-The semantics of *Slave#exec* are the same as *Master#tell*, but the syntax is slightly different.
-
-```js
-// Create some slaves...
-// This will return a SlaveArray
-const slaves = master.create.slaves(3, './path/to/slave.js');
-
-slave[0].exec('some task', data, metadata).then(...);
-slave[1].exec('some task', data, metadata).then(...);
-slave[2].exec('some task', data, metadata).then(...);
-
-// The SlaveArray object also has the base Slave
-// methods that operate on all the slaves in the array.
-
-// All 3 slaves will execute 'some task', and when
-// all have completed, the Promise will be resolved.
-slaves.exec('some task', data, metadata).then(...);
-```
+## API
 
 ### Master API
 **Master#create.slave**(*{String}* **pathToSlaveJS**, *{Object=}* **options**) → *{SlaveArray}*    
@@ -835,7 +840,121 @@ Adds a task for this slave, and allows the master to execute this task. The *onT
 **If *onTaskRequest* throws, or *done* is invoked with an Error, the response will contain an error.**     
 That is, *Response#error* will be populated with the error and *Response#value* will not.
 
-### Metadata
+### SlaveArray API
+
+*(Getter)* **SlaveArray#random** → *{Slave}*    
+Returns a random slave from the array.
+
+*(Getter)* **SlaveArray#each**(*{Function}* **onValue**) → *{undefined}*    
+Iterate over the slaves in the array.
+
+**SlaveArray#exec**(*{String}* **task**, *{*\*=*}* **data**, *{*\*=*}* **metadata**) → *{Promise}*    
+Broadcast a command to all of the slaves in the array and resolve the promies when all tasks are complete.
+
+**SlaveArray#do**(*{String}* **task**, *{*\*=*}* **data**, *{*\*=*}* **metadata**) → *{Promise}*    
+*An alias for SlaveArray#exec*
+
+**SlaveArray#kill**(*{String}* [**signal**='SIGKILL']) → *{Slave}*    
+Kills all the slaves in the array.
+
+**SlaveArray#close**() → *{Promise}*    
+Gracefully closes all of the slaves by removing any listeners added by Dist.io so it can exit.
+
+**SlaveArray#shutdown**() → *{Promise}*    
+Like *SlaveArray#close*, except it waits for all pending requests to resolve before sending the *close* message to each slave.
+
+**SlaveArray#on**(*{String}* **event**, *{Function}* **listener**) → *{Promise}*    
+Attaches the callback ``listener`` to the event ``event`` for every slave in the array.
+
+### Request API
+*Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.
+
+### Response API
+A *Response* is the object that's resolved by every request using *Master#tell* and *Slave#exec*.
+
+*(Getter)* **Response#from** → *{Number}*    
+Returns the id of the slave child process that sent the response.
+
+*(Getter)* **Response#slave** → *{Slave}*    
+Returns the slave object associated with the slave child process that sent the response.
+
+*(Getter)* **Response#rid** → *{Number}*    
+Returns the request id associated with this response.
+
+*(Getter)* **Response#request** → *{Object}*    
+Returns a *Request like* object, which represents the request associated with this response.
+
+*(Getter)* **Response#id** → *{Number}*    
+Returns the response (transmit) id for this response.
+
+*(Getter)* **Response#duration** → *{Number}*    
+Returns the length of time it took to resolve the response's request.
+
+*(Getter)* **Response#received** → *{Number}*    
+The timestamp of when this response was received from the slave child process.
+
+*(Getter)* **Response#sent** → *{Number}*    
+The timestamp of when the request associated with this response was sent.
+
+*(Getter)* **Response#command** → *{String}*    
+The name of the task (or command) that was completed for this response.
+
+*(Getter/Setter)* **Response#error** → *{Error|null}*    
+A *ResponseError*, if once occurred while the request was being completed.    
+This value can be modified.
+
+*(Getter/Setter)* **Response#data** → *{*\**}*    
+The data sent back from the slave child process (using *done(...)*).    
+This value can be modified.
+
+*(Getter/Setter)* **Response#value** → *{*\**}*    
+Alias for *Response#data*.    
+This value can be modified.
+
+*(Getter/Setter)* **Response#val** → *{*\**}*    
+Alias for *Response#data*.    
+This value can be modified.
+
+**Response#pipe**(*{String}* **task**, *{Object=}* **metadata**)**.to**(*{...Slave}* **slaves**) → *{Promise}*
+Pipes a response's value as the data to another slave's task.
+
+```js
+tell(slaveA).to('foo')
+  .then(res => res.pipe('bar').to(slaveB))
+  .then(res => res.pipe('baz').to(slaveA))
+  .then(res => { ... });
+```
+
+### ResponseArray API
+Response arrays are utilized when multiple slave executions are done in parallel (i.e. when using *Master#tell* or *SlaveArray#exec* on multiple slaves). They are a sub class of *Array*, so all the standard *push*, *pop*, etc. methods exist on them.
+
+However, they have some additional convenience methods/properties that make working with a collection of responses easier:
+
+**ResponseArray#each**(*{Function}* **onValue**) → *{undefined}*    
+Iterates over each item in the response array. *onValue* is invoked with *value*, *key*, *parent*.
+
+**ResponseArray#joinValues**(*{String}* **glue**) → *String*    
+Operates just like *Array#join*, but on all the *Response#value* properties.
+
+**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*   
+Sorts the response array by the given *Response* object property. Any property from the *Response* class can be used here. Options for the value passed to the *order* parameter are *asc* and *desc*.
+
+*(Getter)* **Response#errors** → *{Array<Error>}*    
+Returns an array of all the errors in the response array.
+
+*(Getter)* **Response#values** → *{Array<*\**>}*    
+Returns an array of all the values in the response array.
+
+*(Getter)* **Response#sum** → *{Number|NaN}*    
+Sums all the values in the response array.
+
+*(Getter)* **Response#product** → *{Number|NaN}*    
+Multiplies all the values in the response array.
+
+*(Getter)* **Response#averageResponseTime** → *{Number}*    
+Returns the average amount of time taken for each response to resolve.
+
+## Metadata
 The optional *metadata* object passed to the *Slave#exec* and *Master#tell* methods currently accepts two keys.
 
 | Key | Default | Description |
@@ -843,7 +962,7 @@ The optional *metadata* object passed to the *Slave#exec* and *Master#tell* meth
 | *timeout* | ``0``  | Sets a timeout on the request in ms.<br>If the timeout is exceeded, a *TimeoutResponse* object is resolved within the response.<br><br>If this value is non-numeric, parses to ``NaN``, or is ``<= 0`` then it will default to ``0`` (no timeout). |
 | *catchAll* | ``false`` | If true, *ResponseErrors* will be treated like any error and will be **rejected** (passed to the *error* argument of any provided callback).<br><br>A ``false`` setting will force the response error to resolve, and the *Response.error* property will contain the error.
 
-#### Examples
+### Examples
 ```js
 tell(slave)
   .to('some task', 'my data', { timeout: 1000, catchAll: true })
@@ -854,7 +973,7 @@ slave
   .then(...);
 ```
 
-### Timeouts
+## Timeouts
 Request timeouts can be set in 3 different ways.
 
 1. On the master singleton (for all slaves and all requests)
@@ -922,7 +1041,15 @@ $ distio-seve --port=[port] --logLevel=[0-5] --config=[/path/to/config/file.json
   // all IPs will be allowed to connect.
   "authorizedIps": [
     "192\\.168\\.0\\.\\d{1,3}",
-  ]
+  ],
+  // The maximum number of slaves to execute concurrently
+  // If unspecified, Number.MAX_VALUE will be used.
+  // If this value is <= 0, then the default will be used.
+  "maxConcurrentSlaves": 8,
+  // The maximum amount of time a slave is allowed
+  // to run (in ms) before killing it with SIGKILL
+  // Default is 900000 (15 minutes).
+  "killSlavesAfter": 900000
 }
 ```
 
@@ -938,90 +1065,35 @@ There are a few caveats about using them, however:
 - You must use [Master#create.remote.slave(s)](#master-api) to start them.
 - The cannot pass file descriptors to remote slaves.
 
-## Requests
-*Request* objects are abstracted away from the API and there's no explicit need to use them. However, the JSDOCs are [here](http://www.jasonpollman.com/distio-api/), if you wish to see the *Request* class.
+### Remote Slave API
+*RemoteSlave* class extends the *Slave* class, therefore the API between regular slaves and remote slaves is the same, with the following additions.
 
-## Responses
-A *Response* is the object that's resolved by every request using *Master#tell* and *Slave#exec*.
+*(Getter)* **RemoteSlave#socket** → *{Socket}*    
+Returns the slave's *socket.io* reference.
 
-*(Getter)* **Response#from** → *{Number}*    
-Returns the id of the slave child process that sent the response.
+### Connecting To Remote Slaves
 
-*(Getter)* **Response#slave** → *{Slave}*    
-Returns the slave object associated with the slave child process that sent the response.
-
-*(Getter)* **Response#rid** → *{Number}*    
-Returns the request id associated with this response.
-
-*(Getter)* **Response#request** → *{Object}*    
-Returns a *Request like* object, which represents the request associated with this response.
-
-*(Getter)* **Response#id** → *{Number}*    
-Returns the response (transmit) id for this response.
-
-*(Getter)* **Response#duration** → *{Number}*    
-Returns the length of time it took to resolve the response's request.
-
-*(Getter)* **Response#received** → *{Number}*    
-The timestamp of when this response was received from the slave child process.
-
-*(Getter)* **Response#sent** → *{Number}*    
-The timestamp of when the request associated with this response was sent.
-
-*(Getter)* **Response#command** → *{String}*    
-The name of the task (or command) that was completed for this response.
-
-*(Getter/Setter)* **Response#error** → *{Error|null}*    
-A *ResponseError*, if once occurred while the request was being completed.    
-This value can be modified.
-
-*(Getter/Setter)* **Response#data** → *{*\**}*    
-The data sent back from the slave child process (using *done(...)*).    
-This value can be modified.
-
-*(Getter/Setter)* **Response#value** → *{*\**}*    
-Alias for *Response#data*.    
-This value can be modified.
-
-*(Getter/Setter)* **Response#val** → *{*\**}*    
-Alias for *Response#data*.    
-This value can be modified.
-
-**Response#pipe**(*{String}* **task**, *{Object=}* **metadata**)**.to**(*{...Slave}* **slaves**) → *{Promise}*
-Pipes a response's value as the data to another slave's task.
-
+#### No Authentication
 ```js
-tell(slaveA).to('foo')
-  .then(res => res.pipe('bar').to(slaveB))
-  .then(res => res.pipe('baz').to(slaveA))
-  .then(res => { ... });
+  const slave = master.create.remote.slave({
+    host: 'http://my-master-server:3000',
+    script: 'slave.js'
+  });
 ```
 
-## Response Arrays
-Response arrays are utilized when multiple slave executions are done in parallel (i.e. when using *Master#tell* or *SlaveArray#exec* on multiple slaves). They are a sub class of *Array*, so all the standard *push*, *pop*, etc. methods exist on them.
+#### Basic Auth, No Passphrase
+```js
+  const slave = master.create.remote.slave({
+    host: 'http://username:password@my-master-server',
+    script: 'slave.js'
+  });
+```
 
-However, they have some additional convenience methods/properties that make working with a collection of responses easier:
-
-**ResponseArray#each**(*{Function}* **onValue**) → *{undefined}*    
-Iterates over each item in the response array. *onValue* is invoked with *value*, *key*, *parent*.
-
-**ResponseArray#joinValues**(*{String}* **glue**) → *String*    
-Operates just like *Array#join*, but on all the *Response#value* properties.
-
-**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*   
-Sorts the response array by the given *Response* object property. Any property from the *Response* class can be used here. Options for the value passed to the *order* parameter are *asc* and *desc*.
-
-*(Getter)* **Response#errors** → *{Array<Error>}*    
-Returns an array of all the errors in the response array.
-
-*(Getter)* **Response#values** → *{Array<*\**>}*    
-Returns an array of all the values in the response array.
-
-*(Getter)* **Response#sum** → *{Number|NaN}*    
-Sums all the values in the response array.
-
-*(Getter)* **Response#product** → *{Number|NaN}*    
-Multiplies all the values in the response array.
-
-*(Getter)* **Response#averageResponseTime** → *{Number}*    
-Returns the average amount of time taken for each response to resolve.
+#### Basic Auth and Passphrase
+```js
+  const slave = master.create.remote.slave({
+    host: 'http://username:password@my-master-server:3000',
+    script: 'slave.js',
+    passphrase: 'secret passphrase'
+  });
+```
