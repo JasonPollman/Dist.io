@@ -992,9 +992,6 @@ Returns the number of pending requests this slave is waiting for from its slave 
 *(Getter)* **Slave#isConnected** → *{Boolean}*    
 True is the slave hasn't been shutdown, killed, or closed. Indicates that the IPC channel between this process and the slave child process is still intact.
 
-*(Getter)* **Slave#isConnected** → *{Boolean}*    
-True is the slave hasn't been shutdown, killed, or closed. Indicates that the IPC channel between this process and the slave child process is still intact.
-
 *(Getter)* **Slave#hasExited** → *{Boolean}*    
 True is the slave has been closed or shutdown.
 

@@ -1,6 +1,6 @@
 {
   "name": "dist.io",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "Distributed programming paradigms for forked node processes",
   "main": "index.js",
   "author": "Jason James Pollman <jasonjpollman@gmail.com>",
@@ -50,7 +50,8 @@
     "gulp": "^3.9.1",
     "istanbul": "^0.4.3",
     "jsdoc": "^3.4.0",
-    "minami": "^1.1.1"
+    "minami": "^1.1.1",
+    "mocha": "^2.5.3"
   },
   "dependencies": {
     "minimist": "^1.2.0",

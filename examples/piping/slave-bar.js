@@ -2,10 +2,12 @@
  * @file
  * Slave bar.
  * Creates pairs from the data provided (a list of boys and girls).
+ * @see ./master.js for more information.
  */
 
 'use strict';
 const slave = require('../../').Slave;
+require('proto-lib').get('_');
 
 /**
  * Task "make pairs"

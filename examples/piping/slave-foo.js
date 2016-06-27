@@ -2,6 +2,7 @@
  * @file
  * Slave foo.
  * Task "get names" sends back an object containing two arrays: a list of boys, and a list of girls.
+ * @see ./master.js for more information.
  */
 
 'use strict';

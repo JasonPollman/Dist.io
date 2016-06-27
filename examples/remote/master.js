@@ -5,7 +5,6 @@
 
 /* eslint-disable no-console */
 
-
 /**
  * Note: In order to execute this example, you must run bin/distio-serve to host "remote" slaves.
  * Or, alter the configuration below and run bin/distio-serve from a remote machine.

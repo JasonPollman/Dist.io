@@ -1,6 +1,7 @@
 /**
  * @file
- * Simply increments zero "times" times.
+ * Task "add" simply increments zero "times" times.
+ * Task "read file" reads a file n times.
  */
 
 'use strict';

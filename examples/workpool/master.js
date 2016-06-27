@@ -12,8 +12,9 @@ const master = require('../../').Master;
 const path = require('path');
 const slaveJS = path.join(__dirname, 'slave.js');
 
-// Create a single slave...
+// Create some slaves...
 const slaves = master.createSlaves(4, slaveJS);
+// Create a workpool from the slaves...
 const workpool = master.create.workpool(slaves);
 
 /**

@@ -1,5 +1,6 @@
-#!/usr/local/bin/node
+#!/usr/bin/env node
 'use strict';
+
 const args = require('minimist')(process.argv.slice(2), { number: 'port', string: 'config' });
 const distIO = require('../');
 const path = require('path');

@@ -1,6 +1,7 @@
 /**
  * @file
  * An example of reading a file 1,000,000 times.
+ * @see ./master.js for more information.
  */
 
 /* eslint-disable no-console */
