@@ -127,10 +127,71 @@ describe('Master Class', function () {
     });
   });
 
+  describe('Master#slaves.busy', function () {
+    it('Should return all busy slaves', function (done) {
+      this.timeout(4000);
+      this.slow(3000);
+
+      const slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-l.js'), { group: 'testing busy' }
+      );
+
+      slaves.exec('random')
+        .then(() => {
+          slaves.kill();
+          done();
+        })
+        .catch(done);
+
+      const s = Master.slaves.busy;
+      expect(s).to.be.an.instanceof(SlaveArray);
+      expect(s.length).to.be.gte(3);
+      s.forEach(slave => {
+        expect(slave).to.be.an.instanceof(Slave);
+      });
+      expect(s).to.contain(slaves[0]);
+      expect(s).to.contain(slaves[1]);
+      expect(s).to.contain(slaves[2]);
+    });
+  });
+
+  describe('Master#slaves.idle', function () {
+    it('Should return all idle slaves', function (done) {
+      const slaves = Master.createSlaves(
+        3, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing idle' }
+      );
+
+      const s = Master.slaves.idle;
+      expect(s).to.be.an.instanceof(SlaveArray);
+      expect(s.length).to.be.gte(3);
+      s.forEach(slave => {
+        expect(slave).to.be.an.instanceof(Slave);
+      });
+      expect(s).to.contain(slaves[0]);
+      expect(s).to.contain(slaves[1]);
+      expect(s).to.contain(slaves[2]);
+      slaves.kill();
+      done();
+    });
+  });
+
   describe('Master#slaves.remote', function () {
     it('Should return all local slaves', function (done) {
       const s = Master.slaves.remote;
       expect(s).to.be.an.instanceof(SlaveArray);
+      done();
+    });
+  });
+
+  describe('Master#slaves.leastBusy', function () {
+    it('Should return all local slaves', function (done) {
+      const slaves = Master.createSlaves(
+        2, path.join(__dirname, 'data', 'simple-slave-b.js'), { group: 'testing leastBusy' }
+      );
+
+      const s = Master.slaves.leastBusy;
+      expect(s).to.be.an.instanceof(Slave);
+      slaves.kill();
       done();
     });
   });

@@ -10,7 +10,7 @@ Dist.io is an abstraction around distributed, message passing programming and it
 ```bash
 $ npm install dist.io --save
 
-# If you wist to serve as a Master Proxy Server
+# If you wish to serve as a Master Proxy Server
 # and host slave processes, install globally...
 $ npm install dist.io -g
 ```
@@ -70,7 +70,7 @@ tell(slaves).to('say hello')
   .then(responses => {
     console.log(responses.joinValues(', '))
     // -> 'Hello from 0, Hello from 1, Hello from 2...'
-  });
+  })
   .then(() => {
     // Send a message to only the slave with the id 0.
     return tell(master.slave(0)).to('say hello')
@@ -139,6 +139,7 @@ slave.task('say hello', (data, done) => {
   - [Metadata](#metadata)
   - [Timeouts](#timeouts)
   - [Error Handling](#error-handling)
+  - [Grouping Slaves](#grouping-slaves)
 1. [Patterns](#patterns)
   - [Parallel](#parallel)
   - [Pipeline](#pipeline)
@@ -158,6 +159,7 @@ slave.task('say hello', (data, done) => {
   - [Response API](#response-api)
   - [ResponseArray API](#response-array-api)
 1. [Full API](http://www.jasonpollman.com/distio-api/)
+1. [Latest LCOV Report](http://www.jasonpollman.com/distio-coverage/)
 
 ## Examples
 **Examples are located in the [examples](https://github.com/JasonPollman/Dist.io/tree/master/examples) directory of this repo.**    
@@ -180,7 +182,12 @@ Dist.io is divided into two logical parts: the *master process* and the *slave c
 // This is now a master process...
 const master = require('dist-io').Master;
 // We can create new slaves using the master process...
-const slave = master.createSlave('./path/to/slave.js');
+const slave = master.createSlave('./path/to/slave.js', {
+  // Options passed to ChildProcess.fork
+  forkOptions: { ... },
+  // Arguments supplied to the slave process
+  args: []
+});
 
 // Tell the slave to do some stuff...
 master.tell(slave).to('foo')
@@ -189,6 +196,7 @@ master.tell(slave).to('foo')
     console.log(res.value);
     console.log(res.error);
   })
+  .catch(e => { /* Handle Errors */ })
 ```
 
 ``slave.js``
@@ -354,7 +362,7 @@ slave.on('uncaughtException', () => { ... });
 
 // Or, send in as options...
 const slave = master.create.slave('path/to/script.js', {
-  uncaughtException: () => { ... }
+  onUncaughtException: () => { ... }
 });
 ```
 
@@ -396,7 +404,7 @@ slave.exec('task', 'my data')
   });
 ```
 
-**catchAll Behavior**
+**``{ catchAll: true }`` Behavior**
 ```js
 slave.exec('task', 'my data', { catchAll: true })
   .then(res => {
@@ -410,6 +418,41 @@ slave.exec('task', 'my data', { catchAll: true })
 
 The *catchAll* behavior is useful when you have a long chain of promises and expect that all requests complete without any issues.
 
+### Grouping Slaves
+You can group slaves logically by specifying the slave's group in the ``master.create.slave`` method's *options* argument or by setting ``Slave#group``.
+
+```js
+const slaveA = master.create.slave('path/to/script.js', { group: 'foo' });
+const slaveB = master.create.slave('path/to/script.js', { group: 'foo' });
+
+master.getSlavesInGroup('foo') // => [slaveA, slaveB]
+master.slaves.inGroup('foo')   // => [slaveA, slaveB]
+
+slaveA.group = 'bar';
+
+master.slaves.inGroup('foo') // => [slaveB]
+master.slaves.inGroup('bar') // => [slaveA]
+
+// Specify a group on all slaves at once
+// when spawning multiple slaves...
+const slaves = master.create.slaves(8, 'path/to/script.js', { group: 'foo' });
+```
+
+The ``master.tell`` method allows you to utilize slave groups. This allows you to create ad hoc slaves and execute tasks on "old" and "new" slaves by grouping them together.
+
+```js
+function executeSomeTaskMyGroup() {
+  return master.tell('my group').to('do some task');
+}
+
+master.create.slave('path/to/script.js', { group: 'my group' });
+master.create.slave('path/to/another/script.js', { group: 'my group' });
+
+setTimeout(() => {
+  master.create.slave('path/to/script.js', { group: 'my group' });
+  executeTaskOnGroupMyGroup().then( ... );
+}, 3000);
+```
 
 ## Patterns
 #### These are abstractions around common distributed programming patterns to make working with multiple slaves and controlling IO flow simpler.
@@ -466,7 +509,7 @@ master.create.parallel()
 
 ### Pipeline
 **A pipeline is similar to async's *waterfall*.**    
-A slave will execute a task, its results will then passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
+A slave will execute a task, its results will then be passed to another slave, etc. etc. Once all tasks in the pipeline are complete, a single response is resolved with the data from the last task in the pipeline.
 
 The pipeline is started with some *initial* data (albeit ``undefined``), which is passed to the first task. The second task get the value returned from the first task, and so on, and so forth.
 
@@ -668,7 +711,7 @@ There are a few caveats about using them, however:
 - A [Master Proxy Server](#the-master-proxy-server) must be running on the host machine.
 - The script must exist on the host machine and be *npm installed* there.
 - You must use [Master#create.remote.slave(s)](#master-api) to start them.
-- The cannot pass file descriptors to remote slaves.
+- You cannot pass file descriptors to remote slaves.
 
 ### Remote Slave API
 *RemoteSlave* class extends the *Slave* class, therefore the API between regular slaves and remote slaves is the same, with the following additions.
@@ -1128,7 +1171,7 @@ This value can be modified.
 Alias for *Response#data*.    
 This value can be modified.
 
-**Response#pipe**(*{String}* **task**, *{Object=}* **metadata**)**.to**(*{...Slave}* **slaves**) → *{Promise}*
+**Response#pipe**(*{String}* **task**, *{Object=}* **metadata**)**.to**(*{...Slave}* **slaves**) → *{Promise}*    
 Pipes a response's value as the data to another slave's task.
 
 ```js
@@ -1149,7 +1192,7 @@ Iterates over each item in the response array. *onValue* is invoked with *value*
 **ResponseArray#joinValues**(*{String}* **glue**) → *String*    
 Operates just like *Array#join*, but on all the *Response#value* properties.
 
-**ResponseArray#sortBy**(*{String}* **property**, *{String}* [**order**='asc']) → *String*   
+**ResponseArray#sortBy**(*{String}* **property**, *{String=}* [**order**='asc']) → *String*   
 Sorts the response array by the given *Response* object property. Any property from the *Response* class can be used here. Options for the value passed to the *order* parameter are *asc* and *desc*.
 
 *(Getter)* **Response#errors** → *{Array<Error>}*    
