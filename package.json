@@ -1,6 +1,6 @@
 {
   "name": "dist.io",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "description": "Distributed programming paradigms for forked node processes",
   "main": "index.js",
   "author": "Jason James Pollman <jasonjpollman@gmail.com>",
