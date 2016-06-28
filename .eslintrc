@@ -1,17 +1,27 @@
 {
   "extends": "airbnb",
+  "env": {
+    "node": true
+  },
   "rules": {
     "strict": 0,
-    "max-len": ["error", 120],
+    "max-len": [
+      "error",
+      120
+    ],
     "no-param-reassign": 0,
-    "valid-jsdoc": ["warn"],
+    "valid-jsdoc": [
+      "warn"
+    ],
     "require-jsdoc": [
       "warn",
-      "require": {
+      {
+        "require": {
           "FunctionDeclaration": true,
           "MethodDefinition": true,
           "ClassDeclaration": true
+        }
       }
-    ],
+    ]
   }
 }

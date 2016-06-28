@@ -4,3 +4,4 @@ coverage/*
 out/*
 gulpfile.js
 docs/*
+.vscode
