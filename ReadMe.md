@@ -204,7 +204,7 @@ master.tell(slave).to('foo')
 // This is now a slave process...
 const slave = require('dist-io').Slave;
 // Setup some tasks that this slave accepts...
-// Note, you must call done to send resolve the request with a response.
+// Note, you must call done to resolve the request with a response.
 // Any arguments passed to done are optional, and only the first is sent back.
 slave
   .task('foo', (data, done) {
@@ -244,19 +244,18 @@ const tell = master.tell;
 const slaves = master.createSlaves(5, './path/to/slave.js');
 
 // Tell a single slave to perform a task...
-tell(slave[0]).to('some task', 'my data', { /* meta data */ }).then(...)
+tell(slaves[0]).to('some task', 'my data', { /* meta data */ }).then(...)
 
 // Tell all 5 slaves to perform the task 'some task'...
 tell(slaves).to('some task', 'my data', { /* meta data */ }).then(...)
 
 // Or specific slaves...
-tell(slave[0], slave[1], slave[3]).to('some task', 'my data', { /* meta data */ }).then(...)
+tell(slaves[0], slaves[1], slaves[3]).to('some task', 'my data', { /* meta data */ }).then(...)
 
 // If a slave doesn't "do" a task, or doesn't "define" it,
 // an error will be sent back in the response.
 // By default these are *not* considered "errors", but ResponseErrors and will not be caught.
-// For example...
-tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
+tell(slaves[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
   .then(res => {
     console.log(res.error); // Error: Slave #0 does not listen to task 'do some undefined task'.
   })
@@ -265,7 +264,7 @@ tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000 })
   })
 
 // However, you can change this behavior by setting catchAll to true in the metadata.
-tell(slave[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000, catchAll: true })
+tell(slaves[0]).to('do some undefined task', { data: 1234 }, { timeout: 5000, catchAll: true })
   .then(res => {
     // This will not be invoked...
   })
@@ -286,9 +285,9 @@ The semantics of *Slave#exec* are the same as *Master#tell*, but the syntax is s
 // This will return a SlaveArray
 const slaves = master.create.slaves(3, './path/to/slave.js');
 
-slave[0].exec('some task', data, metadata).then(...);
-slave[1].exec('some task', data, metadata).then(...);
-slave[2].exec('some task', data, metadata).then(...);
+slaves[0].exec('some task', data, metadata).then(...);
+slaves[1].exec('some task', data, metadata).then(...);
+slaves[2].exec('some task', data, metadata).then(...);
 
 // The SlaveArray object also has the base Slave
 // methods that operate on all the slaves in the array.
@@ -1072,6 +1071,9 @@ Returns the slave's alias.
 *(Getter)* **SlaveChildProcess#wasProxied** → *{Boolean}*    
 True if the slave was spawned by a non-local process, false otherwise.
 
+**SlaveChildProcess#invoked**(*{String}* **task**, *{*\**}* data, *{Function=}* done) → *{Promise}*    
+Invokes a slave's task as if it were called by the master process.
+
 **SlaveChildProcess#pause**() → *{SlaveChildProcess}*    
 Pauses the slave. This means the slave will refuse to execute tasks and an error will be send back to the master for every request once paused (even closing and shutting-down).
 
@@ -1119,7 +1121,7 @@ Gracefully closes all of the slaves by removing any listeners added by Dist.io s
 **SlaveArray#shutdown**() → *{Promise}*    
 Like *SlaveArray#close*, except it waits for all pending requests to resolve before sending the *close* message to each slave.
 
-**SlaveArray#on**(*{String}* **event**, *{Function}* **listener**) → *{Promise}*    
+**SlaveArray#on**(*{String}* **event**, *{Function}* **listener**) → *{SlaveArray}*    
 Attaches the callback ``listener`` to the event ``event`` for every slave in the array.
 
 ### Request API

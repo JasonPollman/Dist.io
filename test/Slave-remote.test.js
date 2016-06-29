@@ -29,6 +29,38 @@ describe('Slave Class (Remote)', function () {
     }, 1000);
   });
 
+  describe('RemoteSlave#info', function () {
+    this.timeout(5000);
+    this.slow(2000);
+    it('Should get process information about the slave', function (done) {
+      const location = path.join('test', 'data', 'simple-slave-b.js');
+      const connectOptions = {
+        location: '127.0.0.1:1339',
+        path: location,
+      };
+      const slave = master.create.remote.slave(connectOptions, { group: 'sinfo' });
+
+      slave.info()
+        .then(res => {
+          expect(res).to.be.an.instanceof(Response);
+          expect(res.value).to.be.an('object');
+          expect(res.value.os).to.be.an('object');
+          expect(res.value.os.platform).to.be.a('string');
+          expect(res.value.os.cpus).to.be.an('array');
+          expect(res.value.os.type).to.be.a('string');
+          expect(res.value.process).to.be.an('object');
+          expect(res.value.process.arch).to.be.a('string');
+          expect(res.value.process.usage).to.be.an('object');
+          expect(res.value.process.heap).to.be.an('object');
+          slave.kill();
+          done();
+        })
+        .catch(e => {
+          done(e);
+        });
+    });
+  });
+
   describe('RemoteSlave#getAllSlaves', function () {
     it('Should return an array of all slaves', function (done) {
       const location = path.join('test', 'data', 'simple-slave-a.js');

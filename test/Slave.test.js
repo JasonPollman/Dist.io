@@ -577,6 +577,32 @@ describe('Slave Class', function () {
     });
   });
 
+  describe('Slave#info', function () {
+    this.slow(2000);
+    it('Should get process information about the slave', function (done) {
+      const location = path.join(__dirname, 'data', 'simple-slave-d.js');
+      const slave = new Slave(location);
+
+      slave.info()
+        .then(res => {
+          expect(res).to.be.an.instanceof(Response);
+          expect(res.value).to.be.an('object');
+          expect(res.value.os).to.be.an('object');
+          expect(res.value.os.platform).to.be.a('string');
+          expect(res.value.os.cpus).to.be.an('array');
+          expect(res.value.os.type).to.be.a('string');
+          expect(res.value.process).to.be.an('object');
+          expect(res.value.process.arch).to.be.a('string');
+          expect(res.value.process.usage).to.be.an('object');
+          expect(res.value.process.heap).to.be.an('object');
+          done();
+        })
+        .catch(e => {
+          done(e);
+        });
+    });
+  });
+
   after((done) => {
     Slave.getSlavesWithPath(path.join(__dirname, 'data', 'simple-slave-a.js')).kill();
     done();

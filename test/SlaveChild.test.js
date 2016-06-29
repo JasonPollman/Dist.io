@@ -27,6 +27,147 @@ describe('SlaveChildProcess Class', function () {
     done(new Error('oops'));
   });
 
+  slave.task('abc', (data, done) => {
+    done(123);
+  });
+
+  slave.task('def', () => 456);
+
+  describe('SlaveChildProcess#listenerCallsDone', function () {
+    it('Should determine if a function calls the second argument in the arguments list', () => {
+      /* eslint-disable */
+      expect(slave.listenerCallsDone(function () {})).to.equal(false);
+      expect(slave.listenerCallsDone(function (a) {})).to.equal(false);
+      expect(slave.listenerCallsDone(function ($) {})).to.equal(false);
+      expect(slave.listenerCallsDone(() => {})).to.equal(false);
+      expect(slave.listenerCallsDone((a) => {})).to.equal(false);
+      expect(slave.listenerCallsDone(a => {})).to.equal(false);
+      expect(slave.listenerCallsDone(($) => {})).to.equal(false);
+      
+      expect(slave.listenerCallsDone(function (a, b) {})).to.equal(false);
+      expect(slave.listenerCallsDone(function(a, b) {})).to.equal(false);
+
+      expect(slave.listenerCallsDone(function (a, b) {
+        b;
+        b.toString();
+      })).to.equal(false);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b;
+        b.toString();
+      })).to.equal(false);
+
+      expect(slave.listenerCallsDone((a, b) => {})).to.equal(false);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b;
+        b.toString();
+      })).to.equal(false);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b();
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b(   );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function (a, b) {
+        b(   );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b(
+          1,
+          2,
+          3
+        );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function (a, b) {
+        b(
+          1,
+          2,
+          3
+        );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b  (
+          
+          1, 2, 3
+
+        );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function (a, __1, v) {
+        __1  (
+          
+          1, 2, 3
+
+        );
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b.call();
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function (a, _b) {
+        _b.call();
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function (a, $b) {
+        $b.call();
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b.call(   1,     []);
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function(a, Q) {
+        Q.call(   1,     []);
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        b.apply(this,   1,     []);
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone(function       (_a_, $$, ABCD)        {
+        $$.apply(this,   1,     []);
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+
+              b();
+              // A comment
+              a()
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+
+              b(1, 2, 3, 4, 5, 6);
+              // A comment
+              a()
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+
+              b       (1, 2, 3, 4, 5, 6);
+              // A comment
+              a()
+      })).to.equal(true);
+
+      expect(slave.listenerCallsDone((a, b) => {
+        console.log(b);
+
+              b       (1, 2, 3, 4, 5, 6);
+              // A comment
+              a()
+      })).to.equal(true);
+      /* eslint-enable */
+    });
+  });
+
   describe('SlaveChildProcess#id', function () {
     it('Should return the slave\'s id', () => {
       expect(slave.id).to.equal(10009);
@@ -39,6 +180,63 @@ describe('SlaveChildProcess Class', function () {
   describe('SlaveChildProcess#alias', function () {
     it('Should return the slave\'s alias', () => {
       expect(slave.alias).to.equal('test-alias');
+    });
+  });
+
+  describe('SlaveChildProcess#invoke', function () {
+    it('Should invoke a slave\'s task listener', (done) => {
+      slave.invoke('abc')
+        .then(res => {
+          expect(res).to.equal(123);
+          done();
+        })
+        .catch(done);
+    });
+
+    it('Should invoke a slave\'s task listener (using callback)', (done) => {
+      slave.invoke('abc', (err, res) => {
+        expect(err).to.equal(null);
+        expect(res).to.equal(123);
+        done();
+      });
+    });
+
+    it('Should invoke a slave\'s task listener (using callback)', (done) => {
+      slave.invoke('abc', { foo: 999 }, (err, res) => {
+        expect(err).to.equal(null);
+        expect(res).to.equal(123);
+        done();
+      });
+    });
+
+    it('Should invoke a slave\'s task listener (done not called)', (done) => {
+      const p = slave.invoke('def');
+      expect(p).to.be.an.instanceof(Promise);
+      p.then(res => {
+        expect(res).to.equal(456);
+        done();
+      })
+      .catch(done);
+    });
+
+    it('Should invoke a slave\'s task listener (error thrown)', (done) => {
+      const p = slave.invoke('throw');
+      expect(p).to.be.an.instanceof(Promise);
+      p.then(done)
+        .catch(e => {
+          expect(e.message).to.equal('oops');
+          done();
+        });
+    });
+
+    it('Should invoke a slave\'s task listener (error passed to done)', (done) => {
+      const p = slave.invoke('throw2');
+      expect(p).to.be.an.instanceof(Promise);
+      p.then(done)
+        .catch(e => {
+          expect(e.message).to.equal('oops');
+          done();
+        });
     });
   });
 
